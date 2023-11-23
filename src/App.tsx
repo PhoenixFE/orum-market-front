@@ -1,13 +1,14 @@
 import { Outlet } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
+import { Container } from '@mui/material';
 
 function App() {
   return (
-    <body>
+    <Container>
       <Header />
       <Outlet />
-    </body>
+    </Container>
   );
 }
 
