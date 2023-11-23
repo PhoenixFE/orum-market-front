@@ -1,14 +1,15 @@
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
+
+import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
+import { Button, Container } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { Avatar } from '@mui/material';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -55,7 +56,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function Header() {
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Container maxWidth="sm">
       <AppBar position="fixed">
         <Toolbar>
           <IconButton
@@ -67,15 +68,16 @@ export default function Header() {
             <MenuIcon />
           </IconButton>
 
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-          >
-            ORUM
-          </Typography>
-
+          <Link to="/">
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+              sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+            >
+              ORUM
+            </Typography>
+          </Link>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -85,11 +87,29 @@ export default function Header() {
               inputProps={{ 'aria-label': 'search' }}
             />
           </Search>
-          <Link to="/user/:1">
-            <Avatar sx={{ width: 32, height: 32 }}>H</Avatar>
-          </Link>
+          <SignedIn>
+            <Link to="/user/1">
+              <Button variant="text" color="inherit">
+                대시보드
+              </Button>
+            </Link>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+          <SignedOut>
+            <Link to="/sign-in/*">
+              <Button variant="text" color="inherit">
+                로그인
+              </Button>
+            </Link>
+            <Link to="sign-up/*">
+              <Button variant="text" color="inherit">
+                회원가입
+              </Button>
+            </Link>
+          </SignedOut>
         </Toolbar>
       </AppBar>
-    </Box>
+      <Toolbar />
+    </Container>
   );
 }
