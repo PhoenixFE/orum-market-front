@@ -16,6 +16,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Link, Outlet } from 'react-router-dom';
+import { DASHBOARD_MENU } from '../../constants';
 
 const drawerWidth = 240;
 
@@ -36,28 +37,30 @@ export default function Dashboard(props: Props) {
       <Toolbar />
       <Divider />
       <List>
-        {['구매자 대시보드', '주문내역', '찜한 상품', '최근 본 상품'].map(
-          (text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ),
-        )}
-      </List>
-      <Divider />
-      <List>
-        {['판매자 대시보드', '판매자 정보', '상품 관리'].map((text, index) => (
-          <ListItem key={text} disablePadding>
+        {DASHBOARD_MENU.buyer.map((items, index) => (
+          <ListItem key={index} disablePadding>
             <ListItemButton>
               <ListItemIcon>
                 {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
               </ListItemIcon>
-              <ListItemText primary={text} />
+              <Link to={items.url}>
+                <ListItemText primary={items.title} />
+              </Link>
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+      <Divider />
+      <List>
+        {DASHBOARD_MENU.seller.map((items, index) => (
+          <ListItem key={index} disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+              </ListItemIcon>
+              <Link to={items.url}>
+                <ListItemText primary={items.title} />
+              </Link>
             </ListItemButton>
           </ListItem>
         ))}
