@@ -37,11 +37,11 @@ export default function Dashboard(props: Props) {
       <Toolbar />
       <Divider />
       <List>
-        {DASHBOARD_MENU.buyer.map((items, index) => (
-          <ListItem key={index} disablePadding>
+        {DASHBOARD_MENU.buyer.map((items) => (
+          <ListItem key={items.id} disablePadding>
             <ListItemButton>
               <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                {items.id % 2 === 0 ? <InboxIcon /> : <MailIcon />}
               </ListItemIcon>
               <Link to={items.url}>
                 <ListItemText primary={items.title} />
@@ -52,11 +52,11 @@ export default function Dashboard(props: Props) {
       </List>
       <Divider />
       <List>
-        {DASHBOARD_MENU.seller.map((items, index) => (
-          <ListItem key={index} disablePadding>
+        {DASHBOARD_MENU.seller.map((items) => (
+          <ListItem key={items.id} disablePadding>
             <ListItemButton>
               <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                {items.id % 2 === 0 ? <InboxIcon /> : <MailIcon />}
               </ListItemIcon>
               <Link to={items.url}>
                 <ListItemText primary={items.title} />
