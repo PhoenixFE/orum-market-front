@@ -17,7 +17,8 @@ import ProductUpdate from './components/seller/ProductUpdate.tsx';
 import SellerInfo from './components/seller/SellerInfo.tsx';
 import SellerOrderList from './components/seller/SellerOrderList.tsx';
 import ProductManager from './components/seller/ProductManager.tsx';
-import { ClerkProvider, SignIn, SignUp } from '@clerk/clerk-react';
+import SignInPage from './pages/user/SignIn.tsx';
+import SignUpPage from './pages/user/SignUp.tsx';
 
 const router = createBrowserRouter([
   {
@@ -29,8 +30,8 @@ const router = createBrowserRouter([
       { path: '/product', element: <ProductList /> },
       { path: '/product/:id', element: <ProductDetail /> },
       { path: '/cart', element: <MyCart /> },
-      { path: '/sign-in/*', element: <SignIn /> },
-      { path: '/sign-up/*', element: <SignUp /> },
+      { path: '/sign-in', element: <SignInPage /> },
+      { path: '/sign-up', element: <SignUpPage /> },
     ],
   },
   {
@@ -75,13 +76,6 @@ const router = createBrowserRouter([
   },
 ]);
 
-if (!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY) {
-  throw new Error('Missing Publishable Key');
-}
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <ClerkProvider publishableKey={clerkPubKey} afterSignUpUrl="/">
-    <RouterProvider router={router} />
-  </ClerkProvider>,
+  <RouterProvider router={router} />,
 );
