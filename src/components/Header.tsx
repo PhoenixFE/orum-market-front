@@ -15,15 +15,22 @@ import { Badge, Box, Button, Container } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../lib/store';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Logout } from '@mui/icons-material';
-import { UserStore } from '../lib/store';
 
 const categories = ['tops', 'bottoms', 'backpacks', 'shoes', 'gear'];
 
 export default function Header() {
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
-  const { isLoggedIn, logOut }: UserStore = useUserStore();
+  const { isLoggedIn, logOut } = useUserStore();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    let queryParam = `?query=${searchQuery}`;
+    navigate(`/search${queryParam}`);
+    setSearchQuery('');
+  };
 
   const navigate = useNavigate();
 
@@ -37,9 +44,9 @@ export default function Header() {
 
   const handleLogout = () => {
     logOut();
+    localStorage.removeItem('token');
     alert('로그아웃 되었습니다. 다음에 또 만나요!');
     setOpenLogoutDialog(false);
-    localStorage.removeItem('token');
     navigate('/');
   };
 
@@ -125,16 +132,22 @@ export default function Header() {
           </Link>
 
           <Box sx={{ display: 'flex' }}>{renderCategoryLinks()}</Box>
-
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Search>
+          <form onSubmit={handleSearch}>
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="검색해볼까"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                inputProps={{ 'aria-label': 'search' }}
+              />
+              <Button type="submit" color="inherit" variant="outlined">
+                검색
+              </Button>
+            </Search>
+          </form>
           {isLoggedIn && isLoggedInUserButton()}
           {!isLoggedIn && notLoggedInUserButton()}
         </Toolbar>
