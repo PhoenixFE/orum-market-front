@@ -1,5 +1,6 @@
 export interface IProduct {
   _id: number;
+  seller_id: number;
   name: string;
   price: number;
   shippingFees: number;
@@ -16,6 +17,7 @@ export interface IProduct {
   };
   createdAt: string;
   updatedAt: string;
+  content: string;
 }
 
 export interface ICategoryPreview {
