@@ -21,10 +21,12 @@ export default function Home() {
     .finally(function () {
       // 항상 실행되는 영역
     });
+  //axios 받아오기
 
-  const { productId } = useParams();
+  const { productId } = useParams(); //상품id
 
   interface ProductItem {
+    //데이터 받아올때 쓰려고 만듦
     _id: number;
     name: string;
     price: number;
