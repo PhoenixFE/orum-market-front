@@ -1,16 +1,9 @@
 import { useEffect, useState } from 'react';
 import { ICategoryPreview, IProduct } from '../../type';
 import { api } from '../../api/api';
-import {
-  Button,
-  Box,
-  Card,
-  CardContent,
-  CardMedia,
-  Grid,
-  Typography,
-} from '@mui/material';
+import { Button, Box, Grid, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
+import ProductCard from './ProductCard';
 
 const categories = ['tops', 'bottoms', 'backpacks', 'shoes', 'gear'];
 
@@ -60,26 +53,7 @@ const CategoryPreview = ({ category, products }: ICategoryPreview) => {
       </Box>
       <Grid container spacing={2}>
         {products.slice(0, 5).map((product) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={product._id}>
-            <Card>
-              <CardMedia
-                component="img"
-                height="140"
-                image={product.mainImages[0]}
-                alt={product.name}
-              />
-              <CardContent>
-                <Typography gutterBottom variant="h5" component="div">
-                  {product.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Price: {product.price}원
-                  <br />
-                  Shipping Fees: {product.shippingFees}원
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+          <ProductCard key={product._id} product={product} />
         ))}
       </Grid>
     </Box>
