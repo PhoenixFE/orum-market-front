@@ -11,13 +11,15 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { Badge, Button, Container } from '@mui/material';
+import { Badge, Box, Button, Container } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../lib/store';
 import { useState } from 'react';
 import { Logout } from '@mui/icons-material';
 import { UserStore } from '../lib/store';
+
+const categories = ['tops', 'bottoms', 'backpacks', 'shoes', 'gear'];
 
 export default function Header() {
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
@@ -85,6 +87,19 @@ export default function Header() {
     );
   }
 
+  const renderCategoryLinks = () => {
+    return categories.map((category) => (
+      <Button
+        key={category}
+        component={Link}
+        to={`/category/${category}`}
+        color="inherit"
+      >
+        {category.charAt(0).toUpperCase() + category.slice(1)}
+      </Button>
+    ));
+  };
+
   return (
     <Container maxWidth="sm">
       <AppBar position="fixed">
@@ -108,6 +123,9 @@ export default function Header() {
               ORUM
             </Typography>
           </Link>
+
+          <Box sx={{ display: 'flex' }}>{renderCategoryLinks()}</Box>
+
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
