@@ -17,3 +17,8 @@ export interface IProduct {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ICategoryPreview {
+  category: string;
+  products: IProduct[];
+}
