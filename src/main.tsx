@@ -21,6 +21,7 @@ import SignInPage from './pages/user/SignIn.tsx';
 import SignUpPage from './pages/user/SignUp.tsx';
 import { CategoryList } from './pages/product/CategoryList.tsx';
 import { SearchResults } from './pages/product/SearchResult.tsx';
+import CheckOut from './pages/user/CheckOut.tsx';
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
       { path: '/product', element: <ProductList /> },
       { path: '/product/:id', element: <ProductDetail /> },
       { path: '/cart', element: <MyCart /> },
+      { path: '/checkout', element: <CheckOut /> },
       { path: '/search', element: <SearchResults /> },
       { path: '/sign-in', element: <SignInPage /> },
       { path: '/sign-up', element: <SignUpPage /> },

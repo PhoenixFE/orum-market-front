@@ -24,3 +24,17 @@ export interface ICategoryPreview {
   category: string;
   products: IProduct[];
 }
+
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+export interface CartStore {
+  items: CartItem[];
+  addToCart: (newItem: CartItem) => void;
+  removeFromCart: (itemId: string) => void;
+  clearCart: () => void;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { IProduct } from '../../type';
 import { api } from '../../api/api';
 import {
@@ -14,6 +14,7 @@ import {
   Typography,
 } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { useCartStore, useUserStore } from '../../lib/store';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -42,11 +43,7 @@ export default function ProductDetail() {
               <ProductImageGallery images={product.mainImages} />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <ProductDetailsCard
-                productId={product._id}
-                sellerId={product.seller_id}
-                price={product.price}
-              />
+              <ProductDetailsCard product={product} />
             </Grid>
             <Grid item xs={12}>
               <h2>상품 설명</h2>
@@ -98,30 +95,63 @@ const ProductImageGallery = ({ images }: { images: string[] }) => {
   );
 };
 
-const ProductDetailsCard = ({
-  productId,
-  sellerId,
-  price,
-}: {
-  productId: number;
-  sellerId: number;
-  price: number;
-}) => {
-  // Replace "addProductToCart" with your actual function for handling the purchase
+const ProductDetailsCard = ({ product }: { product: IProduct }) => {
+  const { isLoggedIn } = useUserStore();
+  const addToCart = useCartStore((state) => state.addToCart);
+  const navigate = useNavigate();
+
+  const handleNotLoggedIn = () => {
+    const confirmLogin = confirm(
+      '로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?',
+    );
+    if (confirmLogin) {
+      navigate('/sign-in');
+    }
+  };
+
   const addProductToCart = () => {
-    console.log('Product added to cart');
+    if (!isLoggedIn) {
+      handleNotLoggedIn();
+    } else {
+      addToCart({ ...product, quantity: 1 });
+      const confirmAddToCart = confirm(
+        '장바구니에 추가되었습니다. 장바구니로 이동하시겠습니까?',
+      );
+      if (confirmAddToCart) {
+        navigate('/cart');
+      }
+    }
+  };
+
+  const perchaseProduct = () => {
+    if (!isLoggedIn) {
+      handleNotLoggedIn();
+    } else {
+      alert('결제 페이지로 이동합니다');
+      navigate('/checkout');
+    }
+  };
+
+  const addToWishlist = () => {
+    if (!isLoggedIn) {
+      handleNotLoggedIn();
+    } else {
+      alert('위시리스트에 추가되었습니다');
+    }
   };
 
   return (
     <Card sx={{ maxWidth: 345, m: 2 }}>
       <CardContent>
         <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-          Seller ID: {sellerId}
+          Seller ID: {product.seller_id}
         </Typography>
         <Typography variant="h5" component="div">
-          테이라 오프로드 코스 후드 자켓 ({productId})
+          {product.name} ({product._id})
         </Typography>
-        <Typography variant="h6">₩{price.toLocaleString('ko-KR')}</Typography>
+        <Typography variant="h6">
+          ₩{product.price.toLocaleString('ko-KR')}
+        </Typography>
         <Box
           sx={{
             display: 'flex',
@@ -134,14 +164,18 @@ const ProductDetailsCard = ({
             4.0
             <FavoriteBorderIcon fontSize="small" />
           </Typography>
-          <Button size="small">Wishlist</Button>
+          <Button size="small" onClick={addToWishlist}>
+            Wishlist
+          </Button>
         </Box>
       </CardContent>
       <CardActions>
-        <Button size="large" variant="contained" onClick={addProductToCart}>
+        <Button size="large" variant="contained" onClick={perchaseProduct}>
           구매하기
         </Button>
-        <Button size="large">장바구니</Button>
+        <Button size="large" onClick={addProductToCart}>
+          장바구니
+        </Button>
       </CardActions>
     </Card>
   );
