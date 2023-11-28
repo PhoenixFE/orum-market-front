@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IProduct } from '../../type';
+import { ICartStore, IProduct } from '../../type';
 import { api } from '../../api/api';
 import {
   Box,
@@ -97,8 +97,10 @@ const ProductImageGallery = ({ images }: { images: string[] }) => {
 
 const ProductDetailsCard = ({ product }: { product: IProduct }) => {
   const { isLoggedIn } = useUserStore();
-  const addToCart = useCartStore((state) => state.addToCart);
   const navigate = useNavigate();
+  const { items } = useCartStore((state) => state) as ICartStore;
+  const productAlreadyInCart = items.some((item) => item._id === product._id);
+  const { addToCart } = useCartStore((state) => state) as ICartStore;
 
   const handleNotLoggedIn = () => {
     const confirmLogin = confirm(
@@ -113,6 +115,10 @@ const ProductDetailsCard = ({ product }: { product: IProduct }) => {
     if (!isLoggedIn) {
       handleNotLoggedIn();
     } else {
+      if (productAlreadyInCart) {
+        alert('이미 장바구니에 있는 상품입니다.');
+        return;
+      }
       addToCart({ ...product, quantity: 1 });
       const confirmAddToCart = confirm(
         '장바구니에 추가되었습니다. 장바구니로 이동하시겠습니까?',

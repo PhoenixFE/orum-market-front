@@ -21,7 +21,7 @@ export const useCartStore = create(
           );
           if (existingItemIndex !== -1) {
             alert('이미 장바구니에 추가된 상품입니다.');
-            return { items: [...state.items] };
+            return state;
           } else {
             return {
               items: [...state.items, { ...newItem, quantity: 1 }],
