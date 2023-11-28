@@ -26,15 +26,21 @@ export interface ICategoryPreview {
 }
 
 export interface CartItem {
-  id: string;
+  _id: string;
   name: string;
   price: number;
   quantity: number;
 }
 
-export interface CartStore {
+export interface ICartStore {
   items: CartItem[];
   addToCart: (newItem: CartItem) => void;
   removeFromCart: (itemId: string) => void;
   clearCart: () => void;
+}
+
+export interface IUserStore {
+  isLoggedIn: boolean;
+  logIn: () => void;
+  logOut: () => void;
 }
