@@ -15,7 +15,7 @@ import { Badge, Box, Button, Container } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Link, useNavigate } from 'react-router-dom';
-import { useUserStore } from '../lib/store';
+import { useCart, useUserStore } from '../lib/store';
 import React, { useState } from 'react';
 import { Logout } from '@mui/icons-material';
 
@@ -51,6 +51,9 @@ export default function Header() {
     navigate('/');
   };
 
+  const { items: cartItems } = useCart();
+  const cartItemsCount = cartItems.length;
+
   function isLoggedInUserButton() {
     return (
       <>
@@ -67,7 +70,7 @@ export default function Header() {
         </IconButton>
         <Link to="/cart" style={{ textDecoration: 'none', color: 'inherit' }}>
           <IconButton color="inherit">
-            <Badge badgeContent={4} color="error">
+            <Badge badgeContent={cartItemsCount} color="error">
               <ShoppingCartIcon />
             </Badge>
           </IconButton>

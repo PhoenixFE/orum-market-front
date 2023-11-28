@@ -41,3 +41,8 @@ export const useCartStore = create(
     },
   ),
 );
+
+export function useCart() {
+  const cartStore = useCartStore() as ICartStore;
+  return cartStore;
+}
