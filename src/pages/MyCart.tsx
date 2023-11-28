@@ -1,8 +1,12 @@
 import { useCartStore } from '../lib/store';
+import { CartItem } from '../type';
 
 export default function MyCart() {
-  const { items, removeFromCart, clearCart } = useCartStore();
-  console.log(items);
+  const { items, removeFromCart, clearCart } = useCartStore() as {
+    items: CartItem[];
+    removeFromCart: (id: number) => void;
+    clearCart: () => void;
+  };
 
   return (
     <main>
@@ -12,7 +16,7 @@ export default function MyCart() {
       )}
       {items.length > 0 && (
         <>
-          {items.map((item) => (
+          {items.map((item: CartItem) => (
             <div key={item._id}>
               {item.name} - {item.quantity}
               <button onClick={() => removeFromCart(item._id)}>Remove</button>

@@ -4,6 +4,7 @@ export interface IProduct {
   name: string;
   price: number;
   shippingFees: number;
+  quantity: number;
   show: boolean;
   active: boolean;
   mainImages: string[];
@@ -26,7 +27,7 @@ export interface ICategoryPreview {
 }
 
 export interface CartItem {
-  _id: string;
+  _id: number;
   name: string;
   price: number;
   quantity: number;
@@ -35,7 +36,7 @@ export interface CartItem {
 export interface ICartStore {
   items: CartItem[];
   addToCart: (newItem: CartItem) => void;
-  removeFromCart: (itemId: string) => void;
+  removeFromCart: (itemId: number) => void;
   clearCart: () => void;
 }
 
