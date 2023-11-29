@@ -13,10 +13,14 @@ import {
   Checkbox,
 } from '@mui/material';
 import { ICartStore } from '../../type';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function CheckOut() {
   const { items, clearCart } = useCartStore() as ICartStore;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [checkoutItems, setCheckoutItems] = useState([]);
+  const [totalCost, setTotalCost] = useState(0);
   const [userInfo, setUserInfo] = useState({
     name: '집',
     email: '',
@@ -27,15 +31,25 @@ export default function CheckOut() {
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
 
   const userId = localStorage.getItem('_id');
-  const totalCost = items.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
-
-  const navigate = useNavigate();
+  // const totalCost = items.reduce(
+  //   (total, item) => total + item.price * item.quantity,
+  //   0,
+  // );
 
   const addressNameRef = useRef<HTMLInputElement>(null);
   const addressValueRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const singleProduct = location.state?.product;
+    console.log(singleProduct);
+    if (singleProduct) {
+      setCheckoutItems([singleProduct]);
+      setTotalCost(singleProduct.price);
+    } else {
+      setCheckoutItems(items);
+      setTotalCost(items.reduce((total, item) => total + item.price, 0));
+    }
+  }, [items, location.state?.product]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -56,7 +70,6 @@ export default function CheckOut() {
     };
 
     fetchUserInfo();
-    console.log(userInfo);
   }, []);
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +81,7 @@ export default function CheckOut() {
     if (!address.name.trim()) {
       alert('배송지 이름을 입력해주세요.');
       if (addressNameRef.current) {
-        addressNameRef.current.focus(); // Ref를 사용하여 포커스
+        addressNameRef.current.focus();
       }
       return;
     }
@@ -76,23 +89,25 @@ export default function CheckOut() {
     if (!address.value.trim()) {
       alert('배송지 주소를 입력해주세요.');
       if (addressValueRef.current) {
-        addressValueRef.current.focus(); // Ref를 사용하여 포커스
+        addressValueRef.current.focus();
       }
       return;
     }
 
     try {
       const orderData = {
-        products: items.map((item) => ({
+        products: checkoutItems.map((item) => ({
           _id: item._id,
-          quantity: item.quantity,
+          quantity: 1,
         })),
         value: address,
       };
 
       await api.checkOut(orderData);
       alert('주문이 완료되었습니다.');
-      clearCart();
+      if (location.state?.product === undefined) {
+        clearCart();
+      }
       navigate('/');
     } catch (error) {
       console.error('주문 실패:', error);
@@ -113,17 +128,14 @@ export default function CheckOut() {
         <Typography variant="h4">장바구니가 비어있습니다.</Typography>
       ) : (
         <List sx={{ mb: 2 }}>
-          {items.map((item, index) => (
+          {checkoutItems.map((item, index) => (
             <ListItem key={index}>
               <img
                 src={item.mainImages[0]}
                 alt={item.name}
                 style={{ width: '100px', height: '100px', marginRight: '20px' }}
               />
-              <ListItemText
-                primary={item.name}
-                secondary={`수량: ${item.quantity}`}
-              />
+              <ListItemText primary={item.name} />
             </ListItem>
           ))}
         </List>
