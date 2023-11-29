@@ -12,11 +12,12 @@ import {
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { validateEmail, validatePassword } from '../../lib/validation';
+import { IUserStore } from '../../type';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { logIn } = useUserStore();
+  const { logIn } = useUserStore() as IUserStore;
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
