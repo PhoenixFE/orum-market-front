@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import { useCartStore } from '../../lib/store';
 import { api } from '../../api/api';
-import { Container, TextField, Button, Typography } from '@mui/material';
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+} from '@mui/material';
 import { ICartStore } from '../../type';
 
 export default function CheckOut() {
@@ -34,6 +42,17 @@ export default function CheckOut() {
   return (
     <Container>
       <Typography variant="h4">구매하기</Typography>
+      <List sx={{ mb: 2 }}>
+        {items.map((item, index) => (
+          <ListItem key={index}>
+            <ListItemText
+              primary={item.name}
+              secondary={`수량: ${item.quantity}`}
+            />
+            {/* 이미지 추가 가능, 예: <img src={item.image} alt={item.name} /> */}
+          </ListItem>
+        ))}
+      </List>
       <TextField
         label="배송지 이름"
         name="name"
