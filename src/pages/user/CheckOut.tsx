@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useCartStore } from '../../lib/store';
 import { api } from '../../api/api';
 import {
@@ -9,8 +9,11 @@ import {
   List,
   ListItem,
   ListItemText,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import { ICartStore } from '../../type';
+import { useNavigate } from 'react-router-dom';
 
 export default function CheckOut() {
   const { items, clearCart } = useCartStore() as ICartStore;
@@ -20,8 +23,19 @@ export default function CheckOut() {
     address: '',
   });
   const [address, setAddress] = useState({ name: '', value: userInfo.address });
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
 
   const userId = localStorage.getItem('_id');
+  const totalCost = items.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
+
+  const navigate = useNavigate();
+
+  const addressNameRef = useRef<HTMLInputElement>(null);
+  const addressValueRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -51,6 +65,22 @@ export default function CheckOut() {
   };
 
   const handlePurchase = async () => {
+    if (!address.name.trim()) {
+      alert('배송지 이름을 입력해주세요.');
+      if (addressNameRef.current) {
+        addressNameRef.current.focus(); // Ref를 사용하여 포커스
+      }
+      return;
+    }
+
+    if (!address.value.trim()) {
+      alert('배송지 주소를 입력해주세요.');
+      if (addressValueRef.current) {
+        addressValueRef.current.focus(); // Ref를 사용하여 포커스
+      }
+      return;
+    }
+
     try {
       const orderData = {
         products: items.map((item) => ({
@@ -63,9 +93,14 @@ export default function CheckOut() {
       await api.checkOut(orderData);
       alert('주문이 완료되었습니다.');
       clearCart();
+      navigate('/');
     } catch (error) {
       console.error('주문 실패:', error);
     }
+  };
+
+  const handlePurchaseEnabled = () => {
+    return agreedToTerms && agreedToPrivacy && !isCartEmpty;
   };
 
   const isCartEmpty = items.length === 0;
@@ -109,6 +144,7 @@ export default function CheckOut() {
         disabled
       />
       <TextField
+        inputRef={addressNameRef}
         label="배송지 이름"
         name="name"
         value={address.name}
@@ -117,6 +153,7 @@ export default function CheckOut() {
         margin="normal"
       />
       <TextField
+        inputRef={addressValueRef}
         label="배송지 주소"
         name="value"
         value={address.value}
@@ -124,11 +161,34 @@ export default function CheckOut() {
         fullWidth
         margin="normal"
       />
+
+      <Typography variant="h6" sx={{ my: 2 }}>
+        총 금액: ₩{totalCost.toLocaleString()}
+      </Typography>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={agreedToTerms}
+            onChange={(e) => setAgreedToTerms(e.target.checked)}
+          />
+        }
+        label="이용약관에 동의합니다. (필수)"
+      />
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={agreedToPrivacy}
+            onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+          />
+        }
+        label="비회원 개인정보수집 이용에 동의합니다. (필수)"
+      />
+
       <Button
         onClick={handlePurchase}
         variant="contained"
         color="primary"
-        disabled={isCartEmpty}
+        disabled={!handlePurchaseEnabled()}
       >
         결제하기
       </Button>
