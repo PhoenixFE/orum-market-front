@@ -72,7 +72,7 @@ export default function CheckOut() {
 
   return (
     <Container>
-      <Typography variant="h2">구매하기</Typography>
+      <Typography variant="h2">결제하기</Typography>
 
       {isCartEmpty ? (
         <Typography variant="h4">장바구니가 비어있습니다.</Typography>
@@ -130,7 +130,7 @@ export default function CheckOut() {
         color="primary"
         disabled={isCartEmpty}
       >
-        구매하기
+        결제하기
       </Button>
     </Container>
   );
