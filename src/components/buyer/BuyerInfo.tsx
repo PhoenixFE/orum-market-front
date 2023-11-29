@@ -28,7 +28,7 @@ export interface IBuyerInfo {
 }
 
 export default function BuyerInfo() {
-  const { id } = useParams();
+  const userId = localStorage.getItem('_id');
   const [buyerInfoData, setBuyerInfoData] = useState<IBuyerInfo>({
     _id: 0,
     email: '',
@@ -53,16 +53,21 @@ export default function BuyerInfo() {
   const handleUpdateUserInfo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await api.updateUserInfo(id, buyerInfoData);
+      await api.updateUserInfo(userId, buyerInfoData);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
+    if (!userId) {
+      console.log('ID가 유효하지 않습니다.');
+      return;
+    }
+
     const getBuyerInfo = async () => {
       try {
-        const response = await api.getUserInfo(id);
+        const response = await api.getUserInfo(userId);
         setBuyerInfoData({
           ...buyerInfoData,
           _id: response.data.item._id,
@@ -74,6 +79,7 @@ export default function BuyerInfo() {
         console.log(error);
       }
     };
+
     getBuyerInfo();
   }, []);
 
