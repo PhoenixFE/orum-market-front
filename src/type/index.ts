@@ -42,6 +42,6 @@ export interface ICartStore {
 
 export interface IUserStore {
   isLoggedIn: boolean;
-  logIn: () => void;
+  logIn: (token: string) => void;
   logOut: () => void;
 }

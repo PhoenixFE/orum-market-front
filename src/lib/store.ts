@@ -1,13 +1,26 @@
 import { create } from 'zustand';
-import { CartItem, ICartStore, IProduct, IUserStore } from '../type';
+import { CartItem, ICartStore } from '../type';
 import { persist } from 'zustand/middleware';
 
 // 로그인 상태 관리 store
-export const useUserStore = create<IUserStore>((set) => ({
-  isLoggedIn: false,
-  logIn: () => set({ isLoggedIn: true }),
-  logOut: () => set({ isLoggedIn: false }),
-}));
+export const useUserStore = create(
+  persist(
+    (set) => ({
+      isLoggedIn: false,
+      logIn: (token: string) => {
+        localStorage.setItem('token', token);
+        set({ isLoggedIn: true });
+      },
+      logOut: () => {
+        localStorage.removeItem('token');
+        set({ isLoggedIn: false });
+      },
+    }),
+    {
+      name: 'user',
+    },
+  ),
+);
 
 // 장바구니 상태 관리 store
 export const useCartStore = create(
