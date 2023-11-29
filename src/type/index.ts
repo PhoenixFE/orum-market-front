@@ -31,6 +31,7 @@ export interface CartItem {
   name: string;
   price: number;
   quantity: number;
+  mainImages: string[];
 }
 
 export interface ICartStore {
