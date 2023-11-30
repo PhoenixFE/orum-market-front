@@ -46,22 +46,22 @@ export const CategoryList = () => {
     let sorted = [...products];
     switch (sortOrder) {
       case '최신순':
-        products.sort(
-          (a: IProduct, b: IProduct) =>
+        sorted.sort(
+          (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
         break;
       case '오래된순':
-        products.sort(
-          (a: IProduct, b: IProduct) =>
+        sorted.sort(
+          (a, b) =>
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
         );
         break;
       case '가-하':
-        products.sort((a: IProduct, b: IProduct) => a.price - b.price);
+        sorted.sort((a, b) => a.price - b.price);
         break;
       case '하-가':
-        products.sort((a: IProduct, b: IProduct) => b.price - a.price);
+        sorted.sort((a, b) => b.price - a.price);
         break;
       default:
         break;
