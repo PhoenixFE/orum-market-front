@@ -9,7 +9,7 @@ import {
   Button,
 } from '@mui/material';
 
-const dummUserOderList = [
+const dummyUserOderList = [
   {
     _id: 1,
     user_id: 1,
@@ -32,8 +32,8 @@ const dummUserOderList = [
       name: '우리집',
       value: '서울시 강남구 어디동',
     },
-    createAt: '2023-11-29',
-    updateAt: '2023-11-29',
+    createdAt: '2023-11-29',
+    updatedAt: '2023-11-29',
   },
   {
     _id: 2,
@@ -82,7 +82,7 @@ export default function BuyerOrdeList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {dummUserOderList.map((rows) => (
+            {dummyUserOderList.map((rows) => (
               <TableRow key={rows._id}>
                 <TableCell align="center">
                   {rows.createAt} <br /> ({rows._id})
@@ -102,11 +102,11 @@ export default function BuyerOrdeList() {
             <TableRow>
               <TableCell align="right" colSpan={7}>
                 총 가격{' '}
-                {dummUserOderList[0].cost.products +
+                {dummyUserOderList[0].cost.products +
                   ' + ' +
-                  dummUserOderList[0].cost.shippingFees +
+                  dummyUserOderList[0].cost.shippingFees +
                   ' = ' +
-                  dummUserOderList[0].cost.total +
+                  dummyUserOderList[0].cost.total +
                   '원'}
               </TableCell>
             </TableRow>
