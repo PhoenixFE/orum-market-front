@@ -9,29 +9,6 @@ import {
   Button,
 } from '@mui/material';
 
-export interface IExtraCategory {
-  [index: number]: string;
-}
-
-export interface IItems {
-  perchased_id: number;
-  seller_id: number;
-  item_id: number;
-  price: number;
-  shippingFees: number;
-  name: string;
-  mainImages: string;
-  quantity: number;
-  perchasedAt: string;
-  extra: {
-    category: IExtraCategory[];
-  };
-}
-
-export interface Iperchased {
-  item: IItems[];
-}
-
 const dummUserOderList = [
   {
     _id: 1,
