@@ -16,9 +16,13 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart, useUserStore } from '../lib/store';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Logout } from '@mui/icons-material';
 import { IUserStore } from '../type';
+import useOutsideClick from '../hooks/useOutsideClick';
+import CategoryNavBar from './CategoryNavBar';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 const categories = ['tops', 'bottoms', 'backpacks', 'shoes', 'gear'];
 
@@ -26,6 +30,18 @@ export default function Header() {
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const { isLoggedIn, logOut } = useUserStore() as IUserStore;
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCategoryNavBar, setShowCategoryNavBar] = useState(false);
+  const headerRef = useRef(null);
+
+  useOutsideClick(headerRef, () => {
+    if (showCategoryNavBar) {
+      setShowCategoryNavBar(false);
+    }
+  });
+
+  const toggleCategoryNavBar = () => {
+    setShowCategoryNavBar(!showCategoryNavBar);
+  };
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -124,17 +140,17 @@ export default function Header() {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="sm" ref={headerRef}>
       <AppBar position="fixed">
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <IconButton
+          {/* <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
             sx={{ mr: 2, display: { sm: 'none' } }}
           >
             <MenuIcon />
-          </IconButton>
+          </IconButton> */}
 
           <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
             <Typography
@@ -147,7 +163,15 @@ export default function Header() {
             </Typography>
           </Link>
 
-          <Box sx={{ display: 'flex' }}>{renderCategoryLinks()}</Box>
+          {/* <Box sx={{ display: 'flex' }}>{renderCategoryLinks()}</Box> */}
+          <Button onClick={toggleCategoryNavBar} variant="text" color="inherit">
+            쇼핑하기
+            {showCategoryNavBar ? (
+              <KeyboardArrowUpIcon />
+            ) : (
+              <KeyboardArrowDownIcon />
+            )}
+          </Button>
           <form onSubmit={handleSearch}>
             <Search>
               <SearchIconWrapper>
@@ -168,6 +192,7 @@ export default function Header() {
           {!isLoggedIn && notLoggedInUserButton()}
         </Toolbar>
       </AppBar>
+      {showCategoryNavBar && <CategoryNavBar />}
       <Toolbar />
     </Container>
   );

@@ -19,13 +19,13 @@ const CategoryNavBar = () => {
   }, [location]);
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2, mt: 8 }}>
       {CATEGORY.depth2.map((category) => (
         <Button
           key={category.id}
           component={Link}
           to={`/category/${category.dbName}`}
-          color={currentCategory === category.dbName ? 'primary' : 'inherit'}
+          variant={currentCategory === category.dbName ? 'contained' : 'text'}
         >
           {category.name}
         </Button>

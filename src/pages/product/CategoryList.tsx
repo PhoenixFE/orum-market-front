@@ -72,7 +72,7 @@ export const CategoryList = () => {
 
   return (
     <>
-      <CategoryNavBar />
+      {/* <CategoryNavBar /> */}
       <Box
         sx={{
           display: 'flex',

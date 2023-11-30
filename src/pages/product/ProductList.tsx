@@ -60,7 +60,7 @@ export default function ProductList() {
 
   return (
     <main>
-      <CategoryNavBar />
+      {/* <CategoryNavBar /> */}
       <h1>제품 전체 목록 페이지</h1>
       {CATEGORY.depth2.map((category) => (
         <CategoryPreview
