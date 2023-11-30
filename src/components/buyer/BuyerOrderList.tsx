@@ -76,6 +76,7 @@ export default function BuyerOrdeList() {
               <TableCell align="center">이미지</TableCell>
               <TableCell align="center">상품명</TableCell>
               <TableCell align="center">수량</TableCell>
+              <TableCell align="center">상품가격</TableCell>
               <TableCell align="center">주문처리상태</TableCell>
               <TableCell align="center">별점평가</TableCell>
             </TableRow>
@@ -91,12 +92,24 @@ export default function BuyerOrdeList() {
                 <TableCell align="center">
                   {rows.products[0].quantity}
                 </TableCell>
+                <TableCell align="center">{rows.products[0].price}</TableCell>
                 <TableCell align="center">{rows.state}</TableCell>
                 <TableCell align="center">
                   <Button type="button">별점등록</Button>
                 </TableCell>
               </TableRow>
             ))}
+            <TableRow>
+              <TableCell align="right" colSpan={7}>
+                총 가격{' '}
+                {dummUserOderList[0].cost.products +
+                  ' + ' +
+                  dummUserOderList[0].cost.shippingFees +
+                  ' = ' +
+                  dummUserOderList[0].cost.total +
+                  '원'}
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
