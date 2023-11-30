@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useCartStore } from '../lib/store';
-import { CartItem } from '../type';
+import { ICartItem } from '../type';
 import {
   Box,
   Button,
@@ -16,7 +16,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 
 export default function MyCart() {
   const { items, removeFromCart, clearCart } = useCartStore() as {
-    items: CartItem[];
+    items: ICartItem[];
     removeFromCart: (id: number) => void;
     clearCart: () => void;
   };
@@ -44,7 +44,7 @@ export default function MyCart() {
       {items.length > 0 && (
         <Box>
           <List>
-            {items.map((item: CartItem) => (
+            {items.map((item: ICartItem) => (
               <ListItem key={item._id} divider>
                 <img
                   src={item.mainImages[0]}

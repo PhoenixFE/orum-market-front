@@ -18,12 +18,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart, useUserStore } from '../lib/store';
 import React, { useState } from 'react';
 import { Logout } from '@mui/icons-material';
+import { IUserStore } from '../type';
 
 const categories = ['tops', 'bottoms', 'backpacks', 'shoes', 'gear'];
 
 export default function Header() {
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
-  const { isLoggedIn, logOut } = useUserStore();
+  const { isLoggedIn, logOut } = useUserStore() as IUserStore;
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {

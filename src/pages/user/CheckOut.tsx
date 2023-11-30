@@ -12,14 +12,14 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@mui/material';
-import { ICartStore } from '../../type';
+import { ICartItem, ICartStore } from '../../type';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function CheckOut() {
   const { items, clearCart } = useCartStore() as ICartStore;
   const navigate = useNavigate();
   const location = useLocation();
-  const [checkoutItems, setCheckoutItems] = useState([]);
+  const [checkoutItems, setCheckoutItems] = useState<ICartItem[]>([]);
   const [totalCost, setTotalCost] = useState(0);
   const [userInfo, setUserInfo] = useState({
     name: '집',
@@ -31,17 +31,12 @@ export default function CheckOut() {
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
 
   const userId = localStorage.getItem('_id');
-  // const totalCost = items.reduce(
-  //   (total, item) => total + item.price * item.quantity,
-  //   0,
-  // );
 
   const addressNameRef = useRef<HTMLInputElement>(null);
   const addressValueRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const singleProduct = location.state?.product;
-    console.log(singleProduct);
     if (singleProduct) {
       setCheckoutItems([singleProduct]);
       setTotalCost(singleProduct.price);
@@ -63,7 +58,6 @@ export default function CheckOut() {
           email: response.data.item.email,
           address: response.data.item.address,
         });
-        console.log(userInfo);
       } catch (error) {
         console.error('사용자 정보를 가져오는데 실패했습니다', error);
       }
@@ -114,17 +108,16 @@ export default function CheckOut() {
     }
   };
 
+  const isCheckoutItemEmpty = checkoutItems.length === 0;
   const handlePurchaseEnabled = () => {
-    return agreedToTerms && agreedToPrivacy && !isCartEmpty;
+    return agreedToTerms && agreedToPrivacy && !isCheckoutItemEmpty;
   };
-
-  const isCartEmpty = items.length === 0;
 
   return (
     <Container>
       <Typography variant="h2">결제하기</Typography>
 
-      {isCartEmpty ? (
+      {isCheckoutItemEmpty ? (
         <Typography variant="h4">장바구니가 비어있습니다.</Typography>
       ) : (
         <List sx={{ mb: 2 }}>

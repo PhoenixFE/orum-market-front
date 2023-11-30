@@ -32,7 +32,7 @@ export interface ICategoryPreview {
   products: IProduct[];
 }
 
-export interface CartItem {
+export interface ICartItem {
   _id: number;
   name: string;
   price: number;
@@ -41,8 +41,8 @@ export interface CartItem {
 }
 
 export interface ICartStore {
-  items: CartItem[];
-  addToCart: (newItem: CartItem) => void;
+  items: ICartItem[];
+  addToCart: (newItem: ICartItem) => void;
   removeFromCart: (itemId: number) => void;
   clearCart: () => void;
 }

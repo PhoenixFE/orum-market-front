@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { CartItem, ICartStore } from '../type';
+import { ICartItem, ICartStore } from '../type';
 import { persist } from 'zustand/middleware';
 
 // 로그인 상태 관리 store
@@ -27,7 +27,7 @@ export const useCartStore = create(
   persist(
     (set) => ({
       items: [],
-      addToCart: (newItem: CartItem) => {
+      addToCart: (newItem: ICartItem) => {
         set((state: ICartStore) => {
           const existingItemIndex = state.items.findIndex(
             (item) => item._id === newItem._id,
