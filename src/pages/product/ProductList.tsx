@@ -4,11 +4,11 @@ import { api } from '../../api/api';
 import { Button, Box, Grid, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
-
-const categories = ['tops', 'bottoms', 'backpacks', 'shoes', 'gear'];
+import { CATEGORY } from '../../constants/index';
 
 export default function ProductList() {
   const [products, setProducts] = useState<IProduct[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -16,26 +16,40 @@ export default function ProductList() {
 
   const fetchProducts = async () => {
     try {
+      setLoading(true);
+
       const response = await api.getProductList();
       setProducts(response.data.item);
+      setLoading(false);
     } catch (error) {
       console.error('상품 목록을 가져오는데 실패했습니다', error);
+      setLoading(false);
     }
   };
 
+  // useEffect(() => {
+  //   CATEGORY.depth2.forEach((category) => {
+  //     fetchProducts(category.dbCode);
+  //   });
+  // }, []);
+
+  if (loading) {
+    return <div>로딩중입니다.</div>;
+  }
+
   if (!products || products.length === 0) {
-    return <div>제품이 없습니다.</div>;
+    return <div>상품이 없습니다.</div>;
   }
 
   return (
     <main>
       <h1>제품 전체 목록 페이지</h1>
-      {categories.map((category) => (
+      {CATEGORY.depth2.map((category) => (
         <CategoryPreview
-          key={category}
+          key={category.id}
           category={category}
           products={products.filter(
-            (product) => product.extra.category[1] === category,
+            (product) => product.extra.category[1] === category.dbCode,
           )}
         />
       ))}
@@ -54,16 +68,20 @@ const CategoryPreview = ({ category, products }: ICategoryPreview) => {
           marginBottom: 2,
         }}
       >
-        <Typography variant="h5">{category}</Typography>
-        <Button component={Link} to={`/category/${category}`}>
+        <Typography variant="h5">{category.name}</Typography>
+        <Button component={Link} to={`/category/${category.dbName}`}>
           더보기
         </Button>
       </Box>
-      <Grid container spacing={2}>
-        {products.slice(0, 5).map((product) => (
-          <ProductCard key={product._id} product={product} />
-        ))}
-      </Grid>
+
+      {products.length === 0 && <div>제품이 없습니다.</div>}
+      {products.length > 0 && (
+        <Grid container spacing={2}>
+          {products.slice(0, 5).map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </Grid>
+      )}
     </Box>
   );
 };

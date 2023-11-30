@@ -11,51 +11,63 @@ import { IProduct } from '../../type';
 import { useEffect, useState } from 'react';
 import { api } from '../../api/api';
 import ProductCard from './ProductCard';
+import { CATEGORY } from '../../constants/index';
 
 export const CategoryList = () => {
-  const { category } = useParams<{ category: string }>();
+  const { category: categoryName } = useParams<{ category: string }>();
   const [products, setProducts] = useState<IProduct[]>([]);
+  const [sortedProducts, setSortedProducts] = useState<IProduct[]>([]);
   const [sortOrder, setSortOrder] = useState('최신순');
 
+  // API GET 카테고리 상품 목록 조회
   useEffect(() => {
     const fetchProducts = async () => {
-      const response = await api.getProductList();
-      let filteredProducts = response.data.item.filter(
-        (product: IProduct) => product.extra.category[1] === category,
-      );
-
-      switch (sortOrder) {
-        case '최신순':
-          filteredProducts.sort(
-            (a: IProduct, b: IProduct) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      try {
+        const categoryData = CATEGORY.depth2.find(
+          (item) => item.dbName === categoryName,
+        );
+        const categoryCode = categoryData ? categoryData.dbCode : null;
+        if (categoryCode) {
+          const extraQuery = encodeURIComponent(
+            JSON.stringify({ 'extra.category': ['H01', categoryCode] }),
           );
-          break;
-        case '오래된순':
-          filteredProducts.sort(
-            (a: IProduct, b: IProduct) =>
-              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-          );
-          break;
-        case '가-하':
-          filteredProducts.sort(
-            (a: IProduct, b: IProduct) => a.price - b.price,
-          );
-          break;
-        case '하-가':
-          filteredProducts.sort(
-            (a: IProduct, b: IProduct) => b.price - a.price,
-          );
-          break;
-        default:
-          break;
+          const response = await api.getProductList(`extra=${extraQuery}`);
+          setProducts(response.data.item);
+        }
+      } catch (error) {
+        console.error('상품 목록을 가져오는데 실패했습니다', error);
       }
-
-      setProducts(filteredProducts);
     };
-
     fetchProducts();
-  }, [category, sortOrder]);
+  }, [categoryName]);
+
+  // SORT 정렬
+  useEffect(() => {
+    let sorted = [...products];
+    switch (sortOrder) {
+      case '최신순':
+        products.sort(
+          (a: IProduct, b: IProduct) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+        break;
+      case '오래된순':
+        products.sort(
+          (a: IProduct, b: IProduct) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        );
+        break;
+      case '가-하':
+        products.sort((a: IProduct, b: IProduct) => a.price - b.price);
+        break;
+      case '하-가':
+        products.sort((a: IProduct, b: IProduct) => b.price - a.price);
+        break;
+      default:
+        break;
+    }
+    setSortedProducts(sorted);
+  }, [products, sortOrder]);
 
   return (
     <>
@@ -67,7 +79,7 @@ export const CategoryList = () => {
           marginBottom: 2,
         }}
       >
-        <h1>{category}</h1>
+        <h1>{categoryName}</h1>
         <FormControl>
           <InputLabel id="sort-label">정렬</InputLabel>
           <Select
@@ -85,7 +97,7 @@ export const CategoryList = () => {
         </FormControl>
       </Box>
       <Grid container spacing={2}>
-        {products.map((product) => (
+        {sortedProducts.map((product) => (
           <ProductCard key={product._id} product={product} />
         ))}
       </Grid>

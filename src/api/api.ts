@@ -26,7 +26,7 @@ export const api = {
   checkEmail: (email: string) =>
     axiosInstance.get('/users/email', { params: { email } }),
   signIn: (credentials: any) => axiosInstance.post('/users/login', credentials),
-  getProductList: () => axiosInstance.get('/products'),
+  getProductList: (query = '') => axiosInstance.get(`/products/?${query}`),
   getProduct: (id: string) => axiosInstance.get(`/products/${id}`),
   searchProducts: (keyword: string) =>
     axiosInstance.get('/products', { params: { keyword } }),

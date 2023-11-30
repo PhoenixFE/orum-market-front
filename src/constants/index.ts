@@ -47,3 +47,76 @@ export const DASHBOARD_MENU = {
     },
   ],
 };
+
+export const CATEGORY = {
+  depth1: [
+    {
+      id: 1,
+      name: '전체',
+      dbName: 'all',
+      dbCode: 'H01',
+    },
+    {
+      id: 2,
+      name: '남성',
+      dbName: 'male',
+      dbCode: 'H02',
+    },
+    {
+      id: 3,
+      name: '여성',
+      dbName: 'female',
+      dbCode: 'H03',
+    },
+    {
+      id: 4,
+      name: '아이',
+      dbName: 'kids',
+      dbCode: 'H04',
+    },
+  ],
+  depth2: [
+    {
+      id: 1,
+      name: '상의',
+      dbName: 'tops',
+      dbCode: 'H0101',
+      url: '/category/tops',
+    },
+    {
+      id: 2,
+      name: '하의',
+      dbName: 'bottoms',
+      dbCode: 'H0102',
+      url: '/category/bottoms',
+    },
+    {
+      id: 3,
+      name: '등산화',
+      dbName: 'shoes',
+      dbCode: 'H0103',
+      url: '/category/shoes',
+    },
+    {
+      id: 4,
+      name: '배낭',
+      dbName: 'backpacks',
+      dbCode: 'H0104',
+      url: '/category/backpacks',
+    },
+    {
+      id: 5,
+      name: '용품',
+      dbName: 'gear',
+      dbCode: 'H0105',
+      url: '/category/gear',
+    },
+    {
+      id: 6,
+      name: '세트',
+      dbName: 'set',
+      dbCode: 'H0106',
+      url: '/category/set',
+    },
+  ],
+};

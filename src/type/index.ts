@@ -22,7 +22,13 @@ export interface IProduct {
 }
 
 export interface ICategoryPreview {
-  category: string;
+  category: {
+    id: number;
+    name: string;
+    dbName: string;
+    dbCode: string;
+    url: string;
+  };
   products: IProduct[];
 }
 
