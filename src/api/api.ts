@@ -29,8 +29,15 @@ export const api = {
   signIn: (credentials: any) => axiosInstance.post('/users/login', credentials),
   getProductList: (query = '') => axiosInstance.get(`/products/?${query}`),
   getProduct: (id: string) => axiosInstance.get(`/products/${id}`),
-  searchProducts: (keyword: string) =>
-    axiosInstance.get('/products', { params: { keyword } }),
+  searchProducts: (keyword: string, minPrice: number, maxPrice: number) => {
+    return axiosInstance.get('/products/', {
+      params: {
+        keyword,
+        minPrice,
+        maxPrice,
+      },
+    });
+  },
   createProduct: (productData: any) =>
     axiosInstance.post('/seller/products/', {
       ...data,

@@ -143,15 +143,6 @@ export default function Header() {
     <Container maxWidth="sm" ref={headerRef} style={{ marginBottom: '50px' }}>
       <AppBar position="fixed">
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-          {/* <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton> */}
-
           <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
             <Typography
               variant="h6"
@@ -163,7 +154,6 @@ export default function Header() {
             </Typography>
           </Link>
 
-          {/* <Box sx={{ display: 'flex' }}>{renderCategoryLinks()}</Box> */}
           <Button onClick={toggleCategoryNavBar} variant="text" color="inherit">
             쇼핑하기
             {showCategoryNavBar ? (
