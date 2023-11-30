@@ -28,7 +28,6 @@ export default function ProductDetail() {
     if (id) {
       const response = await api.getProduct(id);
       setProduct(response.data.item);
-      console.log(response.data.item);
     } else {
       console.log('id가 없습니다.');
     }
@@ -96,7 +95,7 @@ const ProductImageGallery = ({ images }: { images: string[] }) => {
 };
 
 const ProductDetailsCard = ({ product }: { product: IProduct }) => {
-  const { isLoggedIn } = useUserStore();
+  const { isLoggedIn } = useUserStore() as { isLoggedIn: boolean };
   const navigate = useNavigate();
   const { items } = useCartStore((state) => state) as ICartStore;
   const productAlreadyInCart = items.some((item) => item._id === product._id);
@@ -134,7 +133,7 @@ const ProductDetailsCard = ({ product }: { product: IProduct }) => {
       handleNotLoggedIn();
     } else {
       alert('결제 페이지로 이동합니다');
-      navigate('/checkout');
+      navigate('/checkout', { state: { product } });
     }
   };
 

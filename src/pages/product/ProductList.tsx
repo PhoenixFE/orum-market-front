@@ -15,9 +15,17 @@ export default function ProductList() {
   }, []);
 
   const fetchProducts = async () => {
-    const response = await api.getProductList();
-    setProducts(response.data.item);
+    try {
+      const response = await api.getProductList();
+      setProducts(response.data.item);
+    } catch (error) {
+      console.error('상품 목록을 가져오는데 실패했습니다', error);
+    }
   };
+
+  if (!products || products.length === 0) {
+    return <div>제품이 없습니다.</div>;
+  }
 
   return (
     <main>
