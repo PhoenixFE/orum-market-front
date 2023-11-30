@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/api';
 import ProductCard from './ProductCard';
 import { CATEGORY } from '../../constants/index';
+import CategoryNavBar from '../../components/CategoryNavBar';
 
 export const CategoryList = () => {
   const { category: categoryName } = useParams<{ category: string }>();
@@ -71,6 +72,7 @@ export const CategoryList = () => {
 
   return (
     <>
+      <CategoryNavBar />
       <Box
         sx={{
           display: 'flex',

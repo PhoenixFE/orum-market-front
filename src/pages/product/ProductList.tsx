@@ -5,10 +5,33 @@ import { Button, Box, Grid, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { CATEGORY } from '../../constants/index';
+import CategoryNavBar from '../../components/CategoryNavBar';
 
 export default function ProductList() {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // const location = useLocation();
+  // const getCurrentCategory = () => {
+  //   const path = location.pathname.split('/');
+  //   return path[path.length - 1];
+  // };
+  // const [currentCategory, setCurrentCategory] = useState(getCurrentCategory());
+  // useEffect(() => {
+  //   setCurrentCategory(getCurrentCategory());
+  // }, [location]);
+  // const renderCategoryButtons = () => {
+  //   return CATEGORY.depth2.map((category) => (
+  //     <Button
+  //       key={category.id}
+  //       component={Link}
+  //       to={`/category/${category.dbName}`}
+  //       color={currentCategory === category.dbName ? 'primary' : 'inherit'}
+  //     >
+  //       {category.name}
+  //     </Button>
+  //   ));
+  // };
 
   useEffect(() => {
     fetchProducts();
@@ -27,12 +50,6 @@ export default function ProductList() {
     }
   };
 
-  // useEffect(() => {
-  //   CATEGORY.depth2.forEach((category) => {
-  //     fetchProducts(category.dbCode);
-  //   });
-  // }, []);
-
   if (loading) {
     return <div>로딩중입니다.</div>;
   }
@@ -43,6 +60,7 @@ export default function ProductList() {
 
   return (
     <main>
+      <CategoryNavBar />
       <h1>제품 전체 목록 페이지</h1>
       {CATEGORY.depth2.map((category) => (
         <CategoryPreview
