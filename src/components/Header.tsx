@@ -140,7 +140,7 @@ export default function Header() {
   };
 
   return (
-    <Container maxWidth="sm" ref={headerRef}>
+    <Container maxWidth="sm" ref={headerRef} style={{ marginBottom: '50px' }}>
       <AppBar position="fixed">
         <Toolbar sx={{ justifyContent: 'space-between' }}>
           {/* <IconButton

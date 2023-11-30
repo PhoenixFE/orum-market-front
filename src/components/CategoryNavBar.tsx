@@ -19,7 +19,20 @@ const CategoryNavBar = () => {
   }, [location]);
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2, mt: 8 }}>
+    <Box
+      sx={{
+        position: 'fixed',
+        display: 'flex',
+        justifyContent: 'space-evenly',
+        width: '100%',
+        left: 0,
+        right: 0,
+        mt: { xs: 9, sm: 8 },
+        backgroundColor: 'white',
+        boxShadow: 3,
+        zIndex: 1,
+      }}
+    >
       {CATEGORY.depth2.map((category) => (
         <Button
           key={category.id}
