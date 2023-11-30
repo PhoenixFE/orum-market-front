@@ -1,15 +1,15 @@
 import {
+  Box,
   Button,
   Card,
   CardActionArea,
-  CardActions,
   CardContent,
   CardMedia,
   Grid,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PaymentIcon from '@mui/icons-material/Payment';
 import { IProduct } from '../../type';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -24,40 +24,61 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-      <Card>
-        <Tooltip title="상품 페이지로 이동하기" arrow>
-          <CardActionArea component={Link} to={`/product/${product._id}`}>
-            <CustomCardMedia
-              component="img"
-              height="140"
-              image={product.mainImages[0]}
-              alt={product.name}
-            />
-          </CardActionArea>
-        </Tooltip>
+      <Card
+        sx={{
+          maxWidth: 345,
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
+        <CardActionArea component={Link} to={`/product/${product._id}`}>
+          <CardMedia
+            component="img"
+            height="200"
+            image={product.mainImages[0]}
+            alt={product.name}
+            sx={{ objectFit: 'contain', padding: '16px' }}
+          />
+        </CardActionArea>
         <CardContent>
-          <Link
-            to={`/product/${product._id}`}
-            style={{ textDecoration: 'none', color: 'inherit' }}
-          >
-            <Typography gutterBottom variant="h5" component="div">
-              {product.name}
-            </Typography>
-          </Link>
-          <Typography variant="body2" color="text.secondary">
-            Price: {product.price}원
-            <br />
-            Shipping Fees: {product.shippingFees}원
+          <Typography gutterBottom variant="h6" component="div">
+            {product.name}
+          </Typography>
+          <Typography variant="body1" color="blue">
+            {product.price.toLocaleString()} 원
           </Typography>
         </CardContent>
-        <CardActions>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1rem',
+          }}
+        >
           <Button
+            variant="outlined"
+            size="small"
+            color="primary"
             startIcon={<ShoppingCartIcon />}
+            sx={{ marginLeft: '1rem' }}
             onClick={() => handleAddToCart(product)}
           >
-            장바구니
+            장바구니 담기
           </Button>
-        </CardActions>
+          <Button
+            variant="outlined"
+            size="small"
+            color="primary"
+            startIcon={<PaymentIcon />}
+            sx={{ marginRight: '1rem' }}
+            onClick={() => handleAddToCart(product)}
+          >
+            주문하기
+          </Button>
+        </Box>
       </Card>
     </Grid>
   );

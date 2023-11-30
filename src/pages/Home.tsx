@@ -4,7 +4,7 @@ import ProductList from './product/ProductList';
 
 export default function Home() {
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', marginTop: '7rem' }}>
       <CssBaseline />
       <ProductList />
     </Box>

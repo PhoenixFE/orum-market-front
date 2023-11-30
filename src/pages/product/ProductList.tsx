@@ -1,37 +1,14 @@
 import { useEffect, useState } from 'react';
 import { ICategoryPreview, IProduct } from '../../type';
 import { api } from '../../api/api';
-import { Button, Box, Grid, Typography } from '@mui/material';
+import { Button, Box, Grid, Typography, CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { CATEGORY } from '../../constants/index';
-import CategoryNavBar from '../../components/CategoryNavBar';
 
 export default function ProductList() {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(false);
-
-  // const location = useLocation();
-  // const getCurrentCategory = () => {
-  //   const path = location.pathname.split('/');
-  //   return path[path.length - 1];
-  // };
-  // const [currentCategory, setCurrentCategory] = useState(getCurrentCategory());
-  // useEffect(() => {
-  //   setCurrentCategory(getCurrentCategory());
-  // }, [location]);
-  // const renderCategoryButtons = () => {
-  //   return CATEGORY.depth2.map((category) => (
-  //     <Button
-  //       key={category.id}
-  //       component={Link}
-  //       to={`/category/${category.dbName}`}
-  //       color={currentCategory === category.dbName ? 'primary' : 'inherit'}
-  //     >
-  //       {category.name}
-  //     </Button>
-  //   ));
-  // };
 
   useEffect(() => {
     fetchProducts();
@@ -51,17 +28,18 @@ export default function ProductList() {
   };
 
   if (loading) {
-    return <div>로딩중입니다.</div>;
+    return <CircularProgress />;
   }
 
-  if (!products || products.length === 0) {
-    return <div>상품이 없습니다.</div>;
+  if (!products.length) {
+    return <Typography>상품이 없습니다.</Typography>;
   }
 
   return (
-    <main>
-      {/* <CategoryNavBar /> */}
-      <h1>제품 전체 목록 페이지</h1>
+    <Box sx={{ padding: '1rem' }}>
+      <Typography variant="h4" gutterBottom>
+        최근 올라온 상품
+      </Typography>
       {CATEGORY.depth2.map((category) => (
         <CategoryPreview
           key={category.id}
@@ -71,7 +49,7 @@ export default function ProductList() {
           )}
         />
       ))}
-    </main>
+    </Box>
   );
 }
 
