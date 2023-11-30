@@ -7,12 +7,19 @@
   box-sizing: border-box;
 }
 
-body {
+body,
+html {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
+  overflow-x: hidden;
+}
+body {
   /* font */
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 16px;
+
+  /* 스크롤바 */
+  scrollbar-width: thin;
+  scrollbar-color: #ccc #fff;
 }

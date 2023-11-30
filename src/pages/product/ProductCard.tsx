@@ -23,7 +23,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = useAddToCart();
 
   return (
-    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
+    <Grid item xs={12} sm={6} md={4} lg={3} xl={3} mb={10}>
       <Card
         sx={{
           maxWidth: 345,
@@ -31,6 +31,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
+          backgroundColor: 'grey.50',
         }}
       >
         <CardActionArea component={Link} to={`/product/${product._id}`}>
@@ -39,7 +40,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             height="200"
             image={product.mainImages[0]}
             alt={product.name}
-            sx={{ objectFit: 'contain', padding: '16px' }}
+            sx={{ objectFit: 'cover', padding: '4px' }}
           />
         </CardActionArea>
         <CardContent>

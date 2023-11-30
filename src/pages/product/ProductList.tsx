@@ -37,7 +37,7 @@ export default function ProductList() {
 
   return (
     <Box sx={{ padding: '1rem' }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom mb={5}>
         최근 올라온 상품
       </Typography>
       {CATEGORY.depth2.map((category) => (
@@ -73,7 +73,7 @@ const CategoryPreview = ({ category, products }: ICategoryPreview) => {
       {products.length === 0 && <div>제품이 없습니다.</div>}
       {products.length > 0 && (
         <Grid container spacing={2}>
-          {products.slice(0, 5).map((product) => (
+          {products.slice(0, 4).map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </Grid>

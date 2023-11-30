@@ -34,10 +34,10 @@ export default function ProductDetail() {
   };
 
   return (
-    <>
+    <Box sx={{ p: 4 }}>
       {product && (
         <>
-          <Grid container spacing={2} sx={{ padding: 2 }}>
+          <Grid container spacing={4}>
             <Grid item xs={12} sm={6}>
               <ProductImageGallery images={product.mainImages} />
             </Grid>
@@ -45,16 +45,19 @@ export default function ProductDetail() {
               <ProductDetailsCard product={product} />
             </Grid>
             <Grid item xs={12}>
-              <h2>상품 설명</h2>
+              <Typography variant="h5" gutterBottom component="h2">
+                상품 설명
+              </Typography>
             </Grid>
             <Typography
               paragraph
               dangerouslySetInnerHTML={{ __html: product.content }}
+              sx={{ fontSize: '1rem', color: 'text.secondary' }}
             />
           </Grid>
         </>
       )}
-    </>
+    </Box>
   );
 }
 
@@ -146,16 +149,20 @@ const ProductDetailsCard = ({ product }: { product: IProduct }) => {
   };
 
   return (
-    <Card sx={{ maxWidth: 345, m: 2 }}>
+    <Card
+      sx={{ maxWidth: '100%', boxShadow: 0, border: '1px solid #e0e0e0', m: 2 }}
+    >
       <CardContent>
         <Typography variant="subtitle1" color="text.secondary" gutterBottom>
           Seller ID: {product.seller_id}
+          <br />
+          Product ID: {product._id}
         </Typography>
-        <Typography variant="h5" component="div">
-          {product.name} ({product._id})
+        <Typography gutterBottom variant="h5" component="div">
+          {product.name}
         </Typography>
         <Typography variant="h6">
-          ₩{product.price.toLocaleString('ko-KR')}
+          {product.price.toLocaleString('ko-KR')} 원
         </Typography>
         <Box
           sx={{
@@ -174,11 +181,21 @@ const ProductDetailsCard = ({ product }: { product: IProduct }) => {
           </Button>
         </Box>
       </CardContent>
-      <CardActions>
-        <Button size="large" variant="contained" onClick={perchaseProduct}>
+      <CardActions sx={{ justifyContent: 'flex-end' }}>
+        <Button
+          size="large"
+          variant="outlined"
+          color="primary"
+          onClick={perchaseProduct}
+        >
           구매하기
         </Button>
-        <Button size="large" onClick={addProductToCart}>
+        <Button
+          size="large"
+          variant="outlined"
+          color="primary"
+          onClick={addProductToCart}
+        >
           장바구니
         </Button>
       </CardActions>

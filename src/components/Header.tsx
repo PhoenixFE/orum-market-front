@@ -169,57 +169,64 @@ export default function Header() {
 
   return (
     <AppBar
-      position="fixed"
+      position="sticky"
       color="default"
       elevation={0}
-      sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
+      sx={{
+        borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+        left: 0,
+        right: 0,
+        top: 0,
+      }}
     >
-      <Container maxWidth="lg">
-        <Toolbar
-          sx={{
-            justifyContent: 'space-between',
-          }}
-        >
-          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-            >
-              ORUM
-            </Typography>
-          </Link>
+      <Toolbar
+        disableGutters
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          width: '100%', // Ensure the Toolbar is full width
+          marginRight: 'calc(-50vw + 50%)', // Adjust for scrollbar
+        }}
+      >
+        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+          >
+            ORUM
+          </Typography>
+        </Link>
 
-          <Button onClick={toggleCategoryNavBar} variant="text" color="inherit">
-            쇼핑하기
-            {showCategoryNavBar ? (
-              <KeyboardArrowUpIcon />
-            ) : (
-              <KeyboardArrowDownIcon />
-            )}
-          </Button>
+        <Button onClick={toggleCategoryNavBar} variant="text" color="inherit">
+          쇼핑하기
+          {showCategoryNavBar ? (
+            <KeyboardArrowUpIcon />
+          ) : (
+            <KeyboardArrowDownIcon />
+          )}
+        </Button>
 
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <form onSubmit={handleSearch}>
-              <Search sx={{ marginRight: '16px' }}>
-                <SearchIconWrapper>
-                  <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="검색해볼까"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  inputProps={{ 'aria-label': 'search' }}
-                />
-              </Search>
-            </form>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <form onSubmit={handleSearch}>
+            <Search sx={{ marginRight: '16px' }}>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="검색해볼까"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                inputProps={{ 'aria-label': 'search' }}
+              />
+            </Search>
+          </form>
 
-            {isLoggedIn && isLoggedInUserButton()}
-            {!isLoggedIn && notLoggedInUserButton()}
-          </Box>
-        </Toolbar>
-      </Container>
+          {isLoggedIn && isLoggedInUserButton()}
+          {!isLoggedIn && notLoggedInUserButton()}
+        </Box>
+      </Toolbar>
       {showCategoryNavBar && <CategoryNavBar />}
     </AppBar>
   );
