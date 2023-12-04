@@ -7,101 +7,45 @@ import {
   TableCell,
   Paper,
   ToggleButton,
+  Typography,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const dummySellerProductList = [
-  {
-    item: {
-      _id: 4,
-      seller_id: 7,
-      price: 8000,
-      shippingFees: 3500,
-      show: true,
-      active: true,
-      name: '등산용 양말',
-      images: 'imiageURL',
-      content: '내용',
-      createdAt: '2023-11-29',
-      updatedAt: '2023-11-29',
-      extra: {
-        category: ['H01', 'H0105'],
-        quantity: 1,
-        buyQuantity: 1,
-        order: 0,
-      },
-    },
-  },
-  {
-    item: {
-      _id: 6,
-      seller_id: 7,
-      price: 35000,
-      shippingFees: 3500,
-      show: true,
-      active: true,
-      name: '바람막이',
-      images: 'imiageURL',
-      content: '내용',
-      createdAt: '2023-11-29',
-      updatedAt: '2023-11-29',
-      extra: {
-        category: ['H01', 'H0101'],
-        quantity: 1,
-        buyQuantity: 1,
-        order: 0,
-      },
-    },
-  },
-  {
-    item: {
-      _id: 8,
-      seller_id: 5,
-      price: 20000,
-      shippingFees: 2500,
-      show: true,
-      active: true,
-      name: '등산용 바지',
-      images: 'imiageURL',
-      content: '내용',
-      createdAt: '2023-11-29',
-      updatedAt: '2023-11-29',
-      extra: {
-        category: ['H01', 'H0102'],
-        quantity: 1,
-        buyQuantity: 1,
-        order: 0,
-      },
-    },
-  },
-  {
-    item: {
-      _id: 10,
-      seller_id: 7,
-      price: 40000,
-      shippingFees: 3500,
-      show: true,
-      active: true,
-      name: '등산용 배낭',
-      images: 'imiageURL',
-      content: '내용',
-      createdAt: '2023-11-30',
-      updatedAt: '2023-11-30',
-      extra: {
-        category: ['H01', 'H0105'],
-        quantity: 1,
-        buyQuantity: 1,
-        order: 0,
-      },
-    },
-  },
-];
+import { api } from '../../api/api';
+import { IProduct } from '../../type';
 
 export default function ProductManager() {
   const _id = localStorage.getItem('_id');
 
+  const [productList, setProductList] = useState<IProduct[]>([]);
   const [isShow, setIsShow] = useState(false);
+
+  // 날짜 변환 함수
+  function formatDate(dateString: string) {
+    return new Intl.DateTimeFormat('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(new Date(dateString));
+  }
+
+  useEffect(() => {
+    const fetchSellerProductData = async () => {
+      try {
+        const response = await api.getProductList();
+        const getMatchItem = response.data.item.filter(
+          (id: IProduct) => id.seller_id === Number(_id),
+        );
+        setProductList(getMatchItem);
+      } catch (error) {
+        console.log('상품 목록을 가져오는데 실패했습니다', error);
+      }
+    };
+    fetchSellerProductData();
+  }, []);
+
+  console.log('받아온 데이터:', productList);
 
   return (
     <>
@@ -123,39 +67,42 @@ export default function ProductManager() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {dummySellerProductList
-              .filter((matchId) => matchId.item.seller_id === Number(_id))
-              .map((rows) => (
-                <TableRow key={rows.item._id}>
-                  <TableCell align="center">
-                    {rows.item.updatedAt} <br /> {rows.item._id}
-                  </TableCell>
-                  <TableCell align="center">
-                    {rows.item.extra.category[1]}
-                  </TableCell>
-                  <TableCell align="center">{rows.item.images}</TableCell>
-                  <TableCell align="center">{rows.item.name}</TableCell>
-                  <TableCell align="center">
-                    {rows.item.extra.quantity}
-                  </TableCell>
-                  <TableCell align="center">{rows.item.price}</TableCell>
-                  <TableCell align="center">
-                    <ToggleButton
-                      value="check"
-                      selected={isShow}
-                      size={'small'}
-                      onChange={() => {
-                        setIsShow(!rows.item.show);
-                      }}
-                    >
-                      <CheckIcon />
-                    </ToggleButton>
-                  </TableCell>
-                  <TableCell>
-                    <button type="button">수정하기</button>
-                  </TableCell>
-                </TableRow>
-              ))}
+            {productList.map((rows) => (
+              <TableRow key={rows._id}>
+                <TableCell align="center">
+                  <Typography variant="body2" color="text.secondary">
+                    {formatDate(rows.createdAt)}
+                  </Typography>
+                  {rows._id}
+                </TableCell>
+                <TableCell align="center">{rows.extra.category[1]}</TableCell>
+                <TableCell align="center">
+                  <img
+                    src={`${rows.mainImages[0]}`}
+                    alt="main-Image"
+                    style={{ width: '80px' }}
+                  />
+                </TableCell>
+                <TableCell align="center">{rows.name}</TableCell>
+                <TableCell align="center">{rows.quantity}</TableCell>
+                <TableCell align="center">{rows.price}</TableCell>
+                <TableCell align="center">
+                  <ToggleButton
+                    value="check"
+                    selected={isShow}
+                    size={'small'}
+                    onChange={() => {
+                      setIsShow(!rows.show);
+                    }}
+                  >
+                    <CheckIcon />
+                  </ToggleButton>
+                </TableCell>
+                <TableCell>
+                  <button type="button">수정하기</button>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
