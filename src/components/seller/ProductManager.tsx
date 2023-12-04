@@ -17,10 +17,10 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/api';
 import { IProduct } from '../../type';
 import { CATEGORY } from '../../constants/index';
+import { Link } from 'react-router-dom';
 
 export default function ProductManager() {
   const _id = localStorage.getItem('_id');
-
   const [productList, setProductList] = useState<IProduct[]>([]);
   const [isShow, setIsShow] = useState(false);
 
@@ -47,8 +47,6 @@ export default function ProductManager() {
     };
     fetchSellerProductData();
   }, []);
-
-  console.log('받아온 데이터:', productList);
 
   return (
     <>
@@ -124,9 +122,14 @@ export default function ProductManager() {
                     <Button type="button" variant="contained">
                       상세보기
                     </Button>
-                    <Button type="button" variant="contained">
-                      수정하기
-                    </Button>
+                    <Link
+                      to={`/user/${rows._id}/product-update`}
+                      state={{ productId: `${rows._id}` }}
+                    >
+                      <Button type="button" variant="contained">
+                        수정하기
+                      </Button>
+                    </Link>
                   </Box>
                 </TableCell>
               </TableRow>
