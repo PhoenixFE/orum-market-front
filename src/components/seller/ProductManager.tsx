@@ -8,12 +8,15 @@ import {
   Paper,
   ToggleButton,
   Typography,
+  Box,
+  Button,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import { useEffect, useState } from 'react';
 
 import { api } from '../../api/api';
 import { IProduct } from '../../type';
+import { CATEGORY } from '../../constants/index';
 
 export default function ProductManager() {
   const _id = localStorage.getItem('_id');
@@ -73,9 +76,19 @@ export default function ProductManager() {
                   <Typography variant="body2" color="text.secondary">
                     {formatDate(rows.createdAt)}
                   </Typography>
-                  {rows._id}
+                  ({rows._id})
                 </TableCell>
-                <TableCell align="center">{rows.extra.category[1]}</TableCell>
+                <TableCell align="center">
+                  {CATEGORY.depth2
+                    .filter(
+                      (category) => category.dbCode === rows.extra.category[1],
+                    )
+                    .map((categoryName) => (
+                      <Typography key={categoryName.id} variant="body2">
+                        {categoryName.name}
+                      </Typography>
+                    ))}
+                </TableCell>
                 <TableCell align="center">
                   <img
                     src={`${rows.mainImages[0]}`}
@@ -85,7 +98,9 @@ export default function ProductManager() {
                 </TableCell>
                 <TableCell align="center">{rows.name}</TableCell>
                 <TableCell align="center">{rows.quantity}</TableCell>
-                <TableCell align="center">{rows.price}</TableCell>
+                <TableCell align="center">
+                  {rows.price.toLocaleString()}원
+                </TableCell>
                 <TableCell align="center">
                   <ToggleButton
                     value="check"
@@ -98,8 +113,21 @@ export default function ProductManager() {
                     <CheckIcon />
                   </ToggleButton>
                 </TableCell>
-                <TableCell>
-                  <button type="button">수정하기</button>
+                <TableCell align="center">
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                    }}
+                  >
+                    <Button type="button" variant="contained">
+                      상세보기
+                    </Button>
+                    <Button type="button" variant="contained">
+                      수정하기
+                    </Button>
+                  </Box>
                 </TableCell>
               </TableRow>
             ))}
