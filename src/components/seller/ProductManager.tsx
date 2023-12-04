@@ -48,6 +48,22 @@ export default function ProductManager() {
     fetchSellerProductData();
   }, []);
 
+  if (productList.length === 0) {
+    return (
+      <>
+        <Typography variant="h3" sx={{ marginBottom: '1rem' }}>
+          등록된 물품이 없습니다.
+        </Typography>
+        <Link to={`/user/${_id}/product-create`}>
+          <Button type="button" variant="contained" size="large">
+            물품 등록하러 가기
+          </Button>
+        </Link>
+      </>
+    );
+  }
+
+  console.log(productList);
   return (
     <>
       <TableContainer component={Paper}>
