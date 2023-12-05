@@ -20,6 +20,9 @@ export default function SignUpPage() {
     password: '',
     name: '',
     type: 'user',
+    extra: {
+      membershipClass: 'MC01',
+    },
   });
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState('');
