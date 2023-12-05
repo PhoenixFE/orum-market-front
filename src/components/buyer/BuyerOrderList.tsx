@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 
 import { api } from '../../api/api';
 import { IOrderItem } from '../../type';
+import { Link } from 'react-router-dom';
 
 export default function BuyerOrdeList() {
   const [orderList, setOrderList] = useState<IOrderItem[]>([]);
@@ -38,7 +39,20 @@ export default function BuyerOrdeList() {
     getOrderProductInfo();
   }, []);
 
-  console.log('orderList:', orderList);
+  if (orderList.length === 0) {
+    return (
+      <>
+        <Typography variant="h3" sx={{ marginBottom: '1rem' }}>
+          결제 내역이 없습니다.
+        </Typography>
+        <Link to={`/`}>
+          <Button type="button" variant="contained" size="large">
+            구매하러 가기
+          </Button>
+        </Link>
+      </>
+    );
+  }
 
   return (
     <>
