@@ -7,109 +7,107 @@ import {
   TableCell,
   Paper,
   Button,
+  Typography,
 } from '@mui/material';
+import { useEffect, useState } from 'react';
 
-const dummyUserOderList = [
-  {
-    _id: 1,
-    user_id: 1,
-    state: '0S010',
-    products: [
-      {
-        _id: 1,
-        name: '네파 푸퍼',
-        images: 'imageUrl',
-        quantity: 1,
-        price: 12000,
-      },
-    ],
-    cost: {
-      products: 12000,
-      shippingFees: 2500,
-      total: 14500,
-    },
-    address: {
-      name: '우리집',
-      value: '서울시 강남구 어디동',
-    },
-    createAt: '2023-11-29',
-    updateAt: '2023-11-29',
-  },
-  {
-    _id: 2,
-    user_id: 1,
-    state: '0S010',
-    products: [
-      {
-        _id: 2,
-        name: '등산용 백팩',
-        images: 'imageUrl',
-        quantity: 1,
-        price: 24000,
-      },
-    ],
-    cost: {
-      products: 24000,
-      shippingFees: 3000,
-      total: 27000,
-    },
-    address: {
-      name: '우리집',
-      value: '서울시 강남구 어디동',
-    },
-    createAt: '2023-11-29',
-    updateAt: '2023-11-29',
-  },
-];
+import { api } from '../../api/api';
+import { IOrderItem } from '../../type';
+import { Link } from 'react-router-dom';
+import { ORDER_STATE } from '../../constants';
 
 export default function BuyerOrdeList() {
+  const [orderList, setOrderList] = useState<IOrderItem[]>([]);
+
+  // 날짜 변환 함수
+  function formatDate(dateString: string) {
+    return new Intl.DateTimeFormat('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(new Date(dateString));
+  }
+
+  useEffect(() => {
+    const getOrderProductInfo = async () => {
+      try {
+        const response = await api.getOrderProductInfo();
+        setOrderList(response.data.item);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getOrderProductInfo();
+  }, []);
+
+  if (orderList.length === 0) {
+    return (
+      <>
+        <Typography variant="h3" sx={{ marginBottom: '1rem' }}>
+          결제 내역이 없습니다.
+        </Typography>
+        <Link to={`/`}>
+          <Button type="button" variant="contained" size="large">
+            구매하러 가기
+          </Button>
+        </Link>
+      </>
+    );
+  }
+
   return (
     <>
       <TableContainer component={Paper}>
-        <Table aria-label="구매내역">
+        <Table aria-label="결제내역">
           <TableHead>
             <TableRow>
               <TableCell align="center">
-                주문일자
+                결제일
                 <br /> (주문번호)
               </TableCell>
-              <TableCell align="center">이미지</TableCell>
               <TableCell align="center">상품명</TableCell>
               <TableCell align="center">수량</TableCell>
-              <TableCell align="center">상품가격</TableCell>
+              <TableCell align="center">
+                총 결제금액 <br />
+                (배송비)
+              </TableCell>
               <TableCell align="center">주문처리상태</TableCell>
-              <TableCell align="center">별점평가</TableCell>
+              <TableCell align="center"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {dummyUserOderList.map((rows) => (
+            {orderList.map((rows) => (
               <TableRow key={rows._id}>
                 <TableCell align="center">
-                  {rows.createAt} <br /> ({rows._id})
+                  <Typography variant="body2" color="text.secondary">
+                    {formatDate(rows.createdAt)}
+                  </Typography>
+                  ({rows._id})
                 </TableCell>
-                <TableCell align="center">{rows.products[0].images}</TableCell>
-                <TableCell align="center">{rows.products[0].name}</TableCell>
                 <TableCell align="center">
-                  {rows.products[0].quantity}
+                  {rows.products[0].name} 포함 총 {rows.products.length}건
                 </TableCell>
-                <TableCell align="center">{rows.products[0].price}</TableCell>
-                <TableCell align="center">{rows.state}</TableCell>
+                <TableCell align="center">{rows.products.length}</TableCell>
                 <TableCell align="center">
-                  <Button type="button">별점등록</Button>
+                  {rows.cost.total.toLocaleString()}원<br /> (
+                  {rows.cost.shippingFees.toLocaleString()}원)
+                </TableCell>
+                <TableCell align="center">
+                  {ORDER_STATE.codes
+                    .filter((state) => state.code === rows.state)
+                    .map((stateValue) => (
+                      <Typography key={stateValue.code} variant="body2">
+                        {stateValue.value}
+                      </Typography>
+                    ))}
+                </TableCell>
+                <TableCell align="center">
+                  <Button type="button" variant="outlined">
+                    별점평가
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
-            <TableRow>
-              <TableCell align="right" colSpan={7}>
-                총 가격{' '}
-                {dummyUserOderList[0].cost.products +
-                  ' + ' +
-                  dummyUserOderList[0].cost.shippingFees +
-                  ' = ' +
-                  dummyUserOderList[0].cost.total +
-                  '원'}
-              </TableCell>
-            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>

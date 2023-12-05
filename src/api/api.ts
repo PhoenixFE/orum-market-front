@@ -140,4 +140,7 @@ export const api = {
 
   // 상품 결제
   checkOut: (orderData: any) => axiosInstance.post('/orders/', orderData),
+
+  // 구매자 구매 목록 조회
+  getOrderProductInfo: () => axiosInstance.get('/orders/'),
 };
