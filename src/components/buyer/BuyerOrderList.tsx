@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/api';
 import { IOrderItem } from '../../type';
 import { Link } from 'react-router-dom';
+import { ORDER_STATE } from '../../constants';
 
 export default function BuyerOrdeList() {
   const [orderList, setOrderList] = useState<IOrderItem[]>([]);
@@ -91,7 +92,15 @@ export default function BuyerOrdeList() {
                   {rows.cost.total.toLocaleString()}원<br /> (
                   {rows.cost.shippingFees.toLocaleString()}원)
                 </TableCell>
-                <TableCell align="center">{rows.state}</TableCell>
+                <TableCell align="center">
+                  {ORDER_STATE.codes
+                    .filter((state) => state.code === rows.state)
+                    .map((stateValue) => (
+                      <Typography key={stateValue.code} variant="body2">
+                        {stateValue.value}
+                      </Typography>
+                    ))}
+                </TableCell>
                 <TableCell align="center">
                   <Button type="button" variant="outlined">
                     별점평가

@@ -179,3 +179,80 @@ export const PRICE_MARKS = [
     value: 100000,
   },
 ];
+
+export const ORDER_STATE = {
+  _id: 'orderState',
+  title: '주문 상태',
+  codes: [
+    {
+      sort: 1,
+      code: 'OS010',
+      value: '주문 완료',
+    },
+    {
+      sort: 2,
+      code: 'OS020',
+      value: '결제 완료',
+    },
+    {
+      sort: 3,
+      code: 'OS030',
+      value: '배송 준비중',
+    },
+    {
+      sort: 4,
+      code: 'OS035',
+      value: '배송중',
+    },
+    {
+      sort: 5,
+      code: 'OS040',
+      value: '배송 완료',
+    },
+    {
+      sort: 6,
+      code: 'OS110',
+      value: '반품 요청',
+    },
+    {
+      sort: 7,
+      code: 'OS120',
+      value: '반품 처리중',
+    },
+    {
+      sort: 8,
+      code: 'OS130',
+      value: '반품 완료',
+    },
+    {
+      sort: 9,
+      code: 'OS210',
+      value: '교환 요청',
+    },
+    {
+      sort: 10,
+      code: 'OS220',
+      value: '교환 처리중',
+    },
+    {
+      sort: 11,
+      code: 'OS230',
+      value: '교환 완료',
+    },
+    {
+      sort: 12,
+      code: 'OS310',
+      value: '환불 요청',
+    },
+    {
+      sort: 13,
+      code: 'OS320',
+      value: '환불 처리중',
+    },
+    {
+      sort: 14,
+      code: 'OS330',
+      value: '환불 완료',
+    },
+  ],
+};
