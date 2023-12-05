@@ -63,7 +63,6 @@ export default function ProductManager() {
     );
   }
 
-  console.log(productList);
   return (
     <>
       <TableContainer component={Paper}>
@@ -132,12 +131,15 @@ export default function ProductManager() {
                     sx={{
                       display: 'flex',
                       flexDirection: 'column',
+                      alignItems: 'center',
                       gap: 1,
                     }}
                   >
-                    <Button type="button" variant="contained">
-                      상세보기
-                    </Button>
+                    <Link to={`/product/${rows._id}`}>
+                      <Button type="button" variant="contained">
+                        상세보기
+                      </Button>
+                    </Link>
                     <Link
                       to={`/user/${rows._id}/product-update`}
                       state={{ productId: `${rows._id}` }}
