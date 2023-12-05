@@ -47,9 +47,11 @@ export default function SignInPage() {
 
     try {
       const response = await api.signIn({ email, password });
-      localStorage.setItem('token', response.data.item.token.accessToken);
+      logIn(
+        response.data.item.token.accessToken,
+        response.data.item.token.refreshToken,
+      );
       localStorage.setItem('_id', response.data.item._id);
-      logIn(response.data.item.token.accessToken);
       alert('로그인 되었습니다. 환영합니다!');
       navigate('/');
     } catch (error) {

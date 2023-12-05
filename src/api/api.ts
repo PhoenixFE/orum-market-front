@@ -21,6 +21,55 @@ axiosInstance.interceptors.request.use(
   },
 );
 
+// 응답 인터셉터 추가
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      const originalRequest = error.config;
+      if (error.response.data.message === 'Token Expired') {
+        try {
+          const refreshToken = localStorage.getItem('refreshToken');
+          const res = await axiosInstance.post('/users/refresh', {
+            refreshToken,
+          });
+          localStorage.setItem('token', res.data.accessToken);
+          originalRequest.headers['Authorization'] =
+            `Bearer ${res.data.accessToken}`;
+          return axiosInstance(originalRequest);
+        } catch (refreshError) {
+          // Handle failed refresh (e.g., redirect to login)
+          console.error('Failed to refresh token:', refreshError);
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+          // Redirect or handle logout
+        }
+      }
+    }
+    return Promise.reject(error);
+  },
+);
+
+export const refreshAccessToken = async () => {
+  try {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+    // Updating to a GET request as per API documentation
+    const response = await axios.get(`${API_BASE_URL}/users/refresh`, {
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+      },
+    });
+    localStorage.setItem('token', response.data.accessToken);
+    // Optionally update the state or context to reflect the new token
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    // Handle errors, like redirecting to the login page
+  }
+};
+
 export const api = {
   // 회원 가입
   signUp: (userData: any) => axiosInstance.post('/users/', userData),
