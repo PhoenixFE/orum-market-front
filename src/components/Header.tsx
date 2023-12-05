@@ -11,27 +11,18 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import {
-  Avatar,
-  Badge,
-  Box,
-  Button,
-  Container,
-  Menu,
-  MenuItem,
-} from '@mui/material';
+import { Avatar, Badge, Box, Button, Menu, MenuItem } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart, useUserStore } from '../lib/store';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Logout } from '@mui/icons-material';
 import { IUserStore } from '../type';
 import useOutsideClick from '../hooks/useOutsideClick';
 import CategoryNavBar from './CategoryNavBar';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { refreshAccessToken } from '../api/api';
 
 export default function Header() {
   const { isLoggedIn, logOut } = useUserStore() as IUserStore;
@@ -41,77 +32,6 @@ export default function Header() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
-  const [tokenExpiryTime, setTokenExpiryTime] = useState('');
-
-  const getRemainingTime = () => {
-    const token = localStorage.getItem('token');
-    if (!token) return '00:00:00';
-
-    const decodedToken = JSON.parse(atob(token.split('.')[1]));
-    const currentTime = Math.floor(Date.now() / 1000);
-    const timeLeftInSeconds = decodedToken.exp - currentTime;
-
-    if (timeLeftInSeconds <= 0) return '00:00:00';
-
-    const hours = Math.floor(timeLeftInSeconds / 3600);
-    const minutes = Math.floor((timeLeftInSeconds % 3600) / 60);
-    const seconds = timeLeftInSeconds % 60;
-
-    return `${hours.toString().padStart(2, '0')}:${minutes
-      .toString()
-      .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
-
-  const isTokenExpiringSoon = () => {
-    const token = localStorage.getItem('token');
-    if (!token) return false;
-
-    const expiryTime = JSON.parse(atob(token.split('.')[1])).exp;
-    const currentTime = Math.floor(Date.now() / 1000);
-    const timeLeft = expiryTime - currentTime;
-
-    return timeLeft > 0 && timeLeft < 300;
-  };
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (isTokenExpiringSoon()) {
-  //       const remainingTime = getRemainingTime();
-  //       console.log('Remaining time:', remainingTime);
-  //       setTokenExpiryTime(remainingTime);
-
-  //       const userResponse = window.confirm(
-  //         'Your session is about to expire. Would you like to extend it?',
-  //       );
-  //       if (userResponse) {
-  //         refreshAccessToken();
-  //       }
-  //     }
-  //   }, 60000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
-
-  useEffect(() => {
-    const updateTokenTime = () => {
-      const remainingTime = getRemainingTime();
-      setTokenExpiryTime(remainingTime);
-
-      if (isTokenExpiringSoon()) {
-        const userResponse = window.confirm(
-          'Your session is about to expire in 5 minutes. Would you like to extend it?',
-        );
-        if (userResponse) {
-          refreshAccessToken();
-        }
-      }
-    };
-
-    updateTokenTime();
-    const intervalId = setInterval(updateTokenTime, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [isLoggedIn]);
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -155,7 +75,6 @@ export default function Header() {
 
   const handleLogout = () => {
     logOut();
-    localStorage.removeItem('token');
     alert('로그아웃 되었습니다. 다음에 또 만나요!');
     setOpenLogoutDialog(false);
     navigate('/');
@@ -294,11 +213,6 @@ export default function Header() {
               />
             </Search>
           </form>
-          {isLoggedIn && tokenExpiryTime && (
-            <Typography variant="body2" sx={{ marginRight: '20px' }}>
-              Token expires in: {tokenExpiryTime}
-            </Typography>
-          )}
 
           {isLoggedIn && isLoggedInUserButton()}
           {!isLoggedIn && notLoggedInUserButton()}
