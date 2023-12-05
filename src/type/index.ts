@@ -52,3 +52,19 @@ export interface IUserStore {
   logIn: (token: string) => void;
   logOut: () => void;
 }
+
+export interface IOrderItem {
+  _id: number;
+  user_id: number;
+  state: string;
+  products: IProduct[];
+  cost: {
+    discount: number[];
+    products: number;
+    shippingFees: number;
+    total: number;
+  };
+  address: string[];
+  createdAt: string;
+  updatedAt: string;
+}
