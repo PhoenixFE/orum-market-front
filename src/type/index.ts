@@ -68,3 +68,10 @@ export interface IOrderItem {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface IUserInfo {
+  _id: number;
+  email: string;
+  name: string;
+  address?: string;
+}

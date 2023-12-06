@@ -10,6 +10,7 @@ import {
 
 import { api } from '../../api/api';
 import AddressForm from '../address/AddressForm';
+import { IUserInfo } from '../../type/index';
 
 const Form = styled.form`
   display: flex;
@@ -19,16 +20,9 @@ const Form = styled.form`
   gap: 0.5rem;
 `;
 
-export interface IBuyerInfo {
-  _id: number;
-  email: string;
-  name: string;
-  address?: string;
-}
-
 export default function BuyerInfo() {
   const userId = localStorage.getItem('_id');
-  const [buyerInfoData, setBuyerInfoData] = useState<IBuyerInfo>({
+  const [buyerInfoData, setBuyerInfoData] = useState<IUserInfo>({
     _id: 0,
     email: '',
     name: '',
