@@ -26,6 +26,7 @@ import { Link } from 'react-router-dom';
 export default function ProductManager() {
   const _id = localStorage.getItem('_id');
   const [productList, setProductList] = useState<IProduct[]>([]);
+  const [sortedProductList, setSortedProductList] = useState<IProduct[]>([]);
   const [sortOrder, setSortOrder] = useState('최신순');
   const [isShow, setIsShow] = useState(false);
 
@@ -52,6 +53,34 @@ export default function ProductManager() {
     };
     fetchSellerProductData();
   }, []);
+
+  // SORT 정렬
+  useEffect(() => {
+    let sorted = [...productList];
+    switch (sortOrder) {
+      case '최신순':
+        sorted.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+        break;
+      case '오래된순':
+        sorted.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        );
+        break;
+      case '가-하':
+        sorted.sort((a, b) => a.price - b.price);
+        break;
+      case '하-가':
+        sorted.sort((a, b) => b.price - a.price);
+        break;
+      default:
+        break;
+    }
+    setSortedProductList(sorted);
+  }, [productList, sortOrder]);
 
   if (productList.length === 0) {
     return (
@@ -111,7 +140,7 @@ export default function ProductManager() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {productList.map((rows) => (
+              {sortedProductList.map((rows) => (
                 <TableRow key={rows._id}>
                   <TableCell align="center">
                     <Typography variant="body2" color="text.secondary">
