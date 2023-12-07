@@ -5,13 +5,17 @@ import {
   Button,
   Box,
   IconButton,
+  useMediaQuery,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
-import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
 import TuneIcon from '@mui/icons-material/Tune';
 import AppsRoundedIcon from '@mui/icons-material/AppsRounded';
-import { styled } from '@mui/material/styles';
-import { useState } from 'react';
+import { styled, useTheme } from '@mui/material/styles';
+import React, { useState } from 'react';
 import { SORT_OPTIONS } from '../constants';
 
 interface INavigationBar {
@@ -31,9 +35,11 @@ export default function NavigationBar({
 }: INavigationBar) {
   const [selectedSortOrder, setSelectedSortOrder] = useState<string>('최신순');
   const [itemsPerPage, setItemsPerPage] = useState<number>(4);
+  const theme = useTheme();
+  const isMdDown = useMediaQuery(theme.breakpoints.down('md'));
 
-  const onSortChange = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const newSortOrder = event.currentTarget.value;
+  const onSortChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const newSortOrder = event.target.value as string;
     setSelectedSortOrder(newSortOrder);
     handleSort(newSortOrder);
   };
@@ -62,37 +68,57 @@ export default function NavigationBar({
         </IconButton>
 
         <Typography variant="h6">총 {totalProducts}개의 상품</Typography>
-        <Box sx={{ marginLeft: 'auto' }}>
-          {SORT_OPTIONS.map((option) => (
-            <Button
-              key={option.value}
-              value={option.value}
-              color="inherit"
-              onClick={onSortChange}
+
+        {isMdDown ? (
+          <FormControl sx={{ m: 1, minWidth: 120 }}>
+            <InputLabel id="filter-select-label">Filter</InputLabel>
+            <Select
+              labelId="filter-select-label"
+              id="filter-select"
+              value={selectedSortOrder}
+              label="Filter"
+              onChange={onSortChange}
+            >
+              {SORT_OPTIONS.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        ) : (
+          <Box sx={{ marginLeft: 'auto' }}>
+            {SORT_OPTIONS.map((option) => (
+              <Button
+                key={option.value}
+                value={option.value}
+                color="inherit"
+                onClick={onSortChange}
+                sx={{
+                  fontWeight: isSortSelected(option.value) ? '700' : '300',
+                }}
+              >
+                {option.label}
+              </Button>
+            ))}
+            <IconButton
+              onClick={() => handleGridChange(4)}
               sx={{
-                fontWeight: isSortSelected(option.value) ? '700' : '300',
+                color: itemsPerPage === 4 ? 'black' : 'lightgray',
               }}
             >
-              {option.label}
-            </Button>
-          ))}
-          <IconButton
-            onClick={() => handleGridChange(4)}
-            sx={{
-              color: itemsPerPage === 4 ? 'black' : 'lightgray',
-            }}
-          >
-            <GridViewRoundedIcon />
-          </IconButton>
-          <IconButton
-            onClick={() => handleGridChange(8)}
-            sx={{
-              color: itemsPerPage === 8 ? 'black' : 'lightgray',
-            }}
-          >
-            <AppsRoundedIcon />
-          </IconButton>
-        </Box>
+              <GridViewRoundedIcon />
+            </IconButton>
+            <IconButton
+              onClick={() => handleGridChange(8)}
+              sx={{
+                color: itemsPerPage === 8 ? 'black' : 'lightgray',
+              }}
+            >
+              <AppsRoundedIcon />
+            </IconButton>
+          </Box>
+        )}
       </NavbarContent>
     </StickyNavbar>
   );
@@ -115,5 +141,4 @@ const NavbarContent = styled(Toolbar)(({ theme }) => ({
   padding: 0,
   margin: '0 auto',
   width: '100%',
-  maxWidth: '1200px',
 }));

@@ -24,7 +24,6 @@ export function SearchPage() {
   const [itemsPerPage, setItemsPerPage] = useState(4);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [expanded, setExpanded] = useState<string | false>(false);
 
   function toggleSidebar() {
     setIsSidebarOpen(!isSidebarOpen);
@@ -46,11 +45,6 @@ export function SearchPage() {
   const handleDisplayChange = (value: number) => {
     setItemsPerPage(value);
   };
-
-  const handleAccordionChange =
-    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpanded(isExpanded ? panel : false);
-    };
 
   // 아이템 사이즈를 계산하는 함수
   const getItemSize = () => {
@@ -175,7 +169,7 @@ export function SearchPage() {
             aria-controls="panel1a-content"
             id="panel1a-header"
           >
-            <Typography>Accordion 1</Typography>
+            <Typography>카테고리</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography>
@@ -191,7 +185,7 @@ export function SearchPage() {
             aria-controls="panel2a-content"
             id="panel2a-header"
           >
-            <Typography>Accordion 2</Typography>
+            <Typography>가격</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography>
@@ -207,7 +201,7 @@ export function SearchPage() {
             aria-controls="panel3a-content"
             id="panel3a-header"
           >
-            <Typography>Accordion 3</Typography>
+            <Typography>배송료</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography>
@@ -232,11 +226,7 @@ export function SearchPage() {
           display: 'flex',
           justifyContent: 'center',
         }}
-      >
-        {/* <Button onClick={toggleSidebar} variant="outlined" color="inherit">
-          {isSidebarOpen ? 'Hide Sidebar' : 'Show Sidebar'}
-        </Button> */}
-      </Box>
+      ></Box>
 
       <StickyNavbar
         totalProducts={sortedProducts.length}
