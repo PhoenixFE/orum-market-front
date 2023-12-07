@@ -19,6 +19,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import { api } from '../../api/api';
 import { CATEGORY, QUALITY } from '../../constants/index';
+import path from 'path';
 // import { validateProductTitle } from '../../lib/validation';
 
 const initCreateData = {
@@ -132,10 +133,10 @@ export default function ProductCreate() {
       //파일이 여러개일때
       if (response.data.files) {
         let fileArr = response.data.files;
-        const resImgUrl = fileArr.map(
-          (images) => `https://localhost:443${images.path}`,
-        );
-
+        const resImgUrl = fileArr.map((images) => ({
+          id: images.name,
+          path: `https://localhost:443${images.path}`,
+        }));
         setFilePreview([...filePreview, ...resImgUrl]);
         setProductData({
           ...productData,
@@ -144,7 +145,10 @@ export default function ProductCreate() {
 
         //단일파일일때
       } else {
-        let fileArr = `https://localhost:443${response.data.file.path}`;
+        let fileArr = {
+          id: response.data.file.name,
+          path: `https://localhost:443${response.data.file.path}`,
+        };
 
         setFilePreview([...filePreview, fileArr]);
         setProductData({
@@ -156,39 +160,54 @@ export default function ProductCreate() {
       console.log('사진첨부에러발생', error);
     }
   };
-  const handelFileRemove = (indexToRemove) => {
-    const updatedFilePreview = [...filePreview];
-    updatedFilePreview.splice;
+  const handleFileRemove = (indexToRemove) => {
+    let updatedFilePreview = [...filePreview];
+    // updatedFilePreview.splice(indexToRemove, 1);
+    updatedFilePreview = updatedFilePreview.filter(
+      (item) => item.id !== indexToRemove,
+    );
+    setFilePreview(updatedFilePreview);
+
+    setProductData({
+      ...productData,
+      mainImages: filePreview,
+    });
   };
 
   return (
     <>
       <form>
         <>
-          사진
+          상품 사진<br></br>
           <Button
             component="label"
             variant="contained"
             startIcon={<CloudUploadIcon />}
             onChange={handleFileUpload}
           >
-            Upload file
+            파일 업로드
             <input hidden type="file" multiple accept="image/*" />
           </Button>
-          이미지는 3개까지 첨부 가능합니다.
-          {filePreview.map((path, index) => (
-            <img
-              key={index}
-              src={path}
-              alt={'File Preview'}
-              style={{ marginTop: '10px', maxWidth: '60%' }}
-            />
+          <h3>이미지는 3개까지 첨부 가능합니다.</h3>
+          {filePreview.map((item) => (
+            <div key={item.id}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <IconButton
+                  aria-label="delete"
+                  size="large"
+                  onClick={() => handleFileRemove(item.id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Stack>
+              <img
+                key={item.id}
+                src={item.path}
+                alt={'File Preview'}
+                style={{ marginTop: '10px', maxWidth: '60%' }}
+              />
+            </div>
           ))}
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <IconButton aria-label="delete" size="small">
-              <DeleteIcon fontSize="inherit" />
-            </IconButton>
-          </Stack>
         </>
         <br />
         <br />
