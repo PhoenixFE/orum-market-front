@@ -155,7 +155,7 @@ export const api = {
 
   // 파일 업로드
   uploadFile: (formData: any) =>
-    axiosInstance.post('/files', formData, {
+    axiosInstance.post('/files/', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

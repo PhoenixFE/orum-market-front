@@ -1,6 +1,7 @@
 import { useState } from 'react';
 // import { Link, useParams } from 'react-router-dom';
 // import axios from 'axios';
+import { styled } from '@mui/material/styles';
 import {
   Input,
   TextField,
@@ -8,8 +9,13 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  Button,
+  Stack,
+  IconButton,
 } from '@mui/material';
 // import { CleaningServices } from '@mui/icons-material';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import { api } from '../../api/api';
 import { CATEGORY, QUALITY } from '../../constants/index';
@@ -37,27 +43,28 @@ const initCreateData = {
 
 export default function ProductCreate() {
   const [productData, setProductData] = useState({
-    mainImages: ['image/url'],
+    mainImages: [''],
     extra: { category: ['H01', 'H0101'] },
-    quality: '1',
     price: '',
     shippingFees: '',
     title: '',
     content: '',
+    quantity: '',
   });
 
   const [isValid, setIsValid] = useState(true);
+
+  const [filePreview, setFilePreview] = useState([]);
+
   // const [contentError, setContentError] = useState('');
   // const [numberError, setNumberError] = useState('');
   // const [titleError, setTitleError] = useState('');
-
   const handleAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-
     setProductData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMoveBack = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     window.history.back();
   };
@@ -69,29 +76,27 @@ export default function ProductCreate() {
     });
   };
 
-  const handleQuilty = (quiltySelected: string) => {
+  function handleQuantity(quantitySelected: string) {
     setProductData({
       ...productData,
-      quality: quiltySelected,
+      quantity: quantitySelected,
     });
-  };
+  }
 
+  //상품데이터 등록하기
   const productSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('버튼 눌림!');
-
     if (!isValid) {
       alert('양식이 올바르지 않습니다.');
       return;
     }
     try {
       const response = await api.createProduct(productData);
-      console.log(response);
       setProductData({
         ...productData,
-        mainImages: ['image/url'],
+        mainImages: [],
         extra: { category: ['H01', 'H0101'] },
-        quality: '1',
+        quantity: '1',
         price: '',
         shippingFees: '',
         title: '',
@@ -102,17 +107,88 @@ export default function ProductCreate() {
     }
   };
 
+  // 업로드 버튼 클릭 시 실행되는 함수
+  const handleFileUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const fileInput = e.target.files;
+    if (!fileInput) return;
+
+    const totalFiles = filePreview.length + fileInput.length;
+
+    if (totalFiles > 3) {
+      alert('이미지는 3개까지 첨부가능합니다');
+      return;
+    }
+
+    const formData = new FormData();
+
+    for (let i = 0; i < fileInput.length; i++) {
+      formData.append('attach', fileInput[i]);
+    }
+
+    try {
+      const response = await api.uploadFile(formData);
+
+      //파일이 여러개일때
+      if (response.data.files) {
+        let fileArr = response.data.files;
+        const resImgUrl = fileArr.map(
+          (images) => `https://localhost:443${images.path}`,
+        );
+
+        setFilePreview([...filePreview, ...resImgUrl]);
+        setProductData({
+          ...productData,
+          mainImages: [...filePreview, ...resImgUrl],
+        });
+
+        //단일파일일때
+      } else {
+        let fileArr = `https://localhost:443${response.data.file.path}`;
+
+        setFilePreview([...filePreview, fileArr]);
+        setProductData({
+          ...productData,
+          mainImages: [...filePreview, fileArr],
+        });
+      }
+    } catch (error) {
+      console.log('사진첨부에러발생', error);
+    }
+  };
+  const handelFileRemove = (indexToRemove) => {
+    const updatedFilePreview = [...filePreview];
+    updatedFilePreview.splice;
+  };
+
   return (
     <>
       <form>
         <>
           사진
-          <TextField
-            type="text"
-            name="mainImages"
-            value={productData.mainImages}
-            onChange={handleAllChange}
-          ></TextField>
+          <Button
+            component="label"
+            variant="contained"
+            startIcon={<CloudUploadIcon />}
+            onChange={handleFileUpload}
+          >
+            Upload file
+            <input hidden type="file" multiple accept="image/*" />
+          </Button>
+          이미지는 3개까지 첨부 가능합니다.
+          {filePreview.map((path, index) => (
+            <img
+              key={index}
+              src={path}
+              alt={'File Preview'}
+              style={{ marginTop: '10px', maxWidth: '60%' }}
+            />
+          ))}
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <IconButton aria-label="delete" size="small">
+              <DeleteIcon fontSize="inherit" />
+            </IconButton>
+          </Stack>
         </>
         <br />
         <br />
@@ -141,13 +217,13 @@ export default function ProductCreate() {
         <>
           상품 품질:
           <FormControl>
-            <InputLabel id="quilty-label">상품 품질</InputLabel>
+            <InputLabel id="quantity-label">상품 품질</InputLabel>
             <Select
-              labelId="quilty-label"
-              id="quilty-select"
-              label="quilty"
-              value={productData.quality}
-              onChange={(e) => handleQuilty(e.target.value)}
+              labelId="quantity-label"
+              id="quantity-select"
+              label="quantity"
+              value={productData.quantity}
+              onChange={(e) => handleQuantity(e.target.value)}
               sx={{ width: '100px' }}
             >
               {QUALITY.map((menu) => {
@@ -220,7 +296,7 @@ export default function ProductCreate() {
           등록하기
         </button>
       </form>
-      <button type="button" onClick={handleCancel}>
+      <button type="button" onClick={handleMoveBack}>
         취소
       </button>
     </>
