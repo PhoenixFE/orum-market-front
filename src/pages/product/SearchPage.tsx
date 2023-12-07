@@ -26,9 +26,9 @@ export function SearchPage() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [expanded, setExpanded] = useState<string | false>(false);
 
-  const toggleSidebar = () => {
+  function toggleSidebar() {
     setIsSidebarOpen(!isSidebarOpen);
-  };
+  }
 
   useEffect(() => {
     const fetchAllProducts = async () => {
@@ -84,31 +84,26 @@ export function SearchPage() {
           boxShadow: 'none',
         }}
       >
-        <Accordion
-          expanded={expanded === `panel${0}`}
-          onChange={handleAccordionChange(`panel${0}`)}
-          sx={{
-            boxShadow: 'none',
-            borderBottom: '1px solid #bdbdbd',
-            borderRadius: '0px',
-          }}
-        >
+        {/* <Accordion>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
-            aria-controls={`panel${0}bh-content`}
-            id={`panel${0}bh-header`}
-            sx={{ paddingLeft: 0, paddingRight: 0 }}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
           >
             <Typography variant="body1" fontWeight={800}>
               카테고리
             </Typography>
           </AccordionSummary>
           {CATEGORY.depth2.map((category) => (
-            <AccordionDetails sx={{ paddingLeft: 0, paddingRight: 0 }}>
+            <AccordionDetails
+              sx={{
+                paddingLeft: 0,
+                paddingRight: 0,
+              }}
+            >
               <Button
                 key={category.id}
                 component={Button}
-                variant="text"
                 onClick={() => {
                   setSelectedCategory(category.id);
                 }}
@@ -124,13 +119,20 @@ export function SearchPage() {
               </Button>
             </AccordionDetails>
           ))}
-        </Accordion>
-        <Accordion
+          <AccordionDetails>
+            <Typography>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
+              eget.
+            </Typography>
+          </AccordionDetails>
+        </Accordion> */}
+
+        {/* <Accordion
           expanded={expanded === `panel${1}`}
           onChange={handleAccordionChange(`panel${1}`)}
           sx={{
             boxShadow: 'none',
-            borderBottom: '1px solid #bdbdbd',
             borderRadius: '0px',
           }}
         >
@@ -151,7 +153,6 @@ export function SearchPage() {
           onChange={handleAccordionChange(`panel${2}`)}
           sx={{
             boxShadow: 'none',
-            borderBottom: '1px solid #bdbdbd',
             borderRadius: '0px',
           }}
         >
@@ -166,13 +167,62 @@ export function SearchPage() {
             </Typography>
           </AccordionSummary>
           <CheckBox /> 무료배송
+        </Accordion> */}
+
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+          >
+            <Typography>Accordion 1</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
+              eget.
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel2a-content"
+            id="panel2a-header"
+          >
+            <Typography>Accordion 2</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
+              eget.
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel3a-content"
+            id="panel3a-header"
+          >
+            <Typography>Accordion 3</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
+              eget.
+            </Typography>
+          </AccordionDetails>
         </Accordion>
       </Box>
     </Grid>
   );
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3, padding: '0px' }}>
+    <Box sx={{ flexGrow: 1, p: 3, padding: '0px', marginBottom: '120px' }}>
       <SearchSection />
       <Box
         sx={{
