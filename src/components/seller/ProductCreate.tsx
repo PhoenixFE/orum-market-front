@@ -158,7 +158,13 @@ export default function ProductCreate() {
   };
   const handelFileRemove = (indexToRemove) => {
     const updatedFilePreview = [...filePreview];
-    updatedFilePreview.splice;
+    updatedFilePreview.splice(indexToRemove, 1);
+    setFilePreview(updatedFilePreview);
+
+    setProductData({
+      ...productData,
+      mainImages: updatedFilePreview,
+    });
   };
 
   return (
@@ -177,18 +183,24 @@ export default function ProductCreate() {
           </Button>
           이미지는 3개까지 첨부 가능합니다.
           {filePreview.map((path, index) => (
-            <img
-              key={index}
-              src={path}
-              alt={'File Preview'}
-              style={{ marginTop: '10px', maxWidth: '60%' }}
-            />
+            <div key={index}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <IconButton
+                  aria-label="delete"
+                  size="small"
+                  onClick={() => handelFileRemove(index)}
+                >
+                  <DeleteIcon fontSize="inherit" />
+                </IconButton>
+              </Stack>
+              <img
+                key={index}
+                src={path}
+                alt={'File Preview'}
+                style={{ marginTop: '10px', maxWidth: '60%' }}
+              />
+            </div>
           ))}
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <IconButton aria-label="delete" size="small">
-              <DeleteIcon fontSize="inherit" />
-            </IconButton>
-          </Stack>
         </>
         <br />
         <br />
