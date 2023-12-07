@@ -8,6 +8,7 @@ import ScrollTop from './components/ScrollTop';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Fab from '@mui/material/Fab';
 import { useMemo, useState } from 'react';
+import Footer from './components/Footer';
 
 export const ColorModeContext = React.createContext({
   toggleColorMode: () => {},
@@ -50,6 +51,7 @@ function App() {
             <KeyboardArrowUpIcon />
           </Fab>
         </ScrollTop>
+        <Footer />
       </ThemeProvider>
     </ColorModeContext.Provider>
   );
