@@ -156,14 +156,16 @@ export default function ProductCreate() {
       console.log('사진첨부에러발생', error);
     }
   };
+  console.log(filePreview);
   const handelFileRemove = (indexToRemove) => {
     const updatedFilePreview = [...filePreview];
     updatedFilePreview.splice(indexToRemove, 1);
+
     setFilePreview(updatedFilePreview);
 
     setProductData({
       ...productData,
-      mainImages: updatedFilePreview,
+      mainImages: filePreview,
     });
   };
 
@@ -171,7 +173,7 @@ export default function ProductCreate() {
     <>
       <form>
         <>
-          사진
+          상품 사진<br></br>
           <Button
             component="label"
             variant="contained"
@@ -181,16 +183,16 @@ export default function ProductCreate() {
             Upload file
             <input hidden type="file" multiple accept="image/*" />
           </Button>
-          이미지는 3개까지 첨부 가능합니다.
+          <h3>이미지는 3개까지 첨부 가능합니다.</h3>
           {filePreview.map((path, index) => (
             <div key={index}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <IconButton
                   aria-label="delete"
-                  size="small"
+                  size="large"
                   onClick={() => handelFileRemove(index)}
                 >
-                  <DeleteIcon fontSize="inherit" />
+                  <DeleteIcon />
                 </IconButton>
               </Stack>
               <img
