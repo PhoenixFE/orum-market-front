@@ -26,9 +26,9 @@ export function SearchPage() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [expanded, setExpanded] = useState<string | false>(false);
 
-  const toggleSidebar = () => {
+  function toggleSidebar() {
     setIsSidebarOpen(!isSidebarOpen);
-  };
+  }
 
   useEffect(() => {
     const fetchAllProducts = async () => {
@@ -172,7 +172,7 @@ export function SearchPage() {
   );
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3, padding: '0px' }}>
+    <Box sx={{ flexGrow: 1, p: 3, padding: '0px', marginBottom: '120px' }}>
       <SearchSection />
       <Box
         sx={{
