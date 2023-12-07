@@ -46,7 +46,7 @@ export default function Footer() {
               </Link>
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={4} spacing={4}>
+          <Grid item xs={12} sm={4}>
             <Typography variant="h6" gutterBottom>
               Project Member
             </Typography>

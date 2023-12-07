@@ -47,8 +47,8 @@ export default function NavigationBar({
   return (
     <StickyNavbar>
       <NavbarContent>
-        <IconButton>
-          <GridViewOutlinedIcon onClick={handleToggel} />
+        <IconButton onClick={handleToggel}>
+          <GridViewOutlinedIcon />
         </IconButton>
         <Typography variant="h6">총 {totalProducts}개의 상품</Typography>
         <Box sx={{ marginLeft: 'auto' }}>
