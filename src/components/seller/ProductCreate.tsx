@@ -19,6 +19,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import { api } from '../../api/api';
 import { CATEGORY, QUALITY } from '../../constants/index';
+import { generateKey } from 'crypto';
 // import { validateProductTitle } from '../../lib/validation';
 
 const initCreateData = {
@@ -132,25 +133,26 @@ export default function ProductCreate() {
       //파일이 여러개일때
       if (response.data.files) {
         let fileArr = response.data.files;
-        const resImgUrl = fileArr.map(
-          (images) => `https://localhost:443${images.path}`,
-        );
-
-        setFilePreview((prevFilePreview) => [...filePreview, ...resImgUrl]);
-        setProductData((prevProductData) => ({
-          ...productData,
-          mainImages: [...prevProductData.mainImages, ...resImgUrl],
+        const resImgUrl = fileArr.map((images) => ({
+          path: `https://localhost:443${images.path}`,
+          key: generateKey(),
         }));
+
+        setFilePreview([...filePreview, ...resImgUrl]);
+        setProductData({
+          ...productData,
+          mainImages: [...filePreview, ...resImgUrl],
+        });
 
         //단일파일일때
       } else {
         let fileArr = `https://localhost:443${response.data.file.path}`;
 
-        setFilePreview((prevFilePreview) => [...prevFilePreview, fileArr]);
-        setProductData((prevProductData) => ({
-          ...prevProductData,
-          mainImages: [...prevProductData.mainImages, fileArr],
-        }));
+        setFilePreview([...filePreview, fileArr]);
+        setProductData({
+          ...productData,
+          mainImages: [...filePreview, fileArr],
+        });
       }
     } catch (error) {
       console.log('사진첨부에러발생', error);
@@ -170,9 +172,7 @@ export default function ProductCreate() {
       mainImages: updatedMainImages,
     });
   };
-  const generateKey = () => {
-    return '_' + Math.random().toString(36).substr(2, 9);
-  };
+
   return (
     <>
       <form>
