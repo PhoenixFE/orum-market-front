@@ -136,39 +136,43 @@ export default function ProductCreate() {
           (images) => `https://localhost:443${images.path}`,
         );
 
-        setFilePreview([...filePreview, ...resImgUrl]);
-        setProductData({
+        setFilePreview((prevFilePreview) => [...filePreview, ...resImgUrl]);
+        setProductData((prevProductData) => ({
           ...productData,
-          mainImages: [...filePreview, ...resImgUrl],
-        });
+          mainImages: [...prevProductData.mainImages, ...resImgUrl],
+        }));
 
         //단일파일일때
       } else {
         let fileArr = `https://localhost:443${response.data.file.path}`;
 
-        setFilePreview([...filePreview, fileArr]);
-        setProductData({
-          ...productData,
-          mainImages: [...filePreview, fileArr],
-        });
+        setFilePreview((prevFilePreview) => [...prevFilePreview, fileArr]);
+        setProductData((prevProductData) => ({
+          ...prevProductData,
+          mainImages: [...prevProductData.mainImages, fileArr],
+        }));
       }
     } catch (error) {
       console.log('사진첨부에러발생', error);
     }
   };
-  console.log(filePreview);
   const handelFileRemove = (indexToRemove) => {
-    const updatedFilePreview = [...filePreview];
+    let updatedFilePreview = [...filePreview];
     updatedFilePreview.splice(indexToRemove, 1);
 
     setFilePreview(updatedFilePreview);
 
+    const updatedMainImages = [...productData.mainImages];
+    updatedMainImages.splice(indexToRemove, 1);
+
     setProductData({
       ...productData,
-      mainImages: filePreview,
+      mainImages: updatedMainImages,
     });
   };
-
+  const generateKey = () => {
+    return '_' + Math.random().toString(36).substr(2, 9);
+  };
   return (
     <>
       <form>
@@ -180,23 +184,22 @@ export default function ProductCreate() {
             startIcon={<CloudUploadIcon />}
             onChange={handleFileUpload}
           >
-            Upload file
+            파일 업로드
             <input hidden type="file" multiple accept="image/*" />
           </Button>
           <h3>이미지는 3개까지 첨부 가능합니다.</h3>
-          {filePreview.map((path, index) => (
-            <div key={index}>
+          {filePreview.map((path) => (
+            <div key={generateKey()}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <IconButton
                   aria-label="delete"
                   size="large"
-                  onClick={() => handelFileRemove(index)}
+                  onClick={() => handelFileRemove(path)}
                 >
                   <DeleteIcon />
                 </IconButton>
               </Stack>
               <img
-                key={index}
                 src={path}
                 alt={'File Preview'}
                 style={{ marginTop: '10px', maxWidth: '60%' }}
