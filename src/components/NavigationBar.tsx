@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
+import TuneIcon from '@mui/icons-material/Tune';
 import AppsRoundedIcon from '@mui/icons-material/AppsRounded';
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
@@ -18,11 +19,13 @@ interface INavigationBar {
   handleToggel: () => void;
   handleSort: (value: string) => void;
   handleDisplayChange: (value: number) => void;
+  isSidebarOpen: boolean;
 }
 
 export default function NavigationBar({
   totalProducts,
   handleToggel,
+  isSidebarOpen,
   handleSort,
   handleDisplayChange,
 }: INavigationBar) {
@@ -47,9 +50,17 @@ export default function NavigationBar({
   return (
     <StickyNavbar>
       <NavbarContent>
+        <Button variant="text" color="inherit" onClick={handleToggel}>
+          {isSidebarOpen ? '사이드바 닫기' : '사이드바 열기'}
+        </Button>
         <IconButton onClick={handleToggel}>
-          <GridViewOutlinedIcon />
+          <TuneIcon
+            style={{
+              color: isSidebarOpen ? 'black' : 'lightgray',
+            }}
+          />
         </IconButton>
+
         <Typography variant="h6">총 {totalProducts}개의 상품</Typography>
         <Box sx={{ marginLeft: 'auto' }}>
           {SORT_OPTIONS.map((option) => (

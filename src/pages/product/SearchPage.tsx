@@ -233,9 +233,9 @@ export function SearchPage() {
           justifyContent: 'center',
         }}
       >
-        <Button onClick={toggleSidebar} variant="outlined" color="inherit">
+        {/* <Button onClick={toggleSidebar} variant="outlined" color="inherit">
           {isSidebarOpen ? 'Hide Sidebar' : 'Show Sidebar'}
-        </Button>
+        </Button> */}
       </Box>
 
       <StickyNavbar
@@ -243,6 +243,7 @@ export function SearchPage() {
         handleSort={setCurrentSortOrder}
         handleDisplayChange={handleDisplayChange}
         handleToggel={toggleSidebar}
+        isSidebarOpen={isSidebarOpen}
       />
       <Box sx={{ marginTop: '50px', maxWidth: '100%', paddingX: '20px' }}>
         <Grid container spacing={3}>
