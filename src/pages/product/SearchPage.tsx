@@ -13,6 +13,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 import ProductCard from './ProductCard';
 import { SearchSection } from '../../components/search/SearchSection';
@@ -70,6 +71,7 @@ export function SearchPage() {
 
   // 카테고리, 가격, 배송료에 따라 필터링된 상품 목록
   const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
+
   const filteredProducts = sortedProducts.filter((product) => {
     const withinCategory =
       selectedCategory === 'all' ||
@@ -77,10 +79,22 @@ export function SearchPage() {
     const withinPriceRange =
       product.price >= selectedPriceRange.min &&
       product.price <= selectedPriceRange.max;
-    return withinCategory && withinPriceRange;
+    let withinShippingFee = true;
+
+    if (selectedShippingFee !== '전체') {
+      withinShippingFee =
+        (selectedShippingFee === '무료배송' && product.shippingFees === 0) ||
+        (selectedShippingFee === '유료배송' && product.shippingFees > 0);
+    }
+
+    return withinCategory && withinPriceRange && withinShippingFee;
   });
 
-  console.log('filteredProducts: ', filteredProducts);
+  const resetFilters = () => {
+    setSelectedCategory('all');
+    setSelectedPrice('전체');
+    setSelectedShippingFee('전체');
+  };
 
   // 상품 목록 Grid
   const productGrid = (
@@ -115,6 +129,12 @@ export function SearchPage() {
           boxShadow: 'none',
         }}
       >
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Button variant="text" color="inherit" onClick={resetFilters}>
+            필터 초기화
+            <RefreshIcon sx={{ marginLeft: '5px' }} />
+          </Button>
+        </Box>
         <Accordion>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
@@ -211,14 +231,14 @@ export function SearchPage() {
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            {SHIPPING_FEE.map((shippingFee) => (
+            {SHIPPING_FEE.map((fee) => (
               <Button
-                key={shippingFee.id}
+                key={fee.label}
                 variant="text"
                 color="inherit"
-                onClick={() => setSelectedShippingFee(shippingFee.value)}
+                onClick={() => setSelectedShippingFee(fee.value)}
                 startIcon={
-                  selectedShippingFee === shippingFee.value ? (
+                  selectedShippingFee === fee.value ? (
                     <CheckBoxIcon />
                   ) : (
                     <CheckBoxOutlineBlankIcon />
@@ -226,12 +246,10 @@ export function SearchPage() {
                 }
                 sx={{
                   fontWeight:
-                    selectedShippingFee === shippingFee.value
-                      ? 'bold'
-                      : 'light',
+                    selectedShippingFee === fee.value ? 'bold' : 'light',
                 }}
               >
-                {shippingFee.label}
+                {fee.label}
               </Button>
             ))}
           </AccordionDetails>
