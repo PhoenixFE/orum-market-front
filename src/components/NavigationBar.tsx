@@ -56,36 +56,40 @@ export default function NavigationBar({
   return (
     <StickyNavbar>
       <NavbarContent>
-        <Button variant="text" color="inherit" onClick={handleToggel}>
-          {isSidebarOpen ? '사이드바 닫기' : '사이드바 열기'}
-        </Button>
-        <IconButton onClick={handleToggel}>
-          <TuneIcon
-            style={{
-              color: isSidebarOpen ? 'black' : 'lightgray',
-            }}
-          />
-        </IconButton>
+        <Box sx={{ display: 'flex', flexGrow: 1, alignItems: 'center' }}>
+          <Button variant="text" color="inherit" onClick={handleToggel}>
+            {isSidebarOpen ? '필터 닫기' : '필터 열기'}
+          </Button>
+          <IconButton onClick={handleToggel}>
+            <TuneIcon
+              style={{
+                color: isSidebarOpen ? 'black' : 'lightgray',
+              }}
+            />
+          </IconButton>
 
-        <Typography variant="h6">총 {totalProducts}개의 상품</Typography>
+          <Typography variant="h6">총 {totalProducts}개의 상품</Typography>
+        </Box>
 
         {isMdDown ? (
-          <FormControl sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel id="filter-select-label">Filter</InputLabel>
-            <Select
-              labelId="filter-select-label"
-              id="filter-select"
-              value={selectedSortOrder}
-              label="Filter"
-              onChange={onSortChange}
-            >
-              {SORT_OPTIONS.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+              <InputLabel id="filter-select-label">정렬</InputLabel>
+              <Select
+                labelId="filter-select-label"
+                id="filter-select"
+                value={selectedSortOrder}
+                label="Filter"
+                onChange={onSortChange}
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
         ) : (
           <Box sx={{ marginLeft: 'auto' }}>
             {SORT_OPTIONS.map((option) => (
