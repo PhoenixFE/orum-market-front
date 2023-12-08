@@ -77,6 +77,13 @@ export const CATEGORY = {
   ],
   depth2: [
     {
+      id: 0,
+      name: '전체',
+      dbName: 'all',
+      dbCode: 'H0100',
+      url: '/category/all',
+    },
+    {
       id: 1,
       name: '상의',
       dbName: 'tops',
@@ -262,4 +269,19 @@ export const SORT_OPTIONS = [
   { label: '오래된순', value: '오래된순' },
   { label: '높은가격순', value: '높은가격순' },
   { label: '낮은가격순', value: '낮은가격순' },
+];
+
+export const PRICE_RANGE = [
+  { id: 0, label: '전체', value: '전체' },
+  { id: 1, label: '1만원 이하', value: '1만원 이하' },
+  { id: 2, label: '1만원 ~ 3만원', value: '1만원 ~ 3만원' },
+  { id: 3, label: '3만원 ~ 5만원', value: '3만원 ~ 5만원' },
+  { id: 4, label: '5만원 ~ 7만원', value: '5만원 ~ 7만원' },
+  { id: 5, label: '7만원 이상', value: '7만원 이상' },
+];
+
+export const SHIPPING_FEE = [
+  { id: 0, label: '전체', value: '전체' },
+  { id: 1, label: '무료배송', value: '무료배송' },
+  { id: 2, label: '유료배송', value: '유료배송' },
 ];
