@@ -58,6 +58,9 @@ function App() {
             },
           },
         },
+        typography: {
+          fontFamily: " 'Noto Sans', sans-serif",
+        },
       }),
     [mode],
   );
