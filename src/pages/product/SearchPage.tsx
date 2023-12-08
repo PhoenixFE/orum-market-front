@@ -1,12 +1,5 @@
-import {
-  Box,
-  Button,
-  Container,
-  Grid,
-  Grow,
-  Slide,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Grid, Grow, Slide, Typography } from '@mui/material';
+
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -72,7 +65,7 @@ export function SearchPage() {
   // 카테고리, 가격, 배송료에 따라 필터링된 상품 목록
   const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
 
-  const filteredProducts = sortedProducts.filter((product) => {
+  const filteredProducts = sortedProducts.filter((product: IProduct) => {
     const withinCategory =
       selectedCategory === 'all' ||
       product.extra.category.includes(selectedCategory);
