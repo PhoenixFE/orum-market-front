@@ -8,10 +8,13 @@ import {
   Container,
   InputAdornment,
   IconButton,
+  FormHelperText,
+  Box,
 } from '@mui/material';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Link, useNavigate } from 'react-router-dom';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import CheckIcon from '@mui/icons-material/Check';
+import CircularProgress from '@mui/material/CircularProgress';
 import { validateEmail, validatePassword } from '../../lib/validation';
 
 export default function SignUpPage() {
@@ -24,6 +27,8 @@ export default function SignUpPage() {
       membershipClass: 'MC01',
     },
   });
+  const [isEmailAvailable, setIsEmailAvailable] = useState(false);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -34,6 +39,7 @@ export default function SignUpPage() {
     const { name, value } = event.target;
 
     if (name === 'email') {
+      setIsEmailAvailable(false);
       if (!validateEmail(value)) {
         setEmailError('유효하지 않은 이메일 형식입니다.');
       } else {
@@ -63,23 +69,91 @@ export default function SignUpPage() {
     }
   };
 
+  const checkEmailAvailability = async () => {
+    try {
+      setIsCheckingEmail(true);
+      const response = await fetch(
+        `https://localhost/api/users/email?email=${encodeURIComponent(
+          formData.email,
+        )}`,
+      );
+      const data = await response.json();
+      if (data.ok === 1) {
+        setIsEmailAvailable(true);
+        setEmailError('');
+      } else if (data.ok === 0) {
+        setIsEmailAvailable(false);
+        setEmailError(data.message || '이미 등록된 이메일입니다.');
+      }
+    } catch (error) {
+      console.error(error);
+      setEmailError('이메일 확인에 실패했습니다.');
+    } finally {
+      setIsCheckingEmail(false);
+    }
+  };
+
   return (
-    <Container component="main" maxWidth="xs" sx={{ mt: 8 }}>
+    <Container
+      component="main"
+      maxWidth="xs"
+      sx={{ height: '100%', marginY: '100px' }}
+    >
       <Form onSubmit={handleSubmit}>
-        <TextField
-          type="email"
-          name="email"
-          label="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          error={!!emailError}
-          helperText={emailError}
-        />
+        <Box sx={{ width: '100%' }}>
+          <TextField
+            type="email"
+            name="email"
+            variant="filled"
+            label="이메일"
+            fullWidth
+            value={formData.email}
+            onChange={handleChange}
+            required
+            error={!!emailError}
+            helperText={emailError}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="check email availability"
+                    onClick={checkEmailAvailability}
+                    edge="end"
+                    disabled={
+                      isCheckingEmail ||
+                      formData.email === '' ||
+                      !validateEmail(formData.email) ||
+                      isEmailAvailable // Disable button if email has been checked and is available
+                    }
+                  >
+                    {isCheckingEmail ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : isEmailAvailable ? (
+                      <CheckIcon color="success" />
+                    ) : (
+                      <CheckIcon />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            FormHelperTextProps={{
+              sx: {
+                color: isEmailAvailable ? 'success.main' : '',
+              },
+            }}
+          />
+          {isEmailAvailable && !emailError && (
+            <FormHelperText sx={{ color: 'success.main' }}>
+              사용 가능한 이메일입니다.
+            </FormHelperText>
+          )}
+        </Box>
         <TextField
           name="password"
           type={showPassword ? 'text' : 'password'}
-          label="Password"
+          label="비밀번호"
+          variant="filled"
           value={formData.password}
           onChange={handleChange}
           required
@@ -101,7 +175,8 @@ export default function SignUpPage() {
         />
         <TextField
           name="name"
-          label="Name"
+          label="이름"
+          variant="filled"
           value={formData.name}
           onChange={handleChange}
           required
@@ -109,25 +184,32 @@ export default function SignUpPage() {
         <TextField
           name="type"
           select
-          label="Type"
+          variant="filled"
+          label="유형"
           value={formData.type}
           onChange={handleChange}
           required
         >
-          <MenuItem value="user">User</MenuItem>
-          <MenuItem value="seller">Seller</MenuItem>
+          <MenuItem value="user">구매자</MenuItem>
+          <MenuItem value="seller">판매자</MenuItem>
         </TextField>
 
-        <SubmitButton
-          startIcon={<PersonAddIcon />}
-          variant="contained"
-          type="submit"
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'end',
+          }}
         >
-          Sign Up
-        </SubmitButton>
-        <Link to="/sign-in">
-          <Button variant="text">로그인하러 가기</Button>
-        </Link>
+          <SubmitButton
+            variant="contained"
+            type="submit"
+            sx={{ width: '100%' }}
+            disabled={!isEmailAvailable || isCheckingEmail}
+          >
+            일반 회원가입
+          </SubmitButton>
+        </Box>
       </Form>
     </Container>
   );
@@ -138,7 +220,6 @@ const Form = styled.form`
   flex-direction: column;
   gap: 20px;
   width: 100%;
-  margin-top: 8vh;
 `;
 
 const SubmitButton = styled(Button)`
