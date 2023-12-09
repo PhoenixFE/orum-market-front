@@ -46,6 +46,21 @@ function App() {
           accent: {
             main: '#EF5B2A',
           },
+          ...(mode === 'light'
+            ? {
+                text: {
+                  primary: '#301C3B',
+                  secondary: 'rgba(0, 0, 0, 0.54)',
+                  disabled: 'rgba(0, 0, 0, 0.38)',
+                },
+              }
+            : {
+                text: {
+                  primary: '#FFF',
+                  secondary: 'rgba(255, 255, 255, 0.7)',
+                  disabled: 'rgba(255, 255, 255, 0.5)',
+                },
+              }),
         },
         components: {
           MuiLink: {
@@ -53,6 +68,15 @@ function App() {
               root: {
                 '&:hover': {
                   color: '#EF5B2A',
+                },
+              },
+            },
+          },
+          MuiInputLabel: {
+            styleOverrides: {
+              root: {
+                '&.Mui-focused': {
+                  color: mode === 'light' ? '#301C3B' : '#FFF',
                 },
               },
             },
