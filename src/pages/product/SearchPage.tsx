@@ -1,4 +1,12 @@
-import { Box, Button, Grid, Grow, Slide, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grid,
+  Grow,
+  Slide,
+  Typography,
+  styled,
+} from '@mui/material';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -139,7 +147,7 @@ export function SearchPage() {
             <RefreshIcon sx={{ marginLeft: '5px' }} />
           </Button>
         </Box>
-        <Accordion>
+        <CustomAccordion>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1a-content"
@@ -183,15 +191,15 @@ export function SearchPage() {
                 }
                 sx={{
                   fontWeight:
-                    selectedCategory === category.dbName ? 'bold' : 'light',
+                    selectedCategory === category.dbCode ? 'bold' : 'light',
                 }}
               >
                 {category.name}
               </Button>
             ))}
           </AccordionDetails>
-        </Accordion>
-        <Accordion>
+        </CustomAccordion>
+        <CustomAccordion>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel2a-content"
@@ -223,8 +231,8 @@ export function SearchPage() {
               </Button>
             ))}
           </AccordionDetails>
-        </Accordion>
-        <Accordion>
+        </CustomAccordion>
+        <CustomAccordion>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel3a-content"
@@ -257,7 +265,7 @@ export function SearchPage() {
               </Button>
             ))}
           </AccordionDetails>
-        </Accordion>
+        </CustomAccordion>
       </Box>
     </Grid>
   );
@@ -300,3 +308,14 @@ export function SearchPage() {
     </Box>
   );
 }
+
+const CustomAccordion = styled(Accordion)(({ theme }) => {
+  return {
+    boxShadow: 'none',
+    border: `none`,
+    borderRadius: '10px',
+    backgroundColor: theme.palette.background.paper,
+    '.MuiAccordionDetails-root': {},
+    '.MuiAccordionSummary-root': {},
+  };
+});
