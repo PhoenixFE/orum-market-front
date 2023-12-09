@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   AppBar,
@@ -14,9 +14,6 @@ import {
   Box,
   Button,
   CssBaseline,
-  Divider,
-  Drawer,
-  List,
   Menu,
   MenuItem,
   Typography,
@@ -28,51 +25,43 @@ import {
   ShoppingCart as ShoppingCartIcon,
   Brightness4 as Brightness4Icon,
   Brightness7 as Brightness7Icon,
-  Menu as MenuIcon,
   Logout,
 } from '@mui/icons-material';
-import useOutsideClick from '../hooks/useOutsideClick';
-import CategoryNavBar from './CategoryNavBar';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import LoginIcon from '@mui/icons-material/Login';
 import { useCart, useUserStore } from '../lib/store';
 import { IUserStore } from '../type';
 import { ColorModeContext } from '../App';
 
+// 메인 헤더 컴포넌트
 export default function Header() {
   const { isLoggedIn, logOut } = useUserStore() as IUserStore;
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
-  const [showCategoryNavBar, setShowCategoryNavBar] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
-  const headerRef = useRef(null);
   const { items: cartItems } = useCart();
   const cartItemsCount = cartItems.length;
+  const _id = localStorage.getItem('_id');
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
   const handleDashboard = () => {
-    navigate(`/user/${_id}`); // Navigate to dashboard route
+    navigate(`/user/${_id}`);
     handleMenuClose();
   };
-
-  const _id = localStorage.getItem('_id');
-
   const handleLogoutDialogOpen = () => {
     setOpenLogoutDialog(true);
   };
-
   const handleLogoutDialogClose = () => {
     setOpenLogoutDialog(false);
   };
-
   const handleLogout = () => {
     logOut();
     alert('로그아웃 되었습니다. 다음에 또 만나요!');
@@ -80,27 +69,7 @@ export default function Header() {
     navigate('/');
   };
 
-  const handleDrawerToggle = () => {
-    setMobileOpen((prevState) => !prevState);
-  };
-
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        MUI
-      </Typography>
-      <Divider />
-      <List>
-        {isLoggedIn ? isLoggedInUserButton() : notLoggedInUserButton()}
-      </List>
-    </Box>
-  );
-
-  const container =
-    typeof window !== 'undefined' ? window.document.body : undefined;
-
+  // 로그인한 유저일 경우 보여줄 버튼
   function isLoggedInUserButton() {
     return (
       <Box
@@ -158,20 +127,33 @@ export default function Header() {
     );
   }
 
+  // 로그인하지 않은 유저일 경우 보여줄 버튼
   function notLoggedInUserButton() {
     return (
-      <>
-        <Link to="/sign-in">
-          <Button variant="text" color="inherit">
-            로그인
-          </Button>
-        </Link>
-        <Link to="sign-up">
-          <Button variant="text" color="inherit">
-            회원가입
-          </Button>
-        </Link>
-      </>
+      <Box gap={2} sx={{}}>
+        <Button
+          variant="text"
+          color="inherit"
+          component={Link}
+          to="/sign-in"
+          style={{ fontWeight: 'normal' }}
+        >
+          <LoginIcon style={{ marginRight: '0.4rem', fontSize: '1rem' }} />{' '}
+          {'로그인'}
+        </Button>
+        <Button
+          variant="text"
+          component={Link}
+          to="/sign-up"
+          color="inherit"
+          style={{ fontWeight: 'normal' }}
+        >
+          <PersonOutlineIcon
+            style={{ marginRight: '0.1rem', fontSize: '1rem' }}
+          />
+          회원가입
+        </Button>
+      </Box>
     );
   }
 
@@ -187,21 +169,8 @@ export default function Header() {
         }}
       >
         <ToolbarStyled>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-            >
+          <Link to="/" style={{ alignItems: 'center' }}>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               <img
                 src="../../assets/logo.png"
                 alt="ORUM"
@@ -213,7 +182,11 @@ export default function Header() {
           <Box
             sx={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}
           >
-            <IconButton onClick={colorMode.toggleColorMode} color="inherit">
+            <IconButton
+              onClick={colorMode.toggleColorMode}
+              color="inherit"
+              style={{ marginRight: '0.1rem', fontSize: '1rem' }}
+            >
               {theme.palette.mode === 'dark' ? (
                 <Brightness7Icon />
               ) : (
@@ -223,39 +196,25 @@ export default function Header() {
             {isLoggedIn ? isLoggedInUserButton() : notLoggedInUserButton()}
           </Box>
         </ToolbarStyled>
-        {showCategoryNavBar && <CategoryNavBar />}
       </AppBar>
-      <nav>
-        <Drawer
-          container={container}
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: '240px',
-            },
-          }}
-        >
-          {drawer}
-        </Drawer>
-      </nav>
     </Box>
   );
 }
 
-interface LogoutDialogProps {
+// Styled components
+const ToolbarStyled = styled(Toolbar)({
+  justifyContent: 'space-between',
+  alignItems: 'center',
+});
+
+interface ILogoutDialog {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
 }
 
-function LogoutDialog({ open, onClose, onConfirm }: LogoutDialogProps) {
+// 로그아웃 다이얼로그 컴포넌트
+function LogoutDialog({ open, onClose, onConfirm }: ILogoutDialog) {
   return (
     <Dialog
       open={open}
@@ -285,7 +244,3 @@ function LogoutDialog({ open, onClose, onConfirm }: LogoutDialogProps) {
     </Dialog>
   );
 }
-
-const ToolbarStyled = styled(Toolbar)({
-  justifyContent: 'space-between',
-});
