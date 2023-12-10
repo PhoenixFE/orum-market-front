@@ -54,7 +54,7 @@ export default function NavigationBar({
   };
 
   return (
-    <StickyNavbar>
+    <StickyNavbar color="inherit">
       <NavbarContent>
         <Box sx={{ display: 'flex', flexGrow: 1, alignItems: 'center' }}>
           <Button variant="text" color="inherit" onClick={handleToggel}>

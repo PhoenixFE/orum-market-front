@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { api } from '../../api/api';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import { validateEmail, validatePassword } from '../../lib/validation';
+
 import {
   TextField,
   MenuItem,
@@ -10,12 +13,17 @@ import {
   IconButton,
   FormHelperText,
   Box,
+  Typography,
+  Grid,
+  Paper,
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import CircularProgress from '@mui/material/CircularProgress';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
-import CircularProgress from '@mui/material/CircularProgress';
-import { validateEmail, validatePassword } from '../../lib/validation';
+import LocalActivityOutlinedIcon from '@mui/icons-material/LocalActivityOutlined';
+import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
+import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
+import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -97,14 +105,14 @@ export default function SignUpPage() {
     <Container
       component="main"
       maxWidth="xs"
-      sx={{ height: '100%', marginY: '100px' }}
+      sx={{ height: '100vh-114px', marginY: '100px' }}
     >
       <Form onSubmit={handleSubmit}>
         <Box sx={{ width: '100%' }}>
           <TextField
             type="email"
             name="email"
-            variant="filled"
+            variant="outlined"
             label="이메일"
             fullWidth
             value={formData.email}
@@ -153,7 +161,7 @@ export default function SignUpPage() {
           name="password"
           type={showPassword ? 'text' : 'password'}
           label="비밀번호"
-          variant="filled"
+          variant="outlined"
           value={formData.password}
           onChange={handleChange}
           required
@@ -176,7 +184,7 @@ export default function SignUpPage() {
         <TextField
           name="name"
           label="이름"
-          variant="filled"
+          variant="outlined"
           value={formData.name}
           onChange={handleChange}
           required
@@ -184,7 +192,7 @@ export default function SignUpPage() {
         <TextField
           name="type"
           select
-          variant="filled"
+          variant="outlined"
           label="유형"
           value={formData.type}
           onChange={handleChange}
@@ -202,15 +210,63 @@ export default function SignUpPage() {
           }}
         >
           <SubmitButton
-            variant="contained"
+            variant="outlined"
             type="submit"
-            sx={{ width: '100%' }}
+            size="large"
+            sx={{ width: '100%', marginTop: '20px' }}
             disabled={!isEmailAvailable || isCheckingEmail}
           >
             일반 회원가입
           </SubmitButton>
         </Box>
       </Form>
+
+      <Box sx={{ my: 5 }}>
+        <Typography variant="h6" gutterBottom color="text.secondary">
+          회원 가입 혜택
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <Paper
+              variant="outlined"
+              sx={{ p: 2, textAlign: 'center', height: '100px' }}
+            >
+              <LocalActivityOutlinedIcon />
+              <Typography color="text.secondary">쿠폰</Typography>
+              <Typography variant="caption" color="text.secondary">
+                등급별 쿠폰, 생일 쿠폰 등
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Paper
+              variant="outlined"
+              sx={{ p: 2, textAlign: 'center', height: '100px' }}
+            >
+              <SavingsOutlinedIcon />
+              <Typography color="text.secondary">마일리지 적립</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Paper
+              variant="outlined"
+              sx={{ p: 2, textAlign: 'center', height: '100px' }}
+            >
+              <ReceiptOutlinedIcon />
+              <Typography color="text.secondary">리뷰 적립</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Paper
+              variant="outlined"
+              sx={{ p: 2, textAlign: 'center', height: '100px' }}
+            >
+              <LocalShippingOutlinedIcon />
+              <Typography color="text.secondary">무료 배송 제공</Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
     </Container>
   );
 }

@@ -40,8 +40,11 @@ function App() {
         palette: {
           mode,
           primary: {
-            main: '#ffffff',
+            main: '#EF5B2A',
             contrastText: '#301C3B',
+          },
+          secondary: {
+            main: '#fff',
           },
           accent: {
             main: '#EF5B2A',
@@ -77,6 +80,17 @@ function App() {
               root: {
                 '&.Mui-focused': {
                   color: mode === 'light' ? '#301C3B' : '#FFF',
+                },
+              },
+            },
+          },
+
+          MuiButton: {
+            styleOverrides: {
+              root: {
+                '&:hover': {
+                  backgroundColor: '#EF5B2A',
+                  color: '#fff',
                 },
               },
             },

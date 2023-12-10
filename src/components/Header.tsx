@@ -162,6 +162,7 @@ export default function Header() {
       <CssBaseline />
       <AppBar
         component="nav"
+        color="inherit"
         sx={{
           boxShadow: 'none',
           borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
