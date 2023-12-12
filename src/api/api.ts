@@ -1,6 +1,6 @@
 import axios from 'axios';
-import mem from 'mem';
 import initCreateData from '../../src/components/seller/ProductCreate';
+import { useUserStore } from '../lib/store';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const REFRESH_URL = '/users/refresh';
@@ -14,26 +14,6 @@ const axiosInstance = axios.create({
   },
   withCredentials: true,
 });
-
-// Token Refresh Function
-const getAccessToken = mem(
-  async function () {
-    try {
-      const {
-        data: {
-          item: {
-            token: { accessToken },
-          },
-        },
-      } = await axiosInstance.get('/users/refresh');
-      return accessToken;
-    } catch (err) {
-      console.error(err);
-      return null;
-    }
-  },
-  { maxAge: 1000 },
-);
 
 // 요청 인터셉터 추가
 axiosInstance.interceptors.request.use(
@@ -59,41 +39,66 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   async (error) => {
-    const { config, response } = error;
-    console.error('interceptors err', error);
+    const originalRequest = error.config;
+    const { response } = error;
 
     if (response.status === 401) {
-      if (
-        response.data.errorName === 'TokenExpiredError' &&
-        config.url !== REFRESH_URL
-      ) {
-        console.log('Access token expired. Trying to refresh...');
-        const newAccessToken = await getAccessToken();
+      switch (response.data.errorName) {
+        case 'TokenExpiredError':
+          // Attempt to refresh the token
+          if (originalRequest.url !== REFRESH_URL) {
+            try {
+              const newAccessToken = await getAccessToken();
+              if (newAccessToken) {
+                localStorage.setItem('accessToken', newAccessToken);
+                originalRequest.headers['Authorization'] =
+                  `Bearer ${newAccessToken}`;
+                return axiosInstance(originalRequest);
+              }
+            } catch (refreshError) {
+              console.error('Failed to refresh token', refreshError);
+              return Promise.reject(refreshError);
+            }
+          }
+          break;
 
-        if (newAccessToken) {
-          error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-          localStorage.setItem('accessToken', newAccessToken);
-          return axios(error.config);
-        }
-      } else {
-        alert('로그인이 필요한 서비스입니다.');
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
+        case 'JsonWebTokenError':
+          (useUserStore.getState() as any).logOut();
+          window.location.href = '/sign-in';
+          break;
+
+        case 'EmptyAuthorization':
+          console.error('Authorization header is missing', response.data);
+          window.location.href = '/sign-in';
+          break;
+
+        default:
+          console.error(`Error: ${response.data.errorName}`, response.data);
+          break;
       }
-    } else {
-      const error = response?.data?.error;
-      if (!response || error) {
-        alert(
-          error?.message ||
-            `요청하신 작업처리에 실패했습니다. 잠시후 다시 요청하시기 바랍니다.`,
-        );
-      }
+    }
+
+    if (!response || response.status !== 401 || !response.data.errorName) {
+      console.error('An unexpected error occurred', error);
     }
 
     return Promise.reject(error);
   },
 );
+
+async function getAccessToken() {
+  try {
+    const refreshToken = localStorage.getItem('refreshToken');
+    const response = await axiosInstance.get(REFRESH_URL, {
+      params: { refreshToken },
+    });
+    const { accessToken } = response.data;
+    return accessToken;
+  } catch (err) {
+    console.error('Error refreshing token', err);
+    throw err;
+  }
+}
 
 export const api = {
   // 회원 가입

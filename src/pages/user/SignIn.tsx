@@ -9,6 +9,8 @@ import {
   Container,
   InputAdornment,
   IconButton,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { validateEmail, validatePassword } from '../../lib/validation';
@@ -21,8 +23,20 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const navigate = useNavigate();
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -52,10 +66,14 @@ export default function SignInPage() {
         response.data.item.token.refreshToken,
       );
       localStorage.setItem('_id', response.data.item._id);
-      alert('로그인 되었습니다. 환영합니다!');
+      alert('로그인에 성공하였습니다. 어서오세요.');
       navigate('/');
     } catch (error) {
       console.error(error);
+      setSnackbarMessage(
+        '로그인에 실패하였습니다. 이메일 혹은 비밀번호를 확인해주세요.',
+      );
+      setSnackbarOpen(true);
     }
   };
 
@@ -123,6 +141,19 @@ export default function SignInPage() {
           </Button>
         </Link>
       </Form>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity="error"
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

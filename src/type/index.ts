@@ -49,7 +49,7 @@ export interface ICartStore {
 
 export interface IUserStore {
   isLoggedIn: boolean;
-  logIn: (token: string) => void;
+  logIn: (accessToken: string, refreshToken: string) => void;
   logOut: () => void;
 }
 
