@@ -24,7 +24,10 @@ export default function ProductCard({ product }: ProductCardProps) {
     <>
       <StyledCard>
         <CardActionArea component={Link} to={`/product/${product._id}`}>
-          <ProductImage image={product.mainImages[0]} title={product.name} />
+          <ProductImage
+            image={product.mainImages[0].path}
+            title={product.name}
+          />
           <ProductDetails>
             <Typography variant="h6">{product.name}</Typography>
             <Typography variant="h6" color="inherit" fontWeight={700}>

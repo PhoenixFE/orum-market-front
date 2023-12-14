@@ -174,10 +174,10 @@ const ProductImageGallery = ({ images }: { images: string[] }) => {
     >
       <ImageList sx={imageListStyle} cols={3} gap={9}>
         {images.map((image: string, index: number) => (
-          <ImageListItem key={index}>
+          <ImageListItem key={image.id}>
             <img
-              src={image}
-              alt={`Product ${index}`}
+              src={image.path}
+              alt={`Product ${image.id}`}
               loading="lazy"
               onClick={() => setSelectedImage(image)}
               style={{
@@ -192,7 +192,7 @@ const ProductImageGallery = ({ images }: { images: string[] }) => {
       </ImageList>
       <Box sx={imageContainerStyle}>
         <img
-          src={selectedImage}
+          src={selectedImage.path}
           alt="Selected-Image"
           style={{
             borderRadius: '5px',

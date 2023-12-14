@@ -18,38 +18,15 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { api } from '../../api/api';
 import { CATEGORY, QUALITY } from '../../constants/index';
 import { IProduct } from '../../type/index';
-
-const initCreateData = {
-  price: 0,
-  shippingFees: 0,
-  show: true,
-  active: true,
-  name: '',
-  mainImages: [],
-  content: '',
-  createdAt: '',
-  updatedAt: '',
-  quantity: 1,
-  buyQuantity: 0,
-  extra: {
-    isNew: true,
-    isBest: true,
-    category: ['H01', 'H0101'],
-    sort: 0,
-  },
-};
+import { initProductData } from '../../lib/initProductData';
 
 export default function ProductUpdate() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [productData, setProductData] =
-    useState<Partial<IProduct>>(initCreateData);
+    useState<Partial<IProduct>>(initProductData);
   const [filePreview, setFilePreview] = useState([]);
   const editorRef = useRef();
-
-  const handleMoveBack = () => {
-    window.history.back();
-  };
 
   useEffect(() => {
     fetchProduct();
@@ -59,20 +36,26 @@ export default function ProductUpdate() {
   const fetchProduct = async () => {
     try {
       const response = await api.getProduct(Number(id));
-      setProductData(response.data.item);
-      setFilePreview(
-        response.data.item.mainImages.map((image) => ({
-          id: image.id,
-          path: image.path,
-        })),
+      const mainImagesWithId = response.data.item.mainImages.map(
+        (image, index) => ({
+          img_id: image.id || index.toString(),
+          path: image.path || image,
+        }),
       );
+
+      setProductData({
+        ...response.data.item,
+        mainImages: mainImagesWithId,
+      });
+
+      setFilePreview(mainImagesWithId);
     } catch (error) {
       console.log('제품불러오기실패', error);
     }
   };
 
-  //상품 수정 업로드
-  const updateSubmit = async (e: React.FormEvent) => {
+  //전체 form submit
+  const updateAllDataSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await api.updateProduct(id!, productData);
@@ -83,8 +66,8 @@ export default function ProductUpdate() {
     }
   };
 
-  //파일 업로드
-  const handleFileUpload = async (e: React.FormEvent) => {
+  //파일 업로드를 눌렀을때 실행
+  const clickFileUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     const fileInput = e.target.files;
     if (!fileInput) return;
@@ -109,7 +92,7 @@ export default function ProductUpdate() {
       if (response.data.files) {
         let fileArr = response.data.files;
         const resImgUrl = fileArr.map((images) => ({
-          id: images.name,
+          img_id: images.name,
           path: `https://localhost:443${images.path}`,
         }));
         setFilePreview([...filePreview, ...resImgUrl]);
@@ -121,7 +104,7 @@ export default function ProductUpdate() {
       //단일파일일때
       else {
         let fileArr = {
-          id: response.data.file.name,
+          img_id: response.data.file.name,
           path: `https://localhost:443${response.data.file.path}`,
         };
 
@@ -135,14 +118,20 @@ export default function ProductUpdate() {
       console.log('사진첨부에러발생', error);
     }
   };
-  const handleFileRemove = (idToRemove) => {
-    idToRemove.preventDefault();
+  //이미지 삭제 로직
+  const handleFileRemove = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    idToRemove,
+  ) => {
+    e.preventDefault();
     setFilePreview((prevPreview) =>
-      prevPreview.filter((item) => item.id !== idToRemove),
+      prevPreview.filter((item) => item.img_id !== idToRemove),
     );
     setProductData((prevData) => ({
       ...prevData,
-      mainImages: prevData.mainImages.filter((item) => item.id !== idToRemove),
+      mainImages: prevData.mainImages.filter(
+        (item) => item.img_id !== idToRemove,
+      ),
     }));
   };
 
@@ -157,7 +146,7 @@ export default function ProductUpdate() {
 
   return (
     <>
-      <form onSubmit={updateSubmit}>
+      <form onSubmit={updateAllDataSubmit}>
         <>
           <InputLabel>상품사진</InputLabel>
           <h3>이미지는 3개까지 첨부 가능합니다.</h3>
@@ -165,24 +154,26 @@ export default function ProductUpdate() {
             component="label"
             variant="contained"
             startIcon={<CloudUploadIcon />}
-            onChange={handleFileUpload}
+            onChange={clickFileUpload}
           >
             파일 업로드
             <input hidden type="file" multiple accept="image/*" />
           </Button>
           {filePreview.map((item) => (
-            <div key={item.id}>
+            <div key={item.img_id}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <IconButton
                   aria-label="delete"
                   size="large"
-                  onClick={() => handleFileRemove(item.id)}
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                    handleFileRemove(e, item.img_id)
+                  }
                 >
                   <DeleteIcon />
                 </IconButton>
               </Stack>
               <img
-                key={item.id}
+                key={item.img_id}
                 src={item.path}
                 alt={'File Preview'}
                 style={{ marginTop: '10px', maxWidth: '60%' }}
@@ -321,7 +312,7 @@ export default function ProductUpdate() {
           등록하기
         </Button>
       </form>
-      <Button type="button" variant="outlined" onClick={handleMoveBack}>
+      <Button type="button" variant="outlined" onClick={() => navigate(-1)}>
         취소
       </Button>
     </>
