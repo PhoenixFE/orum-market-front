@@ -52,6 +52,7 @@ export function SearchPage() {
       try {
         const response = await api.getProductList();
         setSearchResult(response.data.item);
+        console.log('상품 검색 성공:', response.data.item);
       } catch (error) {
         console.error('상품 검색 실패:', error);
       }

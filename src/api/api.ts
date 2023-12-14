@@ -2,6 +2,7 @@ import axios from 'axios';
 import initCreateData from '../../src/components/seller/ProductCreate';
 import { IProduct } from '../type';
 import { useUserStore } from '../lib/store';
+import { IProduct } from '../type';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const REFRESH_URL = '/users/refresh';
