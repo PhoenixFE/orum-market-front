@@ -29,16 +29,6 @@ export default function SignInPage() {
 
   const navigate = useNavigate();
 
-  const handleSnackbarClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string,
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -159,7 +149,7 @@ export default function SignInPage() {
       <CustomSnackbar
         open={snackbarOpen}
         message={snackbarMessage}
-        handleClose={handleSnackbarClose}
+        handleClose={() => setSnackbarOpen(false)}
         severity={loginSuccess ? 'success' : 'error'}
       />
     </MainContainer>
