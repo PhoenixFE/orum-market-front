@@ -4,7 +4,6 @@ export const validateEmail = (email: string) => {
 };
 
 export const validatePassword = (password: string) => {
-  // Assuming the password criteria is a minimum of 8 characters
   return password.length >= 8;
 };
 

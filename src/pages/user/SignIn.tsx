@@ -9,12 +9,12 @@ import {
   Container,
   InputAdornment,
   IconButton,
-  Snackbar,
-  Alert,
+  Box,
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { validateEmail, validatePassword } from '../../lib/validation';
 import { IUserStore } from '../../type';
+import CustomSnackbar from '../../components/CustomSnackbar';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
@@ -25,6 +25,7 @@ export default function SignInPage() {
   const [passwordError, setPasswordError] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const navigate = useNavigate();
 
@@ -44,14 +45,20 @@ export default function SignInPage() {
     let isValid = true;
 
     if (!validateEmail(email)) {
-      setEmailError('유효하지 않은 이메일 형식입니다.');
+      setSnackbarMessage(
+        '로그인에 실패하였습니다. 이메일 혹은 비밀번호를 확인해주세요.',
+      );
+      setSnackbarOpen(true);
       isValid = false;
     } else {
       setEmailError('');
     }
 
     if (!validatePassword(password)) {
-      setPasswordError('비밀번호 양식에 맞지 않는 걸');
+      setSnackbarMessage(
+        '로그인에 실패하였습니다. 이메일 혹은 비밀번호를 확인해주세요.',
+      );
+      setSnackbarOpen(true);
       isValid = false;
     } else {
       setPasswordError('');
@@ -66,19 +73,25 @@ export default function SignInPage() {
         response.data.item.token.refreshToken,
       );
       localStorage.setItem('_id', response.data.item._id);
-      alert('로그인에 성공하였습니다. 어서오세요.');
-      navigate('/');
+      setLoginSuccess(true);
+      setSnackbarMessage('로그인에 성공하였습니다. 메인 페이지로 이동합니다.');
+      setSnackbarOpen(true);
+
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
     } catch (error) {
       console.error(error);
       setSnackbarMessage(
         '로그인에 실패하였습니다. 이메일 혹은 비밀번호를 확인해주세요.',
       );
       setSnackbarOpen(true);
+      setLoginSuccess(false);
     }
   };
 
   return (
-    <Container component="main" maxWidth="xs" sx={{ mt: 8 }}>
+    <MainContainer maxWidth="xs">
       <Form onSubmit={handleSubmit} id="sign-in-form">
         <TextField
           id="email"
@@ -124,44 +137,51 @@ export default function SignInPage() {
         />
         <Button
           type="submit"
-          variant="contained"
-          color="primary"
+          variant="outlined"
           fullWidth
           startIcon={<Login />}
           sx={{ mt: 3, mb: 2 }}
         >
-          Sign In
+          로그인
         </Button>
-        <Link to="/sign-up">
-          <Button
-            variant="text"
-            style={{ textDecoration: 'none', marginTop: '8px' }}
-          >
-            회원가입하러 가기
-          </Button>
-        </Link>
+
+        <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+          <Link to="/sign-up">
+            <Button
+              variant="text"
+              style={{ textDecoration: 'none', marginTop: '8px' }}
+            >
+              회원가입하러 가기
+            </Button>
+          </Link>
+        </Box>
       </Form>
-      <Snackbar
+      <CustomSnackbar
         open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity="error"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Container>
+        message={snackbarMessage}
+        handleClose={handleSnackbarClose}
+        severity={loginSuccess ? 'success' : 'error'}
+      />
+    </MainContainer>
   );
 }
+
+const headerHeight = '64px';
+const footerHeight = '138px';
+
+const MainContainer = styled(Container)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - ${headerHeight} - ${footerHeight});
+  margin-top: 0;
+  padding-top: ${headerHeight};
+  max-width: 100%;
+`;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 20px;
   width: 100%;
-  margin-top: 8vh;
 `;
