@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/api';
 import {
   Box,
+  Button,
   Card,
   CardActionArea,
   CardMedia,
@@ -19,7 +20,6 @@ export default function BuyerFavorite() {
       try {
         const response = await api.getMyBookMark();
         setMyBookMarkList(response.data.item);
-        console.log(response.data.item);
       } catch (error) {
         console.log('북마크 조회를 실패했습니다.');
       }
@@ -27,6 +27,19 @@ export default function BuyerFavorite() {
 
     fetchBookmark();
   }, []);
+
+  if (!myBookMarkList || myBookMarkList?.length === 0) {
+    return (
+      <>
+        <Typography variant="h6">북마크된 상품이 없습니다.</Typography>
+        <Link to={`/`}>
+          <Button type="button" variant="outlined" size="medium">
+            상품 보러 가기
+          </Button>
+        </Link>
+      </>
+    );
+  }
 
   return (
     <Container>
@@ -47,7 +60,6 @@ export default function BuyerFavorite() {
               </Typography>
             </ProductDetails>
           </CardActionArea>
-          <ProductActions></ProductActions>
         </StyledCard>
       ))}
     </Container>
@@ -73,11 +85,4 @@ const ProductDetails = styled(Box)({
   flexDirection: 'column',
   alignItems: 'start',
   padding: '16px',
-});
-
-const ProductActions = styled(Box)({
-  display: 'flex',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  padding: '8px',
 });
