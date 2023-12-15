@@ -43,25 +43,28 @@ export default function BuyerFavorite() {
 
   return (
     <Container>
-      {myBookMarkList.map((bookmark) => (
-        <StyledCard key={bookmark._id}>
-          <CardActionArea
-            component={Link}
-            to={`/product/${bookmark.product_id}`}
-          >
-            <ProductImage
-              image={bookmark.product.image.path}
-              title={bookmark.product.name}
-            />
-            <ProductDetails>
-              <Typography variant="h6">{bookmark.product.name}</Typography>
-              <Typography variant="h6" color="inherit" fontWeight={700}>
-                {bookmark.product.price.toLocaleString()} 원
-              </Typography>
-            </ProductDetails>
-          </CardActionArea>
-        </StyledCard>
-      ))}
+      {myBookMarkList
+        .map((bookmark) => (
+          <StyledCard key={bookmark._id}>
+            <CardActionArea
+              component={Link}
+              to={`/product/${bookmark.product_id}`}
+            >
+              <ProductImage
+                image={bookmark.product.image.path}
+                title={bookmark.product.name}
+              />
+              <ProductDetails>
+                <Typography variant="h6">{bookmark.product.name}</Typography>
+                <Typography variant="h6" color="inherit" fontWeight={700}>
+                  {bookmark.product.price.toLocaleString()} 원
+                </Typography>
+              </ProductDetails>
+            </CardActionArea>
+          </StyledCard>
+        ))
+        .sort()
+        .reverse()}
     </Container>
   );
 }
