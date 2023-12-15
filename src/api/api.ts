@@ -176,6 +176,13 @@ export const api = {
   // 구매자 구매 목록 조회
   getOrderProductInfo: () => axiosInstance.get('/orders/'),
 
+  //판매자 주문 목록 조회
+  getOrderCondition: () => axiosInstance.get('seller/orders/'),
+
+  //판매자 주문상태 관리
+  updateOrderState: (product_id: number) =>
+    axiosInstance.patch(`/seller/orders/${product_id}`, product_id),
+
   // 북마크 조회
   getBookmark: (product_id: number) =>
     axiosInstance.get(`/bookmarks/products/${product_id}`),
