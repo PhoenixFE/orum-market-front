@@ -55,6 +55,23 @@ export default function SellerOrderList() {
       console.log('판매 상품 조회 실패', error);
     }
   };
+
+  useEffect(() => {
+    const getOrderCondition = async () => {
+      try {
+        const response = await api.getOrderCondition();
+        const orderState = response.data.item;
+        // console.log('판매상품의 주문상태 불러오기', orderState);
+        setOrderList(orderState);
+      } catch (error) {
+        console.log('주문상태오류', error);
+      }
+    };
+
+    getOrderCondition();
+  }, []);
+
+  console.log('주문상태 상태값', orderList);
   useEffect(() => {
     let sorted = [...productList];
     switch (sortOrder) {
@@ -198,9 +215,12 @@ export default function SellerOrderList() {
                     {rows.shippingFees.toLocaleString()}원
                   </TableCell>
                   <TableCell align="center">
-                    {ORDER_STATE.codes.find(
-                      (state) => state.code === orderList[0]?.state,
-                    )?.value || 'Unknown State'}
+                    {/* {ORDER_STATE.codes.find(
+                      (state) =>
+                        state.code ===
+                        (orderList[0].find((order) => order._id === rows._id)
+                          ?.state || null),
+                    )} */}
                   </TableCell>
                   <TableCell align="center">
                     <ToggleButton
