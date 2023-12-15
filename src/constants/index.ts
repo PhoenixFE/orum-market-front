@@ -25,7 +25,7 @@ export const DASHBOARD_MENU = {
     {
       id: 5,
       title: '최근 본 상품',
-      url: `/user/${_id}/buyer-orderlist`,
+      url: `/user/${_id}/recently-viewed-items`,
     },
   ],
 

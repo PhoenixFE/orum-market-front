@@ -18,7 +18,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 
 import ProductCard from './ProductCard';
 import { SearchSection } from '../../components/search/SearchSection';
-import { useSearchStore } from '../../lib/store';
+import { useSearchStore, useRecentViewProductStore } from '../../lib/store';
 import StickyNavbar from '../../components/NavigationBar';
 import { useSort } from '../../hooks/useSort';
 import { useEffect, useState } from 'react';
@@ -43,6 +43,15 @@ export function SearchPage() {
   const [selectedPrice, setSelectedPrice] = useState('전체');
   const [selectedShippingFee, setSelectedShippingFee] = useState('전체');
 
+  const { addRecentViewProduct } = useRecentViewProductStore() as {
+    addRecentViewProduct: Function;
+  };
+
+  // useAddRecentlyViewed(product);
+  const handleSaveRecentlyViewed = (product) => {
+    addRecentViewProduct({ ...product });
+  };
+
   function toggleSidebar() {
     setIsSidebarOpen(!isSidebarOpen);
   }
@@ -52,7 +61,6 @@ export function SearchPage() {
       try {
         const response = await api.getProductList();
         setSearchResult(response.data.item);
-        console.log('상품 검색 성공:', response.data.item);
       } catch (error) {
         console.error('상품 검색 실패:', error);
       }
@@ -107,6 +115,7 @@ export function SearchPage() {
           key={product._id}
           style={{ transformOrigin: '0 0 0' }}
           {...{ timeout: 1000 }}
+          onClick={() => handleSaveRecentlyViewed(product)}
         >
           <Grid item {...getItemSize()}>
             <ProductCard product={product} />
