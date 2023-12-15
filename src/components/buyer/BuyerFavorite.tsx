@@ -9,24 +9,40 @@ import {
   Container,
   Typography,
   styled,
+  IconButton,
 } from '@mui/material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Link } from 'react-router-dom';
 
 export default function BuyerFavorite() {
   const [myBookMarkList, setMyBookMarkList] = useState([]);
 
-  useEffect(() => {
-    const fetchBookmark = async () => {
-      try {
-        const response = await api.getMyBookMark();
-        setMyBookMarkList(response.data.item);
-      } catch (error) {
-        console.log('북마크 조회를 실패했습니다.');
-      }
-    };
+  const fetchBookmark = async () => {
+    try {
+      const response = await api.getMyBookMark();
+      setMyBookMarkList(response.data.item);
+    } catch (error) {
+      console.log('북마크 조회를 실패했습니다.');
+    }
+  };
 
+  useEffect(() => {
     fetchBookmark();
   }, []);
+
+  const handleBookmark = async (bookmarkId) => {
+    const confirmRemoveBookmark = window.confirm('북마크를 삭제하시겠습니까?');
+
+    if (confirmRemoveBookmark) {
+      try {
+        await api.removeBookmark(Number(bookmarkId));
+        fetchBookmark();
+        alert('북마크가 삭제되었습니다.');
+      } catch (error) {
+        console.log('북마크 삭제에 실패했습니다.');
+      }
+    }
+  };
 
   if (!myBookMarkList || myBookMarkList?.length === 0) {
     return (
@@ -61,6 +77,11 @@ export default function BuyerFavorite() {
                 </Typography>
               </ProductDetails>
             </CardActionArea>
+            <ProductActions>
+              <IconButton onClick={() => handleBookmark(bookmark._id)}>
+                <FavoriteIcon />
+              </IconButton>
+            </ProductActions>
           </StyledCard>
         ))
         .sort()
@@ -88,4 +109,11 @@ const ProductDetails = styled(Box)({
   flexDirection: 'column',
   alignItems: 'start',
   padding: '16px',
+});
+
+const ProductActions = styled(Box)({
+  display: 'flex',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  padding: '8px',
 });
