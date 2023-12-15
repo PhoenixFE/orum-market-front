@@ -46,6 +46,8 @@ const initCreateData = {
 };
 
 export default function ProductCreate() {
+  const userId = localStorage.getItem('_id');
+
   const [productData, setProductData] =
     useState<Partial<IProduct>>(initCreateData);
   const [isValid, setIsValid] = useState(true);
@@ -113,8 +115,8 @@ export default function ProductCreate() {
     });
   }
 
-  //상품데이터 등록하기
-  const productSubmit = async (e: React.FormEvent) => {
+  //상품데이터 form submit
+  const productAllSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) {
       alert('양식이 올바르지 않습니다.');
@@ -123,7 +125,8 @@ export default function ProductCreate() {
     try {
       const response = await api.createProduct(productData);
       setProductData(response.data.item);
-      //   setProductId(response.data.item._id);
+      alert('판매 상품 등록이 완료되었습니다.');
+      navigate(`/user/${userId}/seller-orderlist`);
     } catch (error) {
       console.error('API Error:', error);
     }
@@ -197,7 +200,7 @@ export default function ProductCreate() {
 
   return (
     <>
-      <form onSubmit={productSubmit}>
+      <form onSubmit={productAllSubmit}>
         <InputLabel>상품사진</InputLabel>
         <h3>이미지는 3개까지 첨부 가능합니다.</h3>
         <Button
@@ -209,20 +212,20 @@ export default function ProductCreate() {
           파일 업로드
           <input hidden type="file" multiple accept="image/*" />
         </Button>
-        {filePreview.map((item) => (
-          <div key={item.id}>
+        {filePreview.map((imageItem) => (
+          <div key={imageItem.id}>
             <Stack direction="row" alignItems="center" spacing={1}>
               <IconButton
                 aria-label="delete"
                 size="large"
-                onClick={() => handleFileRemove(item.id)}
+                onClick={() => handleFileRemove(imageItem.id)}
               >
                 <DeleteIcon />
               </IconButton>
             </Stack>
             <img
-              key={item.id}
-              src={item.path}
+              key={imageItem.id}
+              src={imageItem.path}
               alt={'File Preview'}
               style={{ marginTop: '10px', maxWidth: '60%' }}
             />
