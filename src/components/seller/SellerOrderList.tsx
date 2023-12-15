@@ -21,8 +21,8 @@ import {
 import CheckIcon from '@mui/icons-material/Check';
 
 import { api } from '../../api/api';
-import { IProduct } from '../../type';
-import { CATEGORY, QUALITY } from '../../constants/index';
+import { IProduct, IOrderItem } from '../../type';
+import { CATEGORY, QUALITY, ORDER_STATE } from '../../constants/index';
 
 export default function SellerOrderList() {
   const _id = localStorage.getItem('_id');
@@ -31,6 +31,7 @@ export default function SellerOrderList() {
   const [sortedProductList, setSortedProductList] = useState<IProduct[]>([]);
   const [sortOrder, setSortOrder] = useState('최신순');
   const [isShow, setIsShow] = useState(false);
+  const [orderList, setOrderList] = useState<IOrderItem[]>([]);
 
   useEffect(() => {
     fetchSellerProduct();
@@ -138,6 +139,7 @@ export default function SellerOrderList() {
                 <TableCell align="center">품질</TableCell>
                 <TableCell align="center">가격</TableCell>
                 <TableCell align="center">배송료</TableCell>
+                <TableCell align="center">주문상태</TableCell>
                 <TableCell align="center">공개여부</TableCell>
                 <TableCell align="center"></TableCell>
               </TableRow>
@@ -194,6 +196,11 @@ export default function SellerOrderList() {
                   </TableCell>
                   <TableCell align="center">
                     {rows.shippingFees.toLocaleString()}원
+                  </TableCell>
+                  <TableCell align="center">
+                    {ORDER_STATE.codes.find(
+                      (state) => state.code === orderList[0]?.state,
+                    )?.value || 'Unknown State'}
                   </TableCell>
                   <TableCell align="center">
                     <ToggleButton
