@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api/api';
+import CustomSnackbar from '../CustomSnackbar';
 import {
   Box,
   Button,
@@ -15,12 +16,15 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Link } from 'react-router-dom';
 
 export default function BuyerFavorite() {
-  const [myBookMarkList, setMyBookMarkList] = useState([]);
+  const [myBookmarkList, setMyBookmarkList] = useState([]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [deleteBookmarkSuccess, setDeleteBookmarkSuccess] = useState(false);
 
   const fetchBookmark = async () => {
     try {
       const response = await api.getMyBookMark();
-      setMyBookMarkList(response.data.item);
+      setMyBookmarkList(response.data.item);
     } catch (error) {
       console.log('북마크 조회를 실패했습니다.');
     }
@@ -37,14 +41,17 @@ export default function BuyerFavorite() {
       try {
         await api.removeBookmark(Number(bookmarkId));
         fetchBookmark();
-        alert('북마크가 삭제되었습니다.');
+        setDeleteBookmarkSuccess(true);
+        setSnackbarMessage('북마크가 삭제되었습니다.');
+        setSnackbarOpen(true);
       } catch (error) {
+        setDeleteBookmarkSuccess(false);
         console.log('북마크 삭제에 실패했습니다.');
       }
     }
   };
 
-  if (!myBookMarkList || myBookMarkList?.length === 0) {
+  if (!myBookmarkList || myBookmarkList?.length === 0) {
     return (
       <>
         <Typography variant="h6">북마크된 상품이 없습니다.</Typography>
@@ -59,7 +66,7 @@ export default function BuyerFavorite() {
 
   return (
     <Container>
-      {myBookMarkList
+      {myBookmarkList
         .map((bookmark) => (
           <StyledCard key={bookmark._id}>
             <CardActionArea
@@ -86,6 +93,12 @@ export default function BuyerFavorite() {
         ))
         .sort()
         .reverse()}
+      <CustomSnackbar
+        open={snackbarOpen}
+        message={snackbarMessage}
+        handleClose={() => setSnackbarOpen(false)}
+        severity={deleteBookmarkSuccess ? 'success' : 'error'}
+      />
     </Container>
   );
 }
@@ -115,5 +128,5 @@ const ProductActions = styled(Box)({
   display: 'flex',
   justifyContent: 'flex-end',
   alignItems: 'center',
-  padding: '8px',
+  padding: '4px',
 });
