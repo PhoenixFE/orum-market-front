@@ -188,4 +188,7 @@ export const api = {
   // 북마크 제거
   removeBookmark: (bookmark_id: number) =>
     axiosInstance.delete(`/bookmarks/${bookmark_id}`),
+
+  // 내 북마크 목록 조회
+  getMyBookMark: () => axiosInstance.get('/bookmarks/'),
 };
