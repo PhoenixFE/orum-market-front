@@ -40,10 +40,26 @@ export default function BuyerFavorite() {
     if (confirmRemoveBookmark) {
       try {
         await api.removeBookmark(Number(bookmarkId));
-        fetchBookmark();
         setDeleteBookmarkSuccess(true);
         setSnackbarMessage('북마크가 삭제되었습니다.');
         setSnackbarOpen(true);
+        setTimeout(() => {
+          fetchBookmark();
+        }, 500);
+
+        if (deleteBookmarkSuccess) {
+          return (
+            <>
+              <CustomSnackbar
+                open={snackbarOpen}
+                message={snackbarMessage}
+                handleClose={() => setSnackbarOpen(false)}
+                severity={deleteBookmarkSuccess ? 'success' : 'error'}
+              />
+              ;
+            </>
+          );
+        }
       } catch (error) {
         console.log('북마크 삭제에 실패했습니다.');
         setSnackbarMessage('북마크 삭제에 실패했습니다.');
