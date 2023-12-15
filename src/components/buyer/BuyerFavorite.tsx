@@ -45,8 +45,10 @@ export default function BuyerFavorite() {
         setSnackbarMessage('북마크가 삭제되었습니다.');
         setSnackbarOpen(true);
       } catch (error) {
-        setDeleteBookmarkSuccess(false);
         console.log('북마크 삭제에 실패했습니다.');
+        setSnackbarMessage('북마크 삭제에 실패했습니다.');
+        setSnackbarOpen(true);
+        setDeleteBookmarkSuccess(false);
       }
     }
   };
