@@ -177,7 +177,7 @@ export const api = {
   getOrderProductInfo: () => axiosInstance.get('/orders/'),
 
   //판매자 주문 목록 조회
-  getOrderCondition: () => axiosInstance.get('seller/orders/'),
+  getOrderState: () => axiosInstance.get('seller/orders/'),
 
   //판매자 주문상태 관리
   updateOrderState: (product_id: number) =>

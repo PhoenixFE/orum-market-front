@@ -33,6 +33,10 @@ export default function SellerOrderList() {
   const [isShow, setIsShow] = useState(false);
   const [orderList, setOrderList] = useState<IOrderItem[]>([]);
 
+  const [productOrderStates, setProductOrderStates] = useState<
+    Record<string, string>
+  >({});
+
   useEffect(() => {
     fetchSellerProduct();
   }, []);
@@ -57,21 +61,28 @@ export default function SellerOrderList() {
   };
 
   useEffect(() => {
-    const getOrderCondition = async () => {
+    const getOrderState = async () => {
       try {
-        const response = await api.getOrderCondition();
+        const response = await api.getOrderState();
         const orderState = response.data.item;
-        // console.log('판매상품의 주문상태 불러오기', orderState);
+        const orderStatesMap: Record<string, string> = {};
+
+        orderState.forEach((orderItem: IOrderItem) => {
+          orderItem.products.forEach((product) => {
+            orderStatesMap[product.name] = orderItem.state;
+          });
+        });
+
+        setProductOrderStates(orderStatesMap);
         setOrderList(orderState);
       } catch (error) {
         console.log('주문상태오류', error);
       }
     };
 
-    getOrderCondition();
+    getOrderState();
   }, []);
 
-  console.log('주문상태 상태값', orderList);
   useEffect(() => {
     let sorted = [...productList];
     switch (sortOrder) {
@@ -114,6 +125,20 @@ export default function SellerOrderList() {
     );
   }
 
+  const getOrderStateLabel = (productId) => {
+    const orderItem = orderList.find((order) =>
+      order.products.some((product) => product._id === productId),
+    );
+
+    if (orderItem) {
+      const orderStateCode = ORDER_STATE.codes.find(
+        (code) => code.code === orderItem.state,
+      );
+      return orderStateCode ? orderStateCode.value : 'Unknown Order State';
+    }
+
+    return '주문 없음';
+  };
   return (
     <>
       <Link to={`/user/${_id}/product-create`}>
@@ -215,12 +240,7 @@ export default function SellerOrderList() {
                     {rows.shippingFees.toLocaleString()}원
                   </TableCell>
                   <TableCell align="center">
-                    {/* {ORDER_STATE.codes.find(
-                      (state) =>
-                        state.code ===
-                        (orderList[0].find((order) => order._id === rows._id)
-                          ?.state || null),
-                    )} */}
+                    {getOrderStateLabel(rows._id) || '주문없음'}
                   </TableCell>
                   <TableCell align="center">
                     <ToggleButton
