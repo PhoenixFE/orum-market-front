@@ -133,7 +133,7 @@ export default function ProductCreate() {
   };
 
   // 파일 업로드
-  const clickFileUpload = async (e: React.FormEvent) => {
+  const handleFileUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     const fileInput = e.target.files;
     if (!fileInput) return;
@@ -158,7 +158,7 @@ export default function ProductCreate() {
       if (response.data.files) {
         let fileArr = response.data.files;
         const resImgUrl = fileArr.map((images) => ({
-          img_id: images.name,
+          id: images.name,
           path: `https://localhost:443${images.path}`,
         }));
         setFilePreview([...filePreview, ...resImgUrl]);
@@ -170,7 +170,7 @@ export default function ProductCreate() {
         //단일파일일 때
       } else {
         let fileArr = {
-          img_id: response.data.file.name,
+          id: response.data.file.name,
           path: `https://localhost:443${response.data.file.path}`,
         };
 
@@ -188,7 +188,7 @@ export default function ProductCreate() {
   const handleFileRemove = (indexToRemove) => {
     let updatedFilePreview = [...filePreview];
     updatedFilePreview = updatedFilePreview.filter(
-      (item) => item.img_id !== indexToRemove,
+      (item) => item.id !== indexToRemove,
     );
     setFilePreview(updatedFilePreview);
 
@@ -207,25 +207,25 @@ export default function ProductCreate() {
           component="label"
           variant="contained"
           startIcon={<CloudUploadIcon />}
-          onChange={clickFileUpload}
+          onChange={handleFileUpload}
         >
           파일 업로드
           <input hidden type="file" multiple accept="image/*" />
         </Button>
-        {filePreview.map((item) => (
-          <div key={item.img_id}>
+        {filePreview.map((imageItem) => (
+          <div key={imageItem.id}>
             <Stack direction="row" alignItems="center" spacing={1}>
               <IconButton
                 aria-label="delete"
                 size="large"
-                onClick={() => handleFileRemove(item.img_id)}
+                onClick={() => handleFileRemove(imageItem.id)}
               >
                 <DeleteIcon />
               </IconButton>
             </Stack>
             <img
-              key={item.img_id}
-              src={item.path}
+              key={imageItem.id}
+              src={imageItem.path}
               alt={'File Preview'}
               style={{ marginTop: '10px', maxWidth: '60%' }}
             />
