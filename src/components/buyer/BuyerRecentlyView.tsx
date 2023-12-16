@@ -31,6 +31,9 @@ export default function BuyerRecentlyView() {
   return (
     <>
       <Container>
+        <Typography variant="h5" fontWeight={700}>
+          최근 본 상품
+        </Typography>
         {viewItems.map((product) => (
           <StyledCard key={product._id}>
             <CardActionArea component={Link} to={`/product/${product._id}`}>

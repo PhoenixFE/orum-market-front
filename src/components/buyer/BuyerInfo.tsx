@@ -216,7 +216,9 @@ export default function BuyerInfo() {
     <Container>
       {userInfo && !isCreateAddress && !isEditAddress && (
         <>
-          <Typography variant="h4">내 정보 수정</Typography>
+          <Typography variant="h5" fontWeight={700}>
+            내 정보 수정
+          </Typography>
           <form onSubmit={handleUpdateUserInfo}>
             <FormLabel>이메일</FormLabel>
             <TextField

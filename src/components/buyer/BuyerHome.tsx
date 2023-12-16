@@ -14,7 +14,9 @@ export const BuyerHome = () => {
 
   return (
     <>
-      <h1>구매자 대시보드</h1>
+      <Typography variant="h5" fontWeight={700}>
+        구매자 대시보드
+      </Typography>
       <Box
         sx={{
           display: 'flex',
@@ -22,7 +24,9 @@ export const BuyerHome = () => {
           alignItems: 'end',
         }}
       >
-        <Typography variant="h5">내 주문 내역</Typography>
+        <Typography variant="h6" fontWeight={600}>
+          내 주문 내역
+        </Typography>
         <Link to={`/user/${id}/buyer-orderlist`}>
           <Button type="button">전체보기</Button>
         </Link>
@@ -36,7 +40,9 @@ export const BuyerHome = () => {
           alignItems: 'end',
         }}
       >
-        <Typography variant="h5">찜한 상품</Typography>
+        <Typography variant="h6" fontWeight={600}>
+          찜한 상품
+        </Typography>
         <Link to={`/user/${id}/buyer-favorite`}>
           <Button type="button">전체보기</Button>
         </Link>
