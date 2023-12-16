@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { ICartItem, ICartStore } from '../../type';
 import { useLocation, useNavigate } from 'react-router-dom';
+declare const IMP: any;
 
 export default function CheckOut() {
   const { items, clearCart } = useCartStore() as ICartStore;
@@ -113,10 +114,81 @@ export default function CheckOut() {
     return agreedToTerms && agreedToPrivacy && !isCheckoutItemEmpty;
   };
 
+  // function requestPayment() {
+  //   PortOne.requestPayment({
+  //     storeId: 'store-6303d710-90d0-4d2d-8536-bb48f6ab4f21',
+  //     paymentId: 'paymentId_{now()}',
+  //     orderName: '나이키 와플 트레이너 2 SD',
+  //     totalAmount: 1000,
+  //     currency: 'CURRENCY_KRW',
+  //     pgProvider: 'PG_PROVIDER_TOSSPAYMENTS',
+  //     payMethod: 'CARD',
+  //   });
+  // }
+  function requestPayment(pg: string) {
+    let paymentData = {
+      pg: 'kcp',
+      pay_method: 'card',
+      merchant_uid: `mid_${new Date().getTime()}`,
+      name: '주문명:결제테스트',
+      amount: totalCost,
+      buyer_email: userInfo.email,
+      buyer_name: userInfo.name,
+      buyer_tel: '010-1234-5678',
+      buyer_addr: address.value,
+      buyer_postcode: '123-456',
+    };
+
+    if (pg === 'kakao') {
+      paymentData.pg = 'kakaopay';
+    }
+
+    IMP.init('imp38488078');
+    IMP.request_pay(paymentData, (response: PaymentResponse) => {
+      // 결제 완료 후 콜백 함수
+      if (response.success) {
+        // 결제 성공 시 로직
+        console.log('결제 성공', response);
+      } else {
+        // 결제 실패 시 로직
+        console.error('결제 실패', response);
+      }
+    });
+  }
+  interface PaymentResponse {
+    success: boolean;
+  }
+  // 결제 성공 response 예시
+  // {
+  //   apply_num: '';
+  //   bank_name: null;
+  //   buyer_addr: '1';
+  //   buyer_email: 'jin@gmail.com';
+  //   buyer_name: 'Jinwoo Choi';
+  //   buyer_postcode: '123-456';
+  //   buyer_tel: '010-1234-5678';
+  //   card_name: null;
+  //   card_number: '';
+  //   card_quota: 0;
+  //   currency: 'KRW';
+  //   custom_data: null;
+  //   imp_uid: 'imp_045064202407';
+  //   merchant_uid: 'mid_1702745063484';
+  //   name: '주문명:결제테스트';
+  //   paid_amount: 47000;
+  //   paid_at: 1702745085;
+  //   pay_method: 'point';
+  //   pg_provider: 'kakaopay';
+  //   pg_tid: 'T57dd3e83ad74821055e';
+  //   pg_type: 'payment';
+  //   receipt_url: 'https://mockup-pg-web.kakao.com/v1/confirmation/p/T57dd3e83ad74821055e/4f2a3da6fddf5e8fd2ac750cfaaf9d792d99c49e2b1b631d843d36cfd6cc3893';
+  //   status: 'paid';
+  //   success: true;
+  // }
+
   return (
     <Container>
       <Typography variant="h2">결제하기</Typography>
-
       {isCheckoutItemEmpty ? (
         <Typography variant="h4">장바구니가 비어있습니다.</Typography>
       ) : (
@@ -133,7 +205,6 @@ export default function CheckOut() {
           ))}
         </List>
       )}
-
       <TextField
         label="이름"
         value={userInfo.name}
@@ -166,7 +237,6 @@ export default function CheckOut() {
         fullWidth
         margin="normal"
       />
-
       <Typography variant="h6" sx={{ my: 2 }}>
         총 금액: ₩{totalCost.toLocaleString()}
       </Typography>
@@ -188,15 +258,44 @@ export default function CheckOut() {
         }
         label="비회원 개인정보수집 이용에 동의합니다. (필수)"
       />
-
-      <Button
-        onClick={handlePurchase}
+      {/* <Button
+        onClick={requestKakaoPayment}
         variant="contained"
         color="primary"
         disabled={!handlePurchaseEnabled()}
       >
-        결제하기
-      </Button>
+        카카오페이 결제하기
+      </Button>{' '} */}
+      <Button
+        onClick={() => requestPayment('kakao')}
+        variant="text"
+        style={{
+          backgroundColor: '#FEE500',
+          color: 'black',
+          fontWeight: 'bold',
+          padding: '10px 20px',
+          margin: '10px 0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        disabled={!handlePurchaseEnabled()}
+      >
+        <img
+          src="/assets/kakaopay.png" // 카카오페이 로고 이미지 경로
+          alt="카카오페이"
+          style={{ marginRight: '10px', height: '24px' }}
+        />
+        카카오페이
+      </Button>{' '}
+      <Button
+        onClick={() => requestPayment('kcp')}
+        variant="outlined"
+        color="primary"
+        disabled={!handlePurchaseEnabled()}
+      >
+        일반카드 결제하기
+      </Button>{' '}
     </Container>
   );
 }
