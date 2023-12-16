@@ -7,6 +7,7 @@ import {
   Paper,
   Button,
   Typography,
+  Table,
 } from '@mui/material';
 import formatDate from '../../lib/formatDate';
 import { ORDER_STATE } from '../../constants';
@@ -15,7 +16,7 @@ export default function OrderListTable({ orderList }) {
   return (
     <>
       <TableContainer component={Paper}>
-        <TableContainer aria-label="결제내역">
+        <Table aria-label="결제내역">
           <TableHead>
             <TableRow>
               <TableCell align="center">
@@ -66,7 +67,7 @@ export default function OrderListTable({ orderList }) {
               </TableRow>
             ))}
           </TableBody>
-        </TableContainer>
+        </Table>
       </TableContainer>
     </>
   );

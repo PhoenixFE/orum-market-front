@@ -1,15 +1,16 @@
 import { Box, Button, Typography } from '@mui/material';
-import BuyerFavorite from './BuyerFavorite';
 import { Link } from 'react-router-dom';
 import OrderListTable from './OrderListTable';
-import useSetOrderList from '../../hooks/useSetOrderList';
-import { useState } from 'react';
+import useGetOrderList from '../../hooks/useGetOrderList';
+import useGetBookmark from '../../hooks/useGetBookmark';
+import BookmarkListTable from './BookmarkListTable';
 
 export const BuyerHome = () => {
-  const [orderList, setOrderList] = useState([]);
   const id = localStorage.getItem('_id');
-  useSetOrderList(setOrderList);
+  const orderList = useGetOrderList();
   const slicedOrderList = orderList.slice(0, 5);
+  const bookmarkList = useGetBookmark();
+  const sliceBookmarkList = bookmarkList.slice(-5);
 
   return (
     <>
@@ -28,8 +29,19 @@ export const BuyerHome = () => {
       </Box>
       <OrderListTable orderList={slicedOrderList} />
       <br />
-      <h1>찜한 상품</h1>
-      <BuyerFavorite />
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'end',
+        }}
+      >
+        <Typography variant="h5">찜한 상품</Typography>
+        <Link to={`/user/${id}/buyer-favorite`}>
+          <Button type="button">전체보기</Button>
+        </Link>
+      </Box>
+      <BookmarkListTable myBookmarkList={sliceBookmarkList} />
     </>
   );
 };

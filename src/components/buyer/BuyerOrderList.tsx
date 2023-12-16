@@ -1,15 +1,11 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Typography } from '@mui/material';
 
-import { IOrderItem } from '../../type';
 import OrderListTable from './OrderListTable';
-import useSetOrderList from '../../hooks/useSetOrderList';
+import useGetOrderList from '../../hooks/useGetOrderList';
 
 export default function BuyerOrdeList() {
-  const [orderList, setOrderList] = useState<IOrderItem[]>([]);
-
-  useSetOrderList(setOrderList);
+  const orderList = useGetOrderList();
 
   if (orderList.length === 0) {
     return (
