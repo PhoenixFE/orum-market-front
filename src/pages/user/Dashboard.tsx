@@ -17,6 +17,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Link, Outlet } from 'react-router-dom';
 import { DASHBOARD_MENU } from '../../constants';
+import { Grid } from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -27,13 +28,27 @@ interface Props {
 export default function Dashboard(props: Props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [selectedBuyerMenu, setSelectedBuyerMenu] = React.useState(
+    DASHBOARD_MENU.buyer[0].title,
+  );
+  const [selectSellerMenu, setSelectSellerMenu] = React.useState('');
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  const handleSelectBuyerMenu = (itemBuyerTitle: string) => {
+    setSelectedBuyerMenu(itemBuyerTitle);
+    setSelectSellerMenu('');
+  };
+
+  const handleSelectSellerMenu = (itemSellerTitle: string) => {
+    setSelectSellerMenu(itemSellerTitle);
+    setSelectedBuyerMenu('');
+  };
+
   const drawer = (
-    <div>
+    <Grid item xs={3}>
       <Toolbar />
       <Divider />
       <List>
@@ -43,8 +58,20 @@ export default function Dashboard(props: Props) {
               <ListItemIcon>
                 {items.id % 2 === 0 ? <InboxIcon /> : <MailIcon />}
               </ListItemIcon>
-              <Link to={items.url}>
-                <ListItemText primary={items.title} />
+              <Link
+                to={items.url}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <ListItemText
+                  primary={items.title}
+                  primaryTypographyProps={{
+                    fontSize: '16',
+                    fontWeight:
+                      selectedBuyerMenu === items.title ? 'bold' : 'medium',
+                    letterSpacing: 0,
+                  }}
+                  onClick={() => handleSelectBuyerMenu(items.title)}
+                />
               </Link>
             </ListItemButton>
           </ListItem>
@@ -58,14 +85,26 @@ export default function Dashboard(props: Props) {
               <ListItemIcon>
                 {items.id % 2 === 0 ? <InboxIcon /> : <MailIcon />}
               </ListItemIcon>
-              <Link to={items.url}>
-                <ListItemText primary={items.title} />
+              <Link
+                to={items.url}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <ListItemText
+                  primary={items.title}
+                  primaryTypographyProps={{
+                    fontSize: '16',
+                    fontWeight:
+                      selectSellerMenu === items.title ? 'bold' : 'medium',
+                    letterSpacing: 0,
+                  }}
+                  onClick={() => handleSelectSellerMenu(items.title)}
+                />
               </Link>
             </ListItemButton>
           </ListItem>
         ))}
       </List>
-    </div>
+    </Grid>
   );
 
   // Remove this const when copying and pasting into your project.
@@ -76,10 +115,13 @@ export default function Dashboard(props: Props) {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar
+        component="nav"
         position="fixed"
+        color="inherit"
         sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
+          boxShadow: 'none',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+          zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
       >
         <Toolbar>
@@ -92,9 +134,14 @@ export default function Dashboard(props: Props) {
           >
             <MenuIcon />
           </IconButton>
-          <Link to="/">
-            <Typography variant="h6" noWrap component="div">
-              Orum Market
+
+          <Link to="/" style={{ alignItems: 'center' }}>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              <img
+                src="../../assets/logo.png"
+                alt="ORUM"
+                style={{ width: '100px', height: 'auto' }}
+              />
             </Typography>
           </Link>
         </Toolbar>
@@ -102,7 +149,7 @@ export default function Dashboard(props: Props) {
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="mailbox folders"
+        aria-label="dashboard"
       >
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
