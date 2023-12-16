@@ -52,6 +52,11 @@ export default function Dashboard(props: Props) {
       <Toolbar />
       <Divider />
       <List>
+        <Box sx={{ padding: '20px 16px 8px' }}>
+          <Typography variant="h6" fontWeight={700}>
+            구매자
+          </Typography>
+        </Box>
         {DASHBOARD_MENU.buyer.map((items) => (
           <ListItem key={items.id} disablePadding>
             <ListItemButton>
@@ -79,6 +84,11 @@ export default function Dashboard(props: Props) {
       </List>
       <Divider />
       <List>
+        <Box sx={{ padding: '20px 16px 8px' }}>
+          <Typography variant="h6" fontWeight={700}>
+            판매자
+          </Typography>
+        </Box>
         {DASHBOARD_MENU.seller.map((items) => (
           <ListItem key={items.id} disablePadding>
             <ListItemButton>
@@ -188,7 +198,8 @@ export default function Dashboard(props: Props) {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          paddingX: 4,
+          paddingY: 3.7,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}
       >
