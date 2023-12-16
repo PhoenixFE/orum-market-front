@@ -81,7 +81,17 @@ export default function SignInPage() {
   };
 
   return (
-    <MainContainer maxWidth="xs">
+    <Container
+      component="main"
+      maxWidth="xs"
+      sx={{
+        height: '100vh-114px',
+        marginY: '100px',
+        borderRadius: '10px',
+        background: 'primary.main',
+      }}
+    >
+      <h1 style={{ textAlign: 'center' }}>로그인</h1>
       <Form onSubmit={handleSubmit} id="sign-in-form">
         <TextField
           id="email"
@@ -152,22 +162,22 @@ export default function SignInPage() {
         handleClose={() => setSnackbarOpen(false)}
         severity={loginSuccess ? 'success' : 'error'}
       />
-    </MainContainer>
+    </Container>
   );
 }
 
 const headerHeight = '64px';
 const footerHeight = '138px';
 
-const MainContainer = styled(Container)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: calc(100vh - ${headerHeight} - ${footerHeight});
-  margin-top: 0;
-  padding-top: ${headerHeight};
-  max-width: 100%;
-`;
+// const MainContainer = styled(Container)`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   height: calc(100vh - ${headerHeight} - ${footerHeight});
+//   margin-top: 0;
+//   padding-top: ${headerHeight};
+//   max-width: 50%;
+// `;
 
 const Form = styled.form`
   display: flex;

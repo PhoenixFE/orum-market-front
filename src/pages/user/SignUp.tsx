@@ -105,8 +105,13 @@ export default function SignUpPage() {
     <Container
       component="main"
       maxWidth="xs"
-      sx={{ height: '100vh-114px', marginY: '100px' }}
+      sx={{
+        height: '100vh-114px',
+        marginY: '100px',
+        borderRadius: '10px',
+      }}
     >
+      <h1 style={{ textAlign: 'center' }}>회원가입</h1>
       <Form onSubmit={handleSubmit}>
         <Box sx={{ width: '100%' }}>
           <TextField
