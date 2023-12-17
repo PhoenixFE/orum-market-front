@@ -120,11 +120,11 @@ export default function BuyerInfo() {
       };
 
       await api.updateUserInfo(userId, updateFormData);
-      alert('주소가 등록되었습니다.');
+      alert('신규 배송지가 등록되었습니다.');
       window.location.reload();
     } catch (error) {
       console.error(error);
-      alert('주소 등록에 실패했습니다.');
+      alert('신규 배송지 등록에 실패했습니다.');
     }
   };
 
@@ -202,11 +202,11 @@ export default function BuyerInfo() {
         },
       };
       await api.updateUserInfo(userId, updateAddressData);
-      alert('주소가 수정되었습니다.');
+      alert('배송지 주소가 수정되었습니다.');
       window.location.reload();
     } catch (error) {
       console.log(error);
-      alert('주소 수정에 실패했습니다.');
+      alert('배송지 주소 수정에 실패했습니다.');
     }
   };
 
@@ -351,7 +351,7 @@ export default function BuyerInfo() {
             func={handleChangeAddress}
             setData={resetData}
             submit={handleSubmitAddress}
-            title={'주소록 추가하기'}
+            title={'배송지 등록'}
             reset={true}
           />
         </>
@@ -364,7 +364,7 @@ export default function BuyerInfo() {
             func={handleChangeEditAddress}
             setData={setIsEditAddress}
             submit={handleSubmitEditAddress}
-            title={'주소록 수정하기'}
+            title={'배송지 수정'}
             reset={false}
           />
         </>
