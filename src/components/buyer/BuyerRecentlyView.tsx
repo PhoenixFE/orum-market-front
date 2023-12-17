@@ -5,6 +5,7 @@ import {
   CardActionArea,
   CardMedia,
   Container,
+  Grid,
   Typography,
   styled,
 } from '@mui/material';
@@ -12,6 +13,11 @@ import {
 import { Link } from 'react-router-dom';
 
 export default function BuyerRecentlyView() {
+  // 아이템 사이즈를 계산하는 함수
+  const getItemSize = () => {
+    return { xs: 12, sm: 6, md: 4, lg: 4, xl: 4 };
+  };
+
   const recentlyViewedItems = localStorage?.getItem('recentlyViewed');
   const viewItems = JSON.parse(recentlyViewedItems)?.state?.viewItems;
 
@@ -30,36 +36,29 @@ export default function BuyerRecentlyView() {
 
   return (
     <>
-      <Container>
-        <Typography variant="h5" fontWeight={700}>
-          최근 본 상품
-        </Typography>
+      <Typography variant="h5" fontWeight={700}>
+        최근 본 상품
+      </Typography>
+      <Grid container spacing={4} rowSpacing={4}>
         {viewItems.map((product) => (
-          <StyledCard key={product._id}>
-            <CardActionArea component={Link} to={`/product/${product._id}`}>
-              <ProductImage
-                image={product.mainImages[0].path}
-                title={product.name}
-              />
-              <ProductDetails>
-                <Typography variant="h6">{product.name}</Typography>
-                <Typography variant="h6" color="inherit" fontWeight={700}>
-                  {product.price.toLocaleString()} 원
-                </Typography>
-              </ProductDetails>
-            </CardActionArea>
-            <ProductActions>
-              <ShippingFee>
-                <Typography variant="body2">
-                  {product.shippingFees === 0
-                    ? '무료배송'
-                    : '배송료: ' + product.shippingFees.toLocaleString() + '원'}
-                </Typography>
-              </ShippingFee>
-            </ProductActions>
-          </StyledCard>
+          <Grid item {...getItemSize()} key={product._id} marginTop={3}>
+            <StyledCard>
+              <CardActionArea component={Link} to={`/product/${product._id}`}>
+                <ProductImage
+                  image={product.mainImages[0].path}
+                  title={product.name}
+                />
+                <ProductDetails>
+                  <Typography variant="h6">{product.name}</Typography>
+                  <Typography variant="h6" color="inherit" fontWeight={700}>
+                    {product.price.toLocaleString()} 원
+                  </Typography>
+                </ProductDetails>
+              </CardActionArea>
+            </StyledCard>
+          </Grid>
         ))}
-      </Container>
+      </Grid>
     </>
   );
 }
@@ -82,17 +81,5 @@ const ProductDetails = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'start',
-  padding: '16px',
-});
-
-const ProductActions = styled(Box)({
-  display: 'flex',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  padding: '8px',
-});
-
-const ShippingFee = styled(Box)({
-  flexGrow: 1,
-  padding: '0 8px',
+  padding: '12px 4px 6px',
 });
