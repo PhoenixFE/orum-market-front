@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import {
-  Container,
   Typography,
   TextField,
   FormLabel,
   Button,
   Box,
+  styled,
+  Card,
 } from '@mui/material';
 
 import { api } from '../../api/api';
 import { v4 as uuidv4 } from 'uuid';
 import AddressForm from '../address/AddressForm';
+import { Add } from '@mui/icons-material';
 
 export default function BuyerInfo() {
   const userId = localStorage.getItem('_id');
@@ -213,11 +215,19 @@ export default function BuyerInfo() {
   }
 
   return (
-    <Container>
+    <>
       {userInfo && !isCreateAddress && !isEditAddress && (
         <>
           <Typography variant="h5" fontWeight={700}>
             내 정보 수정
+          </Typography>
+          <Typography
+            variant="h6"
+            fontWeight={600}
+            marginTop={2}
+            marginBottom={1}
+          >
+            개인 정보 수정
           </Typography>
           <form onSubmit={handleUpdateUserInfo}>
             <FormLabel>이메일</FormLabel>
@@ -229,6 +239,7 @@ export default function BuyerInfo() {
               fullWidth
               required
               disabled
+              sx={{ marginBottom: '10px' }}
             />
             <FormLabel>이름</FormLabel>
             <TextField
@@ -240,22 +251,35 @@ export default function BuyerInfo() {
               required
             />
 
-            <Button type="submit" variant="contained" size="large">
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              fullWidth
+              sx={{ marginTop: '12px' }}
+            >
               정보 수정
             </Button>
           </form>
-          <br />
-          <br />
-          {!userInfo.extra.address && <>주소록이 비어있습니다.</>}
+
+          <Typography
+            variant="h6"
+            fontWeight={600}
+            marginTop={5}
+            marginBottom={1}
+          >
+            배송지 관리
+          </Typography>
+          {!userInfo.extra.address && <>등록된 배송지가 없습니다.</>}
           {userInfo?.extra?.address?.length === 0 && (
-            <>주소록이 비어있습니다.</>
+            <>등록된 배송지가 없습니다.</>
           )}
 
           {userInfo.extra.address && (
             <>
               {userInfo.extra.address.map((list) => (
                 // 주소록 목록 테이블 형태로 출력
-                <Box
+                <StyledCard
                   key={list.id}
                   sx={{
                     display: 'flex',
@@ -267,22 +291,19 @@ export default function BuyerInfo() {
                     marginBottom: '0.5rem',
                   }}
                 >
-                  <Box>
-                    <Typography variant="h6" fontWeight={700}>
-                      배송지명: {list.addressName}
+                  <AddrdssDetails padding={1}>
+                    <Typography variant="h6">{list.addressName}</Typography>
+                    <Typography variant="body2" fontWeight={600}>
+                      {list.receiver}
                     </Typography>
-                    <Typography variant="body1">
-                      메인주소: {list.mainAddress}
-                      <br></br>
-                      상세주소: {list.subAddress}
+                    <Typography variant="body2" fontWeight={600}>
+                      {list.tel}
                     </Typography>
-                    <Typography variant="body2">
-                      수령인: {list.receiver}
-                      <br></br>
-                      전화번호: {list.tel}
+                    <Typography variant="body2" fontWeight={600}>
+                      {list.mainAddress} {list.subAddress}
                     </Typography>
-                  </Box>
-                  <Box
+                  </AddrdssDetails>
+                  <AddressActions
                     sx={{
                       display: 'flex',
                       flexDirection: 'column',
@@ -303,8 +324,8 @@ export default function BuyerInfo() {
                     >
                       삭제
                     </Button>
-                  </Box>
-                </Box>
+                  </AddressActions>
+                </StyledCard>
               ))}
             </>
           )}
@@ -312,10 +333,12 @@ export default function BuyerInfo() {
           <Box>
             <Button
               onClick={() => setIsCreateAddress(true)}
-              variant="contained"
+              variant="outlined"
               size="large"
+              fullWidth
+              sx={{ marginTop: '4px' }}
             >
-              주소록 추가하기
+              <Add /> 배송지 신규입력
             </Button>
           </Box>
         </>
@@ -346,6 +369,31 @@ export default function BuyerInfo() {
           />
         </>
       )}
-    </Container>
+    </>
   );
 }
+
+const StyledCard = styled(Card)({
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
+  boxShadow: 'none',
+  borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+  paddingBottom: '6px',
+});
+
+const AddrdssDetails = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'start',
+  padding: '2px 4px 6px',
+});
+
+const AddressActions = styled(Box)({
+  display: 'flex',
+  justifyContent: 'space-between',
+  gap: '6px',
+  alignItems: 'center',
+  padding: '4px',
+  flexWrap: 'wrap',
+});
