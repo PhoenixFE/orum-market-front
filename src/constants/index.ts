@@ -14,7 +14,7 @@ export const DASHBOARD_MENU = {
     },
     {
       id: 3,
-      title: '주문 내역',
+      title: '내 주문 내역',
       url: `/user/${_id}/buyer-orderlist`,
     },
     {

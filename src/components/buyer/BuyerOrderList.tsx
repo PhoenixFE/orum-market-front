@@ -24,7 +24,9 @@ export default function BuyerOrdeList() {
 
   return (
     <>
-      <Typography variant="h5">내 주문 내역</Typography>
+      <Typography variant="h5" fontWeight={700}>
+        내 주문 내역
+      </Typography>
       <OrderListTable orderList={orderList} />
     </>
   );
