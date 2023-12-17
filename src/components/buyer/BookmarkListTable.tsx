@@ -22,10 +22,8 @@ export default function BookmarkListTable({ myBookmarkList }) {
   };
 
   const handleSearchProduct = async (productId) => {
-    console.log(productId);
     const response = await api.getProductList();
     const product = response.data.item.find((item) => item._id === productId);
-    console.log(product);
 
     handleAddToCart(product);
   };
