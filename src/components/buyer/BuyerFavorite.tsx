@@ -21,6 +21,9 @@ export default function BuyerFavorite() {
 
   return (
     <>
+      <Typography variant="h5" fontWeight={700}>
+        찜한 상품
+      </Typography>
       <BookmarkListTable myBookmarkList={bookmarkList} />
     </>
   );
