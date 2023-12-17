@@ -9,15 +9,29 @@ import {
   Button,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { Close } from '@mui/icons-material';
 
 import deleteBookmark from '../../lib/deleteBookmark';
-import { Close } from '@mui/icons-material';
+import { api } from '../../api/api';
+import useAddToCart from '../../hooks/useAddToCart';
 
 export default function BookmarkListTable({ myBookmarkList }) {
   // 아이템 사이즈를 계산하는 함수
   const getItemSize = () => {
     return { xs: 12, sm: 6, md: 4, lg: 4, xl: 4 };
   };
+
+  const handleSearchProduct = async (productId) => {
+    console.log(productId);
+    const response = await api.getProductList();
+    const product = response.data.item.find((item) => item._id === productId);
+    console.log(product);
+
+    handleAddToCart(product);
+  };
+
+  const handleAddToCart = useAddToCart();
+
   return (
     <>
       {myBookmarkList
@@ -40,7 +54,11 @@ export default function BookmarkListTable({ myBookmarkList }) {
                 </ProductDetails>
               </CardActionArea>
               <ProductActions>
-                <Button variant="outlined" style={{ flexGrow: '1' }}>
+                <Button
+                  variant="outlined"
+                  style={{ flexGrow: '1' }}
+                  onClick={() => handleSearchProduct(bookmark.product_id)}
+                >
                   장바구니 담기
                 </Button>
                 <Button
