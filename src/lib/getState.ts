@@ -10,7 +10,6 @@ export default function getState(orderList) {
 
   let result = _.countBy(orderList, 'state');
   result = _.merge({}, state, result);
-  console.log(result);
 
   const stateTitle = [
     {
