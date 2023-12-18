@@ -7,12 +7,14 @@ import {
   Box,
   styled,
   Card,
+  Grid,
 } from '@mui/material';
 
 import { api } from '../../api/api';
 import { v4 as uuidv4 } from 'uuid';
 import AddressForm from '../address/AddressForm';
 import { Add } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
 
 export default function BuyerInfo() {
   const userId = localStorage.getItem('_id');
@@ -214,6 +216,22 @@ export default function BuyerInfo() {
     return <>사용자 정보를 받아오지 못했습니다.</>;
   }
 
+  const emptyAddress = (
+    <Grid item xs={12} style={{ height: '10%' }}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        style={{ height: '100%' }}
+      >
+        <Typography variant="body1" color="textSecondary">
+          등록된 배송지가 없습니다.
+        </Typography>
+      </Box>
+    </Grid>
+  );
+
   return (
     <>
       {userInfo && !isCreateAddress && !isEditAddress && (
@@ -270,10 +288,8 @@ export default function BuyerInfo() {
           >
             배송지 관리
           </Typography>
-          {!userInfo.extra.address && <>등록된 배송지가 없습니다.</>}
-          {userInfo?.extra?.address?.length === 0 && (
-            <>등록된 배송지가 없습니다.</>
-          )}
+          {!userInfo.extra.address && <>{emptyAddress}</>}
+          {userInfo?.extra?.address?.length === 0 && <>{emptyAddress}</>}
 
           {userInfo.extra.address && (
             <>

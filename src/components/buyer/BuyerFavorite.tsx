@@ -1,4 +1,4 @@
-import { Button, Grid, Typography } from '@mui/material';
+import { Box, Button, Grid, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import BookmarkListTable from './BookmarkListTable';
 import useGetBookmark from '../../hooks/useGetBookmark';
@@ -12,12 +12,29 @@ export default function BuyerFavorite() {
         <Typography variant="h5" fontWeight={700}>
           찜한 상품 ({bookmarkList.length})
         </Typography>
-        <Typography variant="h6">찜한 상품 목록이 없습니다.</Typography>
-        <Link to={`/`}>
-          <Button type="button" variant="outlined" size="medium">
-            상품 보러 가기
-          </Button>
-        </Link>
+        <Grid item xs={12} style={{ height: '100%' }}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: '100%' }}
+          >
+            <Typography variant="h6" color="textSecondary">
+              찜한 상품이 없습니다.
+            </Typography>
+            <Link to={`/`}>
+              <Button
+                type="button"
+                variant="outlined"
+                size="medium"
+                sx={{ marginTop: '6px' }}
+              >
+                상품 보러 가기
+              </Button>
+            </Link>
+          </Box>
+        </Grid>
       </>
     );
   }

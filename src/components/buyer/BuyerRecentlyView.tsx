@@ -4,7 +4,6 @@ import {
   Card,
   CardActionArea,
   CardMedia,
-  Container,
   Grid,
   Typography,
   styled,
@@ -15,7 +14,7 @@ import { Link } from 'react-router-dom';
 export default function BuyerRecentlyView() {
   // 아이템 사이즈를 계산하는 함수
   const getItemSize = () => {
-    return { xs: 12, sm: 6, md: 4, lg: 4, xl: 4 };
+    return { xs: 12, sm: 6, md: 4, lg: 3, xl: 3 };
   };
 
   const recentlyViewedItems = localStorage?.getItem('recentlyViewed');
@@ -24,12 +23,32 @@ export default function BuyerRecentlyView() {
   if (!viewItems || viewItems?.length === 0) {
     return (
       <>
-        <Typography variant="h6">최근 본 상품이 없습니다.</Typography>
-        <Link to={`/`}>
-          <Button type="button" variant="outlined" size="medium">
-            상품 보러 가기
-          </Button>
-        </Link>
+        <Typography variant="h5" fontWeight={700}>
+          최근 본 상품
+        </Typography>
+        <Grid item xs={12} style={{ height: '100%' }}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: '100%' }}
+          >
+            <Typography variant="h6" color="textSecondary">
+              최근 본 상품이 없습니다.
+            </Typography>
+            <Link to={`/`}>
+              <Button
+                type="button"
+                variant="outlined"
+                size="medium"
+                sx={{ marginTop: '6px' }}
+              >
+                상품 보러 가기
+              </Button>
+            </Link>
+          </Box>
+        </Grid>
       </>
     );
   }

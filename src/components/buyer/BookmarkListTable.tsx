@@ -18,7 +18,7 @@ import useAddToCart from '../../hooks/useAddToCart';
 export default function BookmarkListTable({ myBookmarkList }) {
   // 아이템 사이즈를 계산하는 함수
   const getItemSize = () => {
-    return { xs: 12, sm: 6, md: 4, lg: 4, xl: 4 };
+    return { xs: 12, sm: 6, md: 4, lg: 3, xl: 3 };
   };
 
   const handleSearchProduct = async (productId) => {
