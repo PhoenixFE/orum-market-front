@@ -14,7 +14,6 @@ import { api } from '../../api/api';
 import { v4 as uuidv4 } from 'uuid';
 import AddressForm from '../address/AddressForm';
 import { Add } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
 
 export default function BuyerInfo() {
   const userId = localStorage.getItem('_id');
