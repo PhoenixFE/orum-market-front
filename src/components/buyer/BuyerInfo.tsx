@@ -245,12 +245,19 @@ export default function BuyerInfo() {
 
   return (
     <>
-      <Typography variant="h5" fontWeight={700}>
-        내 정보 수정
-      </Typography>
-      {!userInfo && <>{emptyUser}</>}
+      {!userInfo && (
+        <>
+          <Typography variant="h5" fontWeight={700}>
+            내 정보 수정
+          </Typography>
+          {emptyUser}
+        </>
+      )}
       {userInfo && !isCreateAddress && !isEditAddress && (
         <>
+          <Typography variant="h5" fontWeight={700}>
+            내 정보 수정
+          </Typography>
           <Typography
             variant="h6"
             fontWeight={600}
