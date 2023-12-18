@@ -22,7 +22,9 @@ import { CategoryList } from './pages/product/CategoryList.tsx';
 import { SearchPage } from './pages/product/SearchPage.tsx';
 import CheckOut from './pages/user/CheckOut.tsx';
 import BuyerRecentlyView from './components/buyer/BuyerRecentlyView.tsx';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
+const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
     path: '/',
@@ -87,5 +89,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <RouterProvider router={router} />,
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+  </QueryClientProvider>,
 );
