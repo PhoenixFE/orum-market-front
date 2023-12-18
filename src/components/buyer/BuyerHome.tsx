@@ -8,11 +8,12 @@ import {
   styled,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { ChevronRight } from '@mui/icons-material';
 import OrderListTable from './OrderListTable';
 import useGetOrderList from '../../hooks/useGetOrderList';
 import useGetBookmark from '../../hooks/useGetBookmark';
 import BookmarkListTable from './BookmarkListTable';
-import { ChevronRight } from '@mui/icons-material';
+import getState from '../../lib/getState';
 
 export const BuyerHome = () => {
   const id = localStorage.getItem('_id');
@@ -20,6 +21,8 @@ export const BuyerHome = () => {
   const slicedOrderList = orderList.slice(0, 5);
   const bookmarkList = useGetBookmark();
   const sliceBookmarkList = bookmarkList.slice(-5);
+
+  const getStateData = getState(orderList);
 
   let emptyListMessage = '';
 
@@ -87,55 +90,29 @@ export const BuyerHome = () => {
       </Box>
 
       <OrderStateBox>
-        <Grid container height={'90px'} sx={{ flexGrow: 1, width: '100%' }}>
-          <Grid item xs padding={1}>
-            <OrderStateDetail gap={0.5}>
-              <Typography variant="body1" paddingLeft={1}>
-                결제완료
-              </Typography>
+        <>
+          {getStateData.map((state) => (
+            <Grid
+              container
+              height={'90px'}
+              sx={{ flexGrow: 1, width: '100%' }}
+              key={state.id}
+            >
+              <Grid item xs padding={1}>
+                <OrderStateDetail gap={0.5}>
+                  <Typography variant="body1" paddingLeft={1}>
+                    {state.title}
+                  </Typography>
 
-              <Avatar sx={{ bgcolor: '#ef5b2a' }} aria-label="recipe">
-                0
-              </Avatar>
-            </OrderStateDetail>
-          </Grid>
-          <Divider orientation="vertical"></Divider>
-          <Grid item xs padding={1}>
-            <OrderStateDetail gap={0.5}>
-              <Typography variant="body1" paddingLeft={1}>
-                배송 준비중
-              </Typography>
-
-              <Avatar sx={{ bgcolor: '#ef5b2a' }} aria-label="recipe">
-                0
-              </Avatar>
-            </OrderStateDetail>
-          </Grid>
-          <Divider orientation="vertical"></Divider>
-          <Grid item xs padding={1}>
-            <OrderStateDetail gap={0.5}>
-              <Typography variant="body1" paddingLeft={1}>
-                배송중
-              </Typography>
-
-              <Avatar sx={{ bgcolor: '#ef5b2a' }} aria-label="recipe">
-                0
-              </Avatar>
-            </OrderStateDetail>
-          </Grid>
-          <Divider orientation="vertical"></Divider>
-          <Grid item xs padding={1}>
-            <OrderStateDetail gap={0.5}>
-              <Typography variant="body1" paddingLeft={1}>
-                배송 완료
-              </Typography>
-
-              <Avatar sx={{ bgcolor: '#ef5b2a' }} aria-label="recipe">
-                0
-              </Avatar>
-            </OrderStateDetail>
-          </Grid>
-        </Grid>
+                  <Avatar sx={{ bgcolor: '#ef5b2a' }} aria-label="recipe">
+                    {state.count}
+                  </Avatar>
+                </OrderStateDetail>
+              </Grid>
+              <Divider orientation="vertical"></Divider>
+            </Grid>
+          ))}
+        </>
       </OrderStateBox>
 
       {orderList?.length === 0 ? (
