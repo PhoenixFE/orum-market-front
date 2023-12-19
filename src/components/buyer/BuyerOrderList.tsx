@@ -7,38 +7,38 @@ import useGetOrderList from '../../hooks/useGetOrderList';
 export default function BuyerOrdeList() {
   const orderList = useGetOrderList();
 
-  if (orderList?.length === 0) {
-    return (
-      <>
-        <Typography variant="h5" fontWeight={700}>
-          내 주문 내역
-        </Typography>
-        <Grid item xs={12}>
-          <Box
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            style={{ height: '30%' }}
-          >
-            <Typography variant="h6" color="textSecondary">
-              주문 내역이 없습니다.
-            </Typography>
-            <Link to={`/`}>
-              <Button
-                type="button"
-                variant="outlined"
-                size="medium"
-                sx={{ marginTop: '6px' }}
-              >
-                상품 보러 가기
-              </Button>
-            </Link>
-          </Box>
-        </Grid>
-      </>
-    );
-  }
+  // if (orderList?.length === 0) {
+  //   return (
+  //     <>
+  //       <Typography variant="h5" fontWeight={700}>
+  //         내 주문 내역
+  //       </Typography>
+  //       <Grid item xs={12}>
+  //         <Box
+  //           display="flex"
+  //           flexDirection="column"
+  //           justifyContent="center"
+  //           alignItems="center"
+  //           style={{ height: '30%' }}
+  //         >
+  //           <Typography variant="h6" color="textSecondary">
+  //             주문 내역이 없습니다.
+  //           </Typography>
+  //           <Link to={`/`}>
+  //             <Button
+  //               type="button"
+  //               variant="outlined"
+  //               size="medium"
+  //               sx={{ marginTop: '6px' }}
+  //             >
+  //               상품 보러 가기
+  //             </Button>
+  //           </Link>
+  //         </Box>
+  //       </Grid>
+  //     </>
+  //   );
+  // }
 
   return (
     <>
