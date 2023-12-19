@@ -2,22 +2,14 @@ import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Link, Outlet } from 'react-router-dom';
 import { DASHBOARD_MENU } from '../../constants';
-import { Grid } from '@mui/material';
+import DashboardNavBar from '../../components/DashboardNavBar';
 
 const drawerWidth = 240;
 
@@ -28,94 +20,12 @@ interface Props {
 export default function Dashboard(props: Props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [selectedBuyerMenu, setSelectedBuyerMenu] = React.useState(
-    DASHBOARD_MENU.buyer[0].title,
-  );
-  const [selectSellerMenu, setSelectSellerMenu] = React.useState('');
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const handleSelectBuyerMenu = (itemBuyerTitle: string) => {
-    setSelectedBuyerMenu(itemBuyerTitle);
-    setSelectSellerMenu('');
-  };
-
-  const handleSelectSellerMenu = (itemSellerTitle: string) => {
-    setSelectSellerMenu(itemSellerTitle);
-    setSelectedBuyerMenu('');
-  };
-
-  const drawer = (
-    <Grid item xs={3}>
-      <Toolbar />
-      <Divider />
-      <List>
-        <Box sx={{ padding: '20px 16px 8px' }}>
-          <Typography variant="h6" fontWeight={700}>
-            구매자
-          </Typography>
-        </Box>
-        {DASHBOARD_MENU.buyer.map((items) => (
-          <ListItem key={items.id} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {items.id % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <Link
-                to={items.url}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                <ListItemText
-                  primary={items.title}
-                  primaryTypographyProps={{
-                    fontSize: '16',
-                    fontWeight:
-                      selectedBuyerMenu === items.title ? 'bold' : 'medium',
-                    letterSpacing: 0,
-                  }}
-                  onClick={() => handleSelectBuyerMenu(items.title)}
-                />
-              </Link>
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        <Box sx={{ padding: '20px 16px 8px' }}>
-          <Typography variant="h6" fontWeight={700}>
-            판매자
-          </Typography>
-        </Box>
-        {DASHBOARD_MENU.seller.map((items) => (
-          <ListItem key={items.id} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {items.id % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <Link
-                to={items.url}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                <ListItemText
-                  primary={items.title}
-                  primaryTypographyProps={{
-                    fontSize: '16',
-                    fontWeight:
-                      selectSellerMenu === items.title ? 'bold' : 'medium',
-                    letterSpacing: 0,
-                  }}
-                  onClick={() => handleSelectSellerMenu(items.title)}
-                />
-              </Link>
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Grid>
-  );
+  const drawer = <DashboardNavBar dashboardMenu={DASHBOARD_MENU} />;
 
   // Remove this const when copying and pasting into your project.
   const container =

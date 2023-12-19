@@ -211,9 +211,21 @@ export default function BuyerInfo() {
     }
   };
 
-  if (!userInfo) {
-    return <>사용자 정보를 받아오지 못했습니다.</>;
-  }
+  const emptyUser = (
+    <Grid item xs={12} style={{ height: '100%' }}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        style={{ height: '100%' }}
+      >
+        <Typography variant="h6" color="textSecondary">
+          사용자 정보를 받아오지 못했습니다.
+        </Typography>
+      </Box>
+    </Grid>
+  );
 
   const emptyAddress = (
     <Grid item xs={12} style={{ height: '10%' }}>
@@ -233,6 +245,14 @@ export default function BuyerInfo() {
 
   return (
     <>
+      {!userInfo && (
+        <>
+          <Typography variant="h5" fontWeight={700}>
+            내 정보 수정
+          </Typography>
+          {emptyUser}
+        </>
+      )}
       {userInfo && !isCreateAddress && !isEditAddress && (
         <>
           <Typography variant="h5" fontWeight={700}>
