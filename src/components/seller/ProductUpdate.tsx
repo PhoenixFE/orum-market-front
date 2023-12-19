@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import {
@@ -37,8 +37,6 @@ export default function ProductUpdate() {
   const [priceError, setPriceError] = useState('');
   const [shippingFeesError, setShippingFeesError] = useState('');
   const [contentError, setContentError] = useState('');
-
-  const editorRef = useRef();
 
   useEffect(() => {
     fetchProduct();
@@ -182,12 +180,9 @@ export default function ProductUpdate() {
   };
 
   //상품 설명 onChange
-  const contentChange = () => {
-    const editorData = editorRef.current.getInstance().getMarkdown();
-    setProductData({
-      ...productData,
-      content: editorData,
-    });
+  const contentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setProductData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
