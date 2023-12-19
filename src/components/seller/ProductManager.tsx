@@ -22,7 +22,7 @@ import CheckIcon from '@mui/icons-material/Check';
 
 import { api } from '../../api/api';
 import { IProduct, IOrderItem } from '../../type';
-import { CATEGORY, QUALITY, ORDER_STATE } from '../../constants/index';
+import { QUALITY, ORDER_STATE } from '../../constants/index';
 import formatDate from '../../lib/formatDate';
 
 export default function ProductManager() {
@@ -47,7 +47,6 @@ export default function ProductManager() {
       console.log('판매 상품 조회 실패', error);
     }
   };
-  console.log('productList', productList);
 
   useEffect(() => {
     const getOrderState = async () => {
@@ -177,7 +176,7 @@ export default function ProductManager() {
                   <TableCell align="center">
                     <img
                       src={`${rows.mainImages[0].path}`}
-                      alt="main-Image"
+                      alt={`${rows.mainImages[0].id}`}
                       style={{
                         width: '80px',
                         height: '80px',

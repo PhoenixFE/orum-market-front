@@ -42,7 +42,7 @@ export const DASHBOARD_MENU = {
     },
     {
       id: 3,
-      title: '주문 상태 관리',
+      title: '주문 관리',
       url: `/user/${_id}/seller-order-manager`,
     },
   ],

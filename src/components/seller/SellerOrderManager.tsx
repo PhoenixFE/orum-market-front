@@ -20,6 +20,8 @@ import { api } from '../../api/api';
 import { IProduct, IOrderItem } from '../../type';
 import { CATEGORY, QUALITY, ORDER_STATE } from '../../constants/index';
 import { Link } from 'react-router-dom';
+import formatDate from '../../lib/formatDate';
+import { localURL } from '../../lib/localURL';
 
 export default function SellerOrderManager() {
   const _id = localStorage.getItem('_id');
@@ -27,15 +29,6 @@ export default function SellerOrderManager() {
   const [sortedProductList, setSortedProductList] = useState<IProduct[]>([]);
   const [sortOrder, setSortOrder] = useState('최신순');
   const [orderList, setOrderList] = useState<IOrderItem[]>([]);
-
-  // 날짜 변환 함수
-  function formatDate(dateString: string) {
-    return new Intl.DateTimeFormat('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }).format(new Date(dateString));
-  }
 
   useEffect(() => {
     const fetchSellerProductData = async () => {
@@ -173,7 +166,7 @@ export default function SellerOrderManager() {
                   <TableCell align="center">
                     <img
                       src={`${rows.mainImages[0].path}`}
-                      alt="main-Image"
+                      alt={`${rows.mainImages[0].id}`}
                       style={{
                         width: '80px',
                         height: '80px',
@@ -183,7 +176,7 @@ export default function SellerOrderManager() {
                     />
                   </TableCell>
                   <TableCell align="center">
-                    <Link to={`http://localhost:5173/product/${rows._id}`}>
+                    <Link to={`${localURL}/product/${rows._id}`}>
                       {rows.name}
                     </Link>
                   </TableCell>
