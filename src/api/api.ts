@@ -168,14 +168,20 @@ export const api = {
     }),
 
   // 판매자 상품 목록 조회
-  getSellerProductInfo: (_id: number) =>
-    axiosInstance.get(`/seller/products/${_id}`),
+  getSellerProductInfo: () => axiosInstance.get(`/seller/products/`),
 
   // 상품 결제
   checkOut: (orderData: any) => axiosInstance.post('/orders/', orderData),
 
   // 구매자 구매 목록 조회
   getOrderProductInfo: () => axiosInstance.get('/orders/'),
+
+  //판매자 주문 목록 조회
+  getOrderState: () => axiosInstance.get('seller/orders/'),
+
+  //판매자 주문상태 관리
+  updateOrderState: (product_id: number) =>
+    axiosInstance.patch(`/seller/orders/${product_id}`, product_id),
 
   // 북마크 조회
   getBookmark: (product_id: number) =>
