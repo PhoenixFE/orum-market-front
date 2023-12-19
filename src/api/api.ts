@@ -8,7 +8,7 @@ const REFRESH_URL = '/users/refresh';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 1000 * 5,
+  timeout: 1000 * 20,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -120,7 +120,10 @@ export const api = {
     axiosInstance.patch(`/users/${_id}`, userData),
 
   // 상품 목록 조회
-  getProductList: (query = '') => axiosInstance.get(`/products/?${query}`),
+  getProductList: (query: IProductListQuery = {}) => {
+    const queryString = new URLSearchParams(query as any).toString();
+    return axiosInstance.get(`/products/?${queryString}`);
+  },
 
   // 상품 카테고리 조회
   getProductListByCategory: (extraQuery: string) =>
@@ -193,3 +196,7 @@ export const api = {
   // 내 북마크 목록 조회
   getMyBookMark: () => axiosInstance.get('/bookmarks/'),
 };
+
+interface IProductListQuery {
+  page?: number;
+}
