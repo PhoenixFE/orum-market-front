@@ -15,12 +15,12 @@ import {
   Box,
   CardMedia,
   CardContent,
+  styled,
 } from '@mui/material';
 import formatDate from '../../lib/formatDate';
 import { ORDER_STATE } from '../../constants';
 import { useTheme } from '@emotion/react';
 import { ChevronRight } from '@mui/icons-material';
-import styled from 'styled-components';
 
 export default function OrderListTable({ orderList }) {
   console.log('주문내역', orderList);
@@ -93,7 +93,7 @@ export default function OrderListTable({ orderList }) {
         ) : (
           <>
             {orderList.map((list) => (
-              <Card sx={{ marginBottom: '20px' }}>
+              <Card sx={{ marginBottom: '20px' }} key={list._id}>
                 <OrderListBox>
                   <Typography variant="body1" fontWeight={700}>
                     {formatDate(list.createdAt)}
@@ -103,7 +103,7 @@ export default function OrderListTable({ orderList }) {
                   </Button>
                 </OrderListBox>
                 {list.products.map((product) => (
-                  <OrderProductList>
+                  <OrderProductList key={product._id}>
                     <CardMedia
                       component="img"
                       height="180"
@@ -135,38 +135,35 @@ export default function OrderListTable({ orderList }) {
                       <Typography variant="body1" marginTop={0.5}>
                         {product.price.toLocaleString()}원
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        marginTop={1.5}
-                        fontStyle={{ color: 'red' }}
-                      >
-                        {ORDER_STATE.codes
-                          .filter((state) => state.code === list.state)
-                          .map((stateValue) => (
-                            <>
-                              <Typography
-                                key={stateValue.code}
-                                variant="body2"
-                                marginBottom={1}
-                              >
-                                {stateValue.value}
-                              </Typography>
-                              <OrderReviewBox>
-                                {stateValue.value === '배송 완료' ? (
-                                  <Button
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                  >
-                                    별점평가
-                                  </Button>
-                                ) : (
-                                  ''
-                                )}
-                              </OrderReviewBox>
-                            </>
-                          ))}
-                      </Typography>
+
+                      {ORDER_STATE.codes
+                        .filter((state) => state.code === list.state)
+                        .map((stateValue) => (
+                          <Box key={stateValue.code}>
+                            <Typography
+                              key={stateValue.code}
+                              variant="body2"
+                              marginTop={1.5}
+                              marginBottom={1.5}
+                              fontStyle={{ color: 'red' }}
+                            >
+                              {stateValue.value}
+                            </Typography>
+                            <OrderReviewBox>
+                              {stateValue.value === '배송 완료' ? (
+                                <Button
+                                  variant="outlined"
+                                  size="small"
+                                  fullWidth
+                                >
+                                  별점평가
+                                </Button>
+                              ) : (
+                                ''
+                              )}
+                            </OrderReviewBox>
+                          </Box>
+                        ))}
                     </CardContent>
                   </OrderProductList>
                 ))}
