@@ -48,7 +48,7 @@ export function SearchPage() {
   };
 
   // useAddRecentlyViewed(product);
-  const handleSaveRecentlyViewed = (product) => {
+  const handleSaveRecentlyViewed = (product: IProduct) => {
     addRecentViewProduct({ ...product });
   };
 
