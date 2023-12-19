@@ -192,4 +192,8 @@ export const api = {
 
   // 내 북마크 목록 조회
   getMyBookMark: () => axiosInstance.get('/bookmarks/'),
+
+  // 구매자 구매 상세 조회
+  getOrderProductDetail: (order_id: number) =>
+    axiosInstance.get(`/orders/${order_id}`),
 };
