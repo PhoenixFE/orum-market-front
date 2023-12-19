@@ -8,7 +8,7 @@ const REFRESH_URL = '/users/refresh';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 1000 * 5,
+  timeout: 1000 * 20,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
