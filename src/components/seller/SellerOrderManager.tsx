@@ -176,9 +176,7 @@ export default function SellerOrderManager() {
                     />
                   </TableCell>
                   <TableCell align="center">
-                    <Link to={`${localURL}/product/${rows._id}`}>
-                      {rows.name}
-                    </Link>
+                    <Link to={`/product/${rows._id}`}>{rows.name}</Link>
                   </TableCell>
                   <TableCell align="center">
                     {rows.price.toLocaleString()}원

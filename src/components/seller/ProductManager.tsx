@@ -186,9 +186,7 @@ export default function ProductManager() {
                     />
                   </TableCell>
                   <TableCell align="center">
-                    <Link to={`http://localhost:5173/product/${rows._id}`}>
-                      {rows.name}
-                    </Link>
+                    <Link to={`/product/${rows._id}`}>{rows.name}</Link>
                   </TableCell>
                   <TableCell align="center">
                     {rows.extra.sort
