@@ -50,15 +50,14 @@ export default function SellerOrderList() {
   }
   const fetchSellerProduct = async () => {
     try {
-      const response = await api.getProductList();
-      const getMatchItem = response.data.item.filter(
-        (product: IProduct) => product.seller_id === Number(_id),
-      );
+      const response = await api.getOrderState();
+      const getMatchItem = response.data.item;
       setProductList(getMatchItem);
     } catch (error) {
       console.log('판매 상품 조회 실패', error);
     }
   };
+  console.log('판매상품 리스트', productList);
 
   useEffect(() => {
     const getOrderState = async () => {
@@ -66,9 +65,9 @@ export default function SellerOrderList() {
         const response = await api.getOrderState();
         const orderState = response.data.item;
         const orderStatesMap: Record<string, string> = {};
-
         orderState.forEach((orderItem: IOrderItem) => {
           orderItem.products.forEach((product) => {
+            console.log('orderItem', orderItem.state);
             orderStatesMap[product.name] = orderItem.state;
           });
         });
@@ -175,12 +174,11 @@ export default function SellerOrderList() {
                   등록일자
                   <br /> (등록번호)
                 </TableCell>
-                <TableCell align="center">카테고리</TableCell>
+
                 <TableCell align="center">이미지</TableCell>
                 <TableCell align="center">상품명</TableCell>
                 <TableCell align="center">품질</TableCell>
                 <TableCell align="center">가격</TableCell>
-                <TableCell align="center">배송료</TableCell>
                 <TableCell align="center">주문상태</TableCell>
                 <TableCell align="center">공개여부</TableCell>
                 <TableCell align="center"></TableCell>
@@ -195,21 +193,10 @@ export default function SellerOrderList() {
                     </Typography>
                     ({rows._id})
                   </TableCell>
-                  <TableCell align="center">
-                    {CATEGORY.depth2
-                      .filter(
-                        (category) =>
-                          category.dbCode === rows.extra.category[1],
-                      )
-                      .map((categoryName) => (
-                        <Typography key={categoryName.id} variant="body2">
-                          {categoryName.name}
-                        </Typography>
-                      ))}
-                  </TableCell>
+
                   <TableCell align="center">
                     <img
-                      src={`${rows.mainImages[0].path}`}
+                      src={`${rows.products[0].image}`}
                       alt="main-Image"
                       style={{
                         width: '80px',
@@ -221,23 +208,22 @@ export default function SellerOrderList() {
                   </TableCell>
                   <TableCell align="center">
                     <Link to={`http://localhost:5173/product/${rows._id}`}>
-                      {rows.name}
+                      {rows.products[0].name}
                     </Link>
                   </TableCell>
                   <TableCell align="center">
-                    {rows.extra.sort
+                    {rows.products[0].quantity.sort
                       ? QUALITY.find(
-                          (quality) => quality.value === rows.extra.sort,
+                          (quality) =>
+                            quality.value === rows.products[0].quantity.sort,
                         )?.name
                       : QUALITY.find(
-                          (quality) => quality.value === rows.quantity,
+                          (quality) =>
+                            quality.value === rows.products[0].quantity,
                         )?.name || 'Unknown Quality'}
                   </TableCell>
                   <TableCell align="center">
-                    {rows.price.toLocaleString()}원
-                  </TableCell>
-                  <TableCell align="center">
-                    {rows.shippingFees.toLocaleString()}원
+                    {rows.products[0].price.toLocaleString()}원
                   </TableCell>
                   <TableCell align="center">
                     {getOrderStateLabel(rows._id) || ''}
