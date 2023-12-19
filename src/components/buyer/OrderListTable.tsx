@@ -8,13 +8,81 @@ import {
   Button,
   Typography,
   Table,
+  Grid,
+  Card,
+  styled,
+  Box,
+  CardMedia,
+  CardActionArea,
 } from '@mui/material';
 import formatDate from '../../lib/formatDate';
 import { ORDER_STATE } from '../../constants';
+import { useEffect } from 'react';
+import { api } from '../../api/api';
+import { Link } from 'react-router-dom';
+import { ChevronRight, Close } from '@mui/icons-material';
 
 export default function OrderListTable({ orderList }) {
+  console.log('orderList', orderList);
+
+  useEffect(() => {
+    const test = async (ttt) => {
+      const response = await api.getOrderProductDetail(ttt);
+      console.log('받아온 값', response.data.item);
+    };
+    test(3);
+  }, []);
+
+  const getItemSize = () => {
+    return { xs: 12, sm: 12, md: 12, lg: 12, xl: 12 };
+  };
+
   return (
     <>
+      <Grid container sx={{ backgroundColor: 'red' }}>
+        <Grid item {...getItemSize()} marginY={3}>
+          <StyledCard>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'end',
+              }}
+            >
+              <Typography
+                variant="h6"
+                fontWeight={600}
+                marginTop={2}
+                marginBottom={1}
+              >
+                12월 18일 주문
+              </Typography>
+              <Link to={`/`}>
+                <Button type="button" sx={{ padding: '10px 0' }}>
+                  주문내역 더보기 <ChevronRight />
+                </Button>
+              </Link>
+            </Box>
+            <ProductImage />
+            <ProductDetails>
+              <Typography variant="h6">ddd</Typography>
+              <Typography variant="h6" color="inherit" fontWeight={700}>
+                ddd 원
+              </Typography>
+            </ProductDetails>
+            <ProductActions>
+              <Button variant="outlined" style={{ flexGrow: '1' }}>
+                장바구니 담기
+              </Button>
+              <Button variant="outlined">
+                <Close />
+                삭제
+              </Button>
+            </ProductActions>
+          </StyledCard>
+        </Grid>
+      </Grid>
+
       <TableContainer component={Paper}>
         <Table aria-label="결제내역">
           <TableHead>
@@ -72,3 +140,35 @@ export default function OrderListTable({ orderList }) {
     </>
   );
 }
+
+const StyledCard = styled(Card)({
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
+  boxShadow: 'none',
+  borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+  paddingBottom: '6px',
+  border: '0.5px solid #efefef',
+});
+
+const ProductImage = styled(CardMedia)({
+  height: '150px',
+  backgroundSize: 'cover',
+  backgroundColor: 'grey.50',
+});
+
+const ProductDetails = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'start',
+  padding: '12px 4px 6px',
+});
+
+const ProductActions = styled(Box)({
+  display: 'flex',
+  justifyContent: 'space-between',
+  gap: '6px',
+  alignItems: 'center',
+  padding: '4px',
+  flexWrap: 'wrap',
+});

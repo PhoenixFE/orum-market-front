@@ -13,13 +13,13 @@ export default function BuyerOrdeList() {
         <Typography variant="h5" fontWeight={700}>
           내 주문 내역
         </Typography>
-        <Grid item xs={12} style={{ height: '100%' }}>
+        <Grid item xs={12}>
           <Box
             display="flex"
             flexDirection="column"
             justifyContent="center"
             alignItems="center"
-            style={{ height: '100%' }}
+            style={{ height: '30%' }}
           >
             <Typography variant="h6" color="textSecondary">
               주문 내역이 없습니다.
