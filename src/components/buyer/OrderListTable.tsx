@@ -167,6 +167,28 @@ export default function OrderListTable({ orderList }) {
                     </CardContent>
                   </OrderProductList>
                 ))}
+                <Card>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '10px',
+                    }}
+                  >
+                    <Typography variant="body2">
+                      총 결제 금액 <br />
+                      <Typography variant="caption">
+                        상품금액 {list.cost.products.toLocaleString()} + 배송비{' '}
+                        {list.cost.shippingFees.toLocaleString()}
+                      </Typography>
+                    </Typography>
+                    <Typography variant="body2" fontWeight={700}>
+                      {list.cost.total.toLocaleString()}원
+                    </Typography>
+                  </Box>
+                </Card>
               </Card>
             ))}
           </>
