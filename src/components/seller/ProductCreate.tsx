@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import {
   TextField,
-  Select,
   MenuItem,
-  InputLabel,
   Button,
   Stack,
   IconButton,
@@ -18,11 +16,15 @@ import {
   CardMedia,
   Badge,
   Typography,
+  Dialog,
+  DialogTitle,
+  ToggleButtonGroup,
+  ToggleButton,
 } from '@mui/material';
 
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { api } from '../../api/api';
 import { CATEGORY, QUALITY } from '../../constants/index';
@@ -41,6 +43,7 @@ import {
   KeyboardArrowDown,
 } from '@mui/icons-material';
 import Check from '@mui/icons-material/Check';
+import { useMutation } from 'react-query';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const initCreateData = {
   price: 0,
@@ -72,11 +75,25 @@ export default function ProductCreate() {
   const [italic, setItalic] = useState(false);
   const [fontWeight, setFontWeight] = useState('normal');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedQuality, setSelectedQuality] = useState('');
 
   const [nameError, setNameError] = useState('');
   const [priceError, setPriceError] = useState('');
   const [shippingFeesError, setShippingFeesError] = useState('');
   const [contentError, setContentError] = useState('');
+
+  // 사진 클릭시 팝업
+  const handleClickOpen = (image) => {
+    setSelectedImage(image);
+    setOpenDialog(true);
+  };
+
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
 
   const navigate = useNavigate();
 
@@ -129,26 +146,33 @@ export default function ProductCreate() {
   };
 
   //카테고리 상태값 업데이트
-  const handleCategory = (categorySelected: string) => {
-    setProductData({
-      ...productData,
-      extra: {
-        ...productData.extra,
-        category: ['H01', categorySelected],
-      },
-    });
+  const handleCategoryChange = (event, newCategory) => {
+    if (newCategory !== null) {
+      setSelectedCategory(newCategory);
+      setProductData({
+        ...productData,
+        extra: {
+          ...productData.extra,
+          category: ['H01', newCategory],
+        },
+      });
+    }
   };
 
   //품질 상태값 업데이트
-  function handleQuantity(qualityGrade: number) {
-    setProductData({
-      ...productData,
-      extra: {
-        ...productData.extra,
-        sort: qualityGrade,
-      },
-    });
-  }
+  const handleQualityChange = (event, newQuality) => {
+    if (newQuality !== null) {
+      // Prevent deselecting all options
+      setSelectedQuality(newQuality);
+      setProductData({
+        ...productData,
+        extra: {
+          ...productData.extra,
+          sort: newQuality,
+        },
+      });
+    }
+  };
 
   //상품데이터 form submit
   const productAllSubmit = async (e: React.FormEvent) => {
@@ -168,41 +192,41 @@ export default function ProductCreate() {
   };
 
   // 파일 업로드
-  const handleFileUpload = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const files = e.target.files;
-    if (!files) return;
-
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append('attach', files[i]);
-    }
-
-    try {
-      const response = await api.uploadFile(formData);
-      let newPreviews = [];
-
-      if (response.data.files) {
-        newPreviews = response.data.files.map((file) => ({
+  const uploadFileMutation = useMutation(
+    (newFiles) => {
+      return api.uploadFile(newFiles);
+    },
+    {
+      onSuccess: (response) => {
+        const files = response.data.files || [response.data.file];
+        const newPreviews = files.map((file) => ({
           id: file.name,
           path: `${API_BASE_URL}${file.path}`,
         }));
-      } else if (response.data.file) {
-        const singleFile = response.data.file;
-        newPreviews.push({
-          id: singleFile.name,
-          path: `${API_BASE_URL}${singleFile.path}`,
-        });
-      }
+        setFilePreview((currentPreviews) => [
+          ...currentPreviews,
+          ...newPreviews,
+        ]);
+        setProductData((currentData) => ({
+          ...currentData,
+          mainImages: [...currentData.mainImages, ...newPreviews],
+        }));
+      },
+      onError: (error) => {
+        console.error('Error uploading file:', error);
+      },
+    },
+  );
 
-      setFilePreview((currentPreviews) => [...currentPreviews, ...newPreviews]);
-
-      setProductData((currentData) => ({
-        ...currentData,
-        mainImages: currentData.mainImages.concat(newPreviews),
-      }));
-    } catch (error) {
-      console.log('사진첨부에러발생', error);
+  const handleFileUpload = (e) => {
+    e.preventDefault();
+    const files = e.target.files;
+    if (files) {
+      const formData = new FormData();
+      Array.from(files).forEach((file) => {
+        formData.append('attach', file);
+      });
+      uploadFileMutation.mutate(formData);
     }
   };
 
@@ -231,7 +255,6 @@ export default function ProductCreate() {
           top: '64px',
           backgroundColor: '#fff',
           zIndex: 1100,
-          // box shadow only bottom
           overscrollBehavior: 'contain',
         }}
         m={0}
@@ -251,81 +274,45 @@ export default function ProductCreate() {
         p={4}
         gap={4}
       >
-        {/* <Box>
-          <FormLabel sx={{ fontSize: 'medium' }}>상품 사진:</FormLabel>
-          <Button
-            component="label"
-            variant="contained"
-            startIcon={<CloudUploadIcon />}
-            onChange={handleFileUpload}
-          >
-            파일 업로드
-            <input hidden type="file" multiple name="attach" accept="image/*" />
-          </Button>
-          {filePreview.map((imageItem) => (
-            <div key={imageItem.id}>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <IconButton
-                  aria-label="delete"
-                  size="large"
-                  onClick={() => handleFileRemove(imageItem.id)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-                <img
-                  src={imageItem.path}
-                  alt={`Preview ${imageItem.id}`}
-                  style={{
-                    marginTop: '10px',
-                    maxWidth: '60%',
-                    width: '200px',
-                    height: '200px',
-                    objectFit: 'cover',
-                  }}
-                />
-              </Stack>
-            </div>
-          ))}
-        </Box> */}
-
         <Box>
           <FormLabel sx={{ fontSize: 'medium' }}>카테고리:</FormLabel>
-          <Select
-            labelId="category-label"
-            id="category-select"
-            label="category"
-            value={productData.extra.category[1]}
-            onChange={(e) => handleCategory(e.target.value)}
-            sx={{ width: '100px' }}
+
+          <ToggleButtonGroup
+            value={selectedCategory}
+            exclusive
+            onChange={handleCategoryChange}
+            aria-label="category"
           >
-            {CATEGORY.depth2.map((menu) => {
-              return (
-                <MenuItem key={menu.id} value={menu.dbCode}>
-                  {menu.name}
-                </MenuItem>
-              );
-            })}
-          </Select>
+            {CATEGORY.depth2.map((menu) => (
+              <ToggleButton
+                key={menu.id}
+                value={menu.dbCode}
+                aria-label={menu.name}
+              >
+                {menu.name}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
         </Box>
 
         <Box>
           <FormLabel sx={{ fontSize: 'medium' }}>상품 품질:</FormLabel>
-          <Select
-            labelId="quantity-label"
-            id="quantity-select"
-            label="quantity"
-            value={productData.extra.sort}
-            onChange={(e) => handleQuantity(e.target.value)}
-            sx={{ width: '100px' }}
+          <ToggleButtonGroup
+            value={selectedQuality}
+            exclusive
+            onChange={handleQualityChange}
+            aria-label="quality"
           >
-            {QUALITY.map((menu) => {
-              return (
-                <MenuItem key={menu.id} value={menu.value}>
-                  {menu.name}
-                </MenuItem>
-              );
-            })}
-          </Select>
+            {QUALITY.map((quality) => (
+              <ToggleButton
+                key={quality.id}
+                value={quality.value}
+                aria-label={quality.name}
+              >
+                {quality.name}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
         </Box>
 
         <Box>
@@ -375,7 +362,7 @@ export default function ProductCreate() {
           <FormLabel sx={{ fontSize: 'medium' }}>상품 설명:</FormLabel>
           <Textarea
             placeholder="상품 설명을 입력하세요."
-            minRows={3}
+            minRows={4}
             name="content"
             value={productData.content}
             onChange={handleAllChange}
@@ -466,6 +453,11 @@ export default function ProductCreate() {
             사진 업로드
             <input hidden accept="image/*" multiple type="file" />
           </Button>
+          {uploadFileMutation.isLoading && (
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <CircularProgress />
+            </Box>
+          )}
           <Stack direction="row" spacing={2}>
             {filePreview.map((image, index) => (
               <Badge
@@ -491,16 +483,19 @@ export default function ProductCreate() {
                 }}
                 key={image.id}
               >
-                <Card sx={{ width: 90, height: 90 }}>
-                  <CardActionArea>
-                    <CardMedia
-                      component="img"
-                      height="90"
-                      image={image.path}
-                      alt={`Preview ${index + 1}`}
-                    />
-                  </CardActionArea>
-                </Card>
+                {' '}
+                <div onClick={() => handleClickOpen(image.path)} key={image.id}>
+                  <Card sx={{ width: 90, height: 90 }}>
+                    <CardActionArea>
+                      <CardMedia
+                        component="img"
+                        height="90"
+                        image={image.path}
+                        alt={`Preview ${index + 1}`}
+                      />
+                    </CardActionArea>
+                  </Card>
+                </div>
               </Badge>
             ))}
           </Stack>
@@ -508,6 +503,30 @@ export default function ProductCreate() {
             {filePreview.length > 0 && (
               <Typography variant="caption">{`${filePreview.length}/10`}</Typography>
             )}
+            <Dialog onClose={handleClose} open={openDialog}>
+              <DialogTitle>
+                사진 미리보기
+                <IconButton
+                  aria-label="close"
+                  onClick={handleClose}
+                  sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              {selectedImage && (
+                <img
+                  src={selectedImage}
+                  alt={`Preview` + selectedImage}
+                  style={{ width: '100%' }}
+                />
+              )}
+            </Dialog>
           </Box>
         </Box>
       </Box>
@@ -521,7 +540,7 @@ export default function ProductCreate() {
         <Button type="button" onClick={handleMoveBack} variant="outlined">
           취소
         </Button>
-        <Button type="submit" variant="contained">
+        <Button type="submit" variant="contained" size="large">
           등록하기
         </Button>
       </Box>
