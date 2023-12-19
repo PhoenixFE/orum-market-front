@@ -80,12 +80,8 @@ export default function SignUpPage() {
   const checkEmailAvailability = async () => {
     try {
       setIsCheckingEmail(true);
-      const response = await fetch(
-        `https://localhost/api/users/email?email=${encodeURIComponent(
-          formData.email,
-        )}`,
-      );
-      const data = await response.json();
+      const response = await api.checkEmail(formData.email);
+      const data = response.data;
       if (data.ok === 1) {
         setIsEmailAvailable(true);
         setEmailError('');
