@@ -174,9 +174,6 @@ export default function ProductCreate() {
     }
   };
 
-  console.log('파일업로드 preview', filePreview);
-  console.log('파일업로드 data', productData);
-
   //파일 삭제
   const handleFileRemove = (indexToRemove) => {
     let updatedFilePreview = [...filePreview];
@@ -187,9 +184,12 @@ export default function ProductCreate() {
 
     setProductData({
       ...productData,
-      mainImages: filePreview,
+      mainImages: updatedFilePreview,
     });
   };
+
+  console.log('preview', filePreview);
+  console.log('data', productData);
 
   return (
     <>
