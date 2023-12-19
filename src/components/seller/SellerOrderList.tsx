@@ -196,7 +196,7 @@ export default function SellerOrderList() {
 
                   <TableCell align="center">
                     <img
-                      src={`${rows.products[0].image}`}
+                      src={`${rows.products[0].image.path}`}
                       alt="main-Image"
                       style={{
                         width: '80px',
