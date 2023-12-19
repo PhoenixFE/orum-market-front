@@ -12,7 +12,7 @@ export interface IProduct {
   extra: {
     isNew?: boolean;
     isBest?: boolean;
-    category: string[];
+    category?: string[];
     sort?: number;
   };
   createdAt: string;

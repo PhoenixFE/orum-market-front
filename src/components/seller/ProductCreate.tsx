@@ -9,6 +9,8 @@ import {
   Button,
   Stack,
   IconButton,
+  InputAdornment,
+  OutlinedInput,
 } from '@mui/material';
 
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -41,7 +43,7 @@ const initCreateData = {
     isNew: true,
     isBest: true,
     category: ['H01', 'H0101'],
-    sort: 0,
+    sort: 1,
   },
 };
 
@@ -63,7 +65,12 @@ export default function ProductCreate() {
   //가격, 배송료, 상품명, 상품 설명 상태값 업데이트
   const handleAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setProductData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'price' || name === 'shippingFees') {
+      const numericValue = parseFloat(value);
+      setProductData((prev) => ({ ...prev, [name]: numericValue }));
+    } else {
+      setProductData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   //상품 등록 유효성 검사
@@ -111,10 +118,13 @@ export default function ProductCreate() {
     });
   };
   //품질 상태값 업데이트
-  function handleQuantity(quantitySelected: number) {
+  function handleQuantity(qualityGrade: number) {
     setProductData({
       ...productData,
-      quantity: quantitySelected,
+      extra: {
+        ...productData.extra,
+        sort: qualityGrade,
+      },
     });
   }
 
@@ -290,24 +300,28 @@ export default function ProductCreate() {
         <br />
         <>
           상품 가격:
-          <TextField
-            type="text"
+          <OutlinedInput
+            type="number"
             name="price"
+            endAdornment={<InputAdornment position="end">원</InputAdornment>}
+            inputProps={{ step: 1000, min: 0 }}
             value={productData.price}
             onChange={handleAllChange}
-          ></TextField>
+          ></OutlinedInput>
           {!isValid ? <div style={{ color: 'red' }}>{priceError}</div> : <></>}
         </>
         <br />
         <br />
         <>
           배송비:
-          <TextField
-            type="text"
+          <OutlinedInput
+            type="number"
             name="shippingFees"
+            endAdornment={<InputAdornment position="end">원</InputAdornment>}
+            inputProps={{ step: 500, min: 0 }}
             value={productData.shippingFees}
             onChange={handleAllChange}
-          ></TextField>
+          ></OutlinedInput>
           {shippingFeesError && (
             <div style={{ color: 'red' }}>{shippingFeesError}</div>
           )}
