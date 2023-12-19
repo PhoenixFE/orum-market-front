@@ -24,14 +24,14 @@ import {
   validateProductPrice,
   validateProductShippingFees,
 } from '../../lib/validation';
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const initCreateData = {
   price: 0,
   shippingFees: 0,
   show: true,
   active: true,
   name: '',
-  mainImages: [''],
+  mainImages: [],
   content: '',
   createdAt: '',
   updatedAt: '',
@@ -104,11 +104,14 @@ export default function ProductCreate() {
   const handleCategory = (categorySelected: string) => {
     setProductData({
       ...productData,
-      extra: { category: ['H01', categorySelected] },
+      extra: {
+        ...productData.extra,
+        category: ['H01', categorySelected],
+      },
     });
   };
   //품질 상태값 업데이트
-  function handleQuantity(quantitySelected: string) {
+  function handleQuantity(quantitySelected: number) {
     setProductData({
       ...productData,
       quantity: quantitySelected,
@@ -135,55 +138,45 @@ export default function ProductCreate() {
   // 파일 업로드
   const handleFileUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    const fileInput = e.target.files;
-    if (!fileInput) return;
-
-    const totalFiles = filePreview.length + fileInput.length;
-
-    if (totalFiles > 3) {
-      alert('이미지는 3개까지 첨부가능합니다');
-      return;
-    }
+    const files = e.target.files;
+    if (!files) return;
 
     const formData = new FormData();
-
-    for (let i = 0; i < fileInput.length; i++) {
-      formData.append('attach', fileInput[i]);
+    for (let i = 0; i < files.length; i++) {
+      formData.append('attach', files[i]);
     }
 
     try {
       const response = await api.uploadFile(formData);
+      let newPreviews = [];
 
-      //파일이 여러개일 때
       if (response.data.files) {
-        let fileArr = response.data.files;
-        const resImgUrl = fileArr.map((images) => ({
-          id: images.name,
-          path: `https://localhost:443${images.path}`,
+        newPreviews = response.data.files.map((file) => ({
+          id: file.name,
+          path: `${API_BASE_URL}${file.path}`,
         }));
-        setFilePreview([...filePreview, ...resImgUrl]);
-        setProductData({
-          ...productData,
-          mainImages: [...filePreview, ...resImgUrl],
-        });
-
-        //단일파일일 때
-      } else {
-        let fileArr = {
-          id: response.data.file.name,
-          path: `https://localhost:443${response.data.file.path}`,
-        };
-
-        setFilePreview([...filePreview, fileArr]);
-        setProductData({
-          ...productData,
-          mainImages: [...filePreview, fileArr],
+      } else if (response.data.file) {
+        const singleFile = response.data.file;
+        newPreviews.push({
+          id: singleFile.name,
+          path: `${API_BASE_URL}${singleFile.path}`,
         });
       }
+
+      setFilePreview((currentPreviews) => [...currentPreviews, ...newPreviews]);
+
+      setProductData((currentData) => ({
+        ...currentData,
+        mainImages: currentData.mainImages.concat(newPreviews),
+      }));
     } catch (error) {
       console.log('사진첨부에러발생', error);
     }
   };
+
+  console.log('파일업로드 preview', filePreview);
+  console.log('파일업로드 data', productData);
+
   //파일 삭제
   const handleFileRemove = (indexToRemove) => {
     let updatedFilePreview = [...filePreview];
@@ -210,7 +203,7 @@ export default function ProductCreate() {
           onChange={handleFileUpload}
         >
           파일 업로드
-          <input hidden type="file" multiple accept="image/*" />
+          <input hidden type="file" multiple name="attach" accept="image/*" />
         </Button>
         {filePreview.map((imageItem) => (
           <div key={imageItem.id}>
@@ -224,10 +217,15 @@ export default function ProductCreate() {
               </IconButton>
             </Stack>
             <img
-              key={imageItem.id}
               src={imageItem.path}
-              alt={'File Preview'}
-              style={{ marginTop: '10px', maxWidth: '60%' }}
+              alt={`Preview ${imageItem.id}`}
+              style={{
+                marginTop: '10px',
+                maxWidth: '60%',
+                width: '200px',
+                height: '200px',
+                objectFit: 'cover',
+              }}
             />
           </div>
         ))}
