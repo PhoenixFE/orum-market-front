@@ -14,8 +14,8 @@ import { BuyerHome } from './components/buyer/BuyerHome.tsx';
 import ProductCreate from './components/seller/ProductCreate.tsx';
 import ProductUpdate from './components/seller/ProductUpdate.tsx';
 import SellerInfo from './components/seller/SellerInfo.tsx';
-import SellerOrderList from './components/seller/SellerOrderList.tsx';
 import ProductManager from './components/seller/ProductManager.tsx';
+import SellerOrderManager from './components/seller/SellerOrderManager.tsx';
 import SignInPage from './pages/user/SignIn.tsx';
 import SignUpPage from './pages/user/SignUp.tsx';
 import { CategoryList } from './pages/product/CategoryList.tsx';
@@ -61,8 +61,8 @@ const router = createBrowserRouter([
         element: <BuyerFavorite />,
       },
       {
-        path: '/user/:id/product-manager',
-        element: <ProductManager />,
+        path: '/user/:id/seller-order-manager',
+        element: <SellerOrderManager />,
       },
       {
         path: '/user/:id/product-create',
@@ -77,8 +77,8 @@ const router = createBrowserRouter([
         element: <SellerInfo />,
       },
       {
-        path: '/user/:id/seller-orderlist',
-        element: <SellerOrderList />,
+        path: '/user/:id/product-manager',
+        element: <ProductManager />,
       },
       {
         path: '/user/:id/recently-viewed-items',
