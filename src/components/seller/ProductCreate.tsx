@@ -11,10 +11,18 @@ import {
   IconButton,
   InputAdornment,
   OutlinedInput,
+  Box,
+  Divider,
+  Card,
+  CardActionArea,
+  CardMedia,
+  Badge,
+  Typography,
 } from '@mui/material';
 
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
 
 import { api } from '../../api/api';
 import { CATEGORY, QUALITY } from '../../constants/index';
@@ -26,6 +34,13 @@ import {
   validateProductPrice,
   validateProductShippingFees,
 } from '../../lib/validation';
+import { FormLabel, ListItemDecorator, Menu, Textarea } from '@mui/joy';
+import {
+  FormatBold,
+  FormatItalic,
+  KeyboardArrowDown,
+} from '@mui/icons-material';
+import Check from '@mui/icons-material/Check';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const initCreateData = {
   price: 0,
@@ -54,6 +69,9 @@ export default function ProductCreate() {
     useState<Partial<IProduct>>(initCreateData);
   const [isValid, setIsValid] = useState(true);
   const [filePreview, setFilePreview] = useState([]);
+  const [italic, setItalic] = useState(false);
+  const [fontWeight, setFontWeight] = useState('normal');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const [nameError, setNameError] = useState('');
   const [priceError, setPriceError] = useState('');
@@ -105,8 +123,11 @@ export default function ProductCreate() {
   //뒤로가기
   const handleMoveBack = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    navigate(-1);
+
+    if (window.confirm('작성한 내용이 저장되지 않습니다. 취소하시겠습니까?'))
+      navigate(-1);
   };
+
   //카테고리 상태값 업데이트
   const handleCategory = (categorySelected: string) => {
     setProductData({
@@ -117,6 +138,7 @@ export default function ProductCreate() {
       },
     });
   };
+
   //품질 상태값 업데이트
   function handleQuantity(qualityGrade: number) {
     setProductData({
@@ -202,71 +224,97 @@ export default function ProductCreate() {
   console.log('data', productData);
 
   return (
-    <>
-      <form onSubmit={productAllSubmit}>
-        <InputLabel>상품사진</InputLabel>
-        <h3>이미지는 3개까지 첨부 가능합니다.</h3>
-        <Button
-          component="label"
-          variant="contained"
-          startIcon={<CloudUploadIcon />}
-          onChange={handleFileUpload}
-        >
-          파일 업로드
-          <input hidden type="file" multiple name="attach" accept="image/*" />
-        </Button>
-        {filePreview.map((imageItem) => (
-          <div key={imageItem.id}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <IconButton
-                aria-label="delete"
-                size="large"
-                onClick={() => handleFileRemove(imageItem.id)}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Stack>
-            <img
-              src={imageItem.path}
-              alt={`Preview ${imageItem.id}`}
-              style={{
-                marginTop: '10px',
-                maxWidth: '60%',
-                width: '200px',
-                height: '200px',
-                objectFit: 'cover',
-              }}
-            />
-          </div>
-        ))}
-        <br></br>
-        <br></br>
-        <InputLabel id="category-label">카테고리</InputLabel>
-        <Select
-          labelId="category-label"
-          id="category-select"
-          label="category"
-          value={productData.extra.category[1]}
-          onChange={(e) => handleCategory(e.target.value)}
-          sx={{ width: '100px' }}
-        >
-          {CATEGORY.depth2.map((menu) => {
-            return (
-              <MenuItem key={menu.id} value={menu.dbCode}>
-                {menu.name}
-              </MenuItem>
-            );
-          })}
-        </Select>
-        <br />
-        <br />
-        <>
-          <InputLabel id="quantity-label">상품 품질</InputLabel>
+    <form onSubmit={productAllSubmit}>
+      <Box
+        sx={{
+          position: 'sticky',
+          top: '64px',
+          backgroundColor: '#fff',
+          zIndex: 1100,
+          // box shadow only bottom
+          overscrollBehavior: 'contain',
+        }}
+        m={0}
+        pt={2}
+        px={2}
+      >
+        <FormLabel sx={{ fontSize: 'x-large' }}>상품 등록</FormLabel>
+        <Divider />
+      </Box>
+
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+        m={2}
+        p={4}
+        gap={4}
+      >
+        {/* <Box>
+          <FormLabel sx={{ fontSize: 'medium' }}>상품 사진:</FormLabel>
+          <Button
+            component="label"
+            variant="contained"
+            startIcon={<CloudUploadIcon />}
+            onChange={handleFileUpload}
+          >
+            파일 업로드
+            <input hidden type="file" multiple name="attach" accept="image/*" />
+          </Button>
+          {filePreview.map((imageItem) => (
+            <div key={imageItem.id}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <IconButton
+                  aria-label="delete"
+                  size="large"
+                  onClick={() => handleFileRemove(imageItem.id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+                <img
+                  src={imageItem.path}
+                  alt={`Preview ${imageItem.id}`}
+                  style={{
+                    marginTop: '10px',
+                    maxWidth: '60%',
+                    width: '200px',
+                    height: '200px',
+                    objectFit: 'cover',
+                  }}
+                />
+              </Stack>
+            </div>
+          ))}
+        </Box> */}
+
+        <Box>
+          <FormLabel sx={{ fontSize: 'medium' }}>카테고리:</FormLabel>
+          <Select
+            labelId="category-label"
+            id="category-select"
+            label="category"
+            value={productData.extra.category[1]}
+            onChange={(e) => handleCategory(e.target.value)}
+            sx={{ width: '100px' }}
+          >
+            {CATEGORY.depth2.map((menu) => {
+              return (
+                <MenuItem key={menu.id} value={menu.dbCode}>
+                  {menu.name}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </Box>
+
+        <Box>
+          <FormLabel sx={{ fontSize: 'medium' }}>상품 품질:</FormLabel>
           <Select
             labelId="quantity-label"
             id="quantity-select"
             label="quantity"
-            value={productData.quantity}
+            value={productData.extra.sort}
             onChange={(e) => handleQuantity(e.target.value)}
             sx={{ width: '100px' }}
           >
@@ -278,11 +326,10 @@ export default function ProductCreate() {
               );
             })}
           </Select>
-        </>
-        <br />
-        <br />
-        <>
-          상품명:
+        </Box>
+
+        <Box>
+          <FormLabel sx={{ fontSize: 'medium' }}>상품명:</FormLabel>
           <TextField
             type="text"
             name="name"
@@ -295,11 +342,10 @@ export default function ProductCreate() {
           ) : (
             <> </>
           )}
-        </>
-        <br />
-        <br />
-        <>
-          상품 가격:
+        </Box>
+
+        <Box>
+          <FormLabel sx={{ fontSize: 'medium' }}>상품 가격:</FormLabel>
           <OutlinedInput
             type="number"
             name="price"
@@ -309,11 +355,9 @@ export default function ProductCreate() {
             onChange={handleAllChange}
           ></OutlinedInput>
           {!isValid ? <div style={{ color: 'red' }}>{priceError}</div> : <></>}
-        </>
-        <br />
-        <br />
-        <>
-          배송비:
+        </Box>
+        <Box>
+          <FormLabel sx={{ fontSize: 'medium' }}>배송비:</FormLabel>
           <OutlinedInput
             type="number"
             name="shippingFees"
@@ -325,32 +369,162 @@ export default function ProductCreate() {
           {shippingFeesError && (
             <div style={{ color: 'red' }}>{shippingFeesError}</div>
           )}
-        </>
-        <br />
-        <br />
-        <>
-          상품 설명:
-          <TextField
-            type="text"
-            name="content"
+        </Box>
+
+        <Box>
+          <FormLabel sx={{ fontSize: 'medium' }}>상품 설명:</FormLabel>
+          <Textarea
             placeholder="상품 설명을 입력하세요."
+            minRows={3}
+            name="content"
             value={productData.content}
             onChange={handleAllChange}
-          ></TextField>
+            endDecorator={
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 'var(--Textarea-paddingBlock)',
+                  pt: 'var(--Textarea-paddingBlock)',
+                  borderTop: '1px solid',
+                  borderColor: 'divider',
+                  flex: 'auto',
+                }}
+              >
+                <IconButton
+                  variant="plain"
+                  color="neutral"
+                  onClick={(event) => setAnchorEl(event.currentTarget)}
+                >
+                  <FormatBold />
+                  <KeyboardArrowDown fontSize="md" />
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={() => setAnchorEl(null)}
+                  size="sm"
+                  placement="bottom-start"
+                  sx={{ '--ListItemDecorator-size': '24px' }}
+                >
+                  {['200', 'normal', 'bold'].map((weight) => (
+                    <MenuItem
+                      key={weight}
+                      selected={fontWeight === weight}
+                      onClick={() => {
+                        setFontWeight(weight);
+                        setAnchorEl(null);
+                      }}
+                      sx={{ fontWeight: weight }}
+                    >
+                      <ListItemDecorator>
+                        {fontWeight === weight && <Check fontSize="sm" />}
+                      </ListItemDecorator>
+                      {weight === '200' ? 'lighter' : weight}
+                    </MenuItem>
+                  ))}
+                </Menu>
+                <IconButton
+                  variant={italic ? 'soft' : 'plain'}
+                  color={italic ? 'primary' : 'neutral'}
+                  aria-pressed={italic}
+                  onClick={() => setItalic((bool) => !bool)}
+                >
+                  <FormatItalic />
+                </IconButton>
+              </Box>
+            }
+            sx={{
+              minWidth: 300,
+              fontWeight,
+              fontStyle: italic ? 'italic' : 'initial',
+            }}
+          />
           {!isValid && productData.content.length > 0 ? (
             <div style={{ color: 'red' }}>{contentError}</div>
           ) : (
             <></>
           )}
-        </>
-        <br />
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            border: '1px solid #e0e0e0',
+            borderRadius: '4px',
+            padding: '16px',
+          }}
+        >
+          <Button
+            component="label"
+            variant="outlined"
+            startIcon={<CloudUploadIcon />}
+            onChange={handleFileUpload}
+            disabled={filePreview.length >= 10}
+          >
+            사진 업로드
+            <input hidden accept="image/*" multiple type="file" />
+          </Button>
+          <Stack direction="row" spacing={2}>
+            {filePreview.map((image, index) => (
+              <Badge
+                badgeContent={
+                  <CloseIcon
+                    onClick={() => handleFileRemove(image.id)}
+                    sx={{
+                      fontSize: '1rem',
+                      color: 'white',
+                      backgroundColor: 'red',
+                      borderRadius: '50%',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: 'darkred',
+                      },
+                    }}
+                  />
+                }
+                overlap="circular"
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                key={image.id}
+              >
+                <Card sx={{ width: 90, height: 90 }}>
+                  <CardActionArea>
+                    <CardMedia
+                      component="img"
+                      height="90"
+                      image={image.path}
+                      alt={`Preview ${index + 1}`}
+                    />
+                  </CardActionArea>
+                </Card>
+              </Badge>
+            ))}
+          </Stack>
+          <Box sx={{ alignSelf: 'center' }}>
+            {filePreview.length > 0 && (
+              <Typography variant="caption">{`${filePreview.length}/10`}</Typography>
+            )}
+          </Box>
+        </Box>
+      </Box>
+
+      <Box
+        sx={{ display: 'flex', justifyContent: 'center' }}
+        m={2}
+        p={2}
+        gap={1}
+      >
+        <Button type="button" onClick={handleMoveBack} variant="outlined">
+          취소
+        </Button>
         <Button type="submit" variant="contained">
           등록하기
         </Button>
-      </form>
-      <Button type="button" onClick={handleMoveBack} variant="outlined">
-        취소
-      </Button>
-    </>
+      </Box>
+    </form>
   );
 }
