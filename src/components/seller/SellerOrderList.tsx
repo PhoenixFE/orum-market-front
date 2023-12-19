@@ -137,7 +137,7 @@ export default function SellerOrderList() {
       return orderStateCode ? orderStateCode.value : 'Unknown Order State';
     }
 
-    return '주문 없음';
+    return '판매중';
   };
   return (
     <>
@@ -240,7 +240,7 @@ export default function SellerOrderList() {
                     {rows.shippingFees.toLocaleString()}원
                   </TableCell>
                   <TableCell align="center">
-                    {getOrderStateLabel(rows._id) || '주문없음'}
+                    {getOrderStateLabel(rows._id) || ''}
                   </TableCell>
                   <TableCell align="center">
                     <ToggleButton
