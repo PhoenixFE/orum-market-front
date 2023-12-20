@@ -7,19 +7,22 @@ export interface IProduct {
   quantity: number;
   show: boolean;
   active: boolean;
-  mainImages: string[];
+  mainImages: IProductImage[];
+  buyQuantity: number;
   extra: {
-    isNew: boolean;
-    isBest: boolean;
-    category: string[];
-    quantity: number;
-    buyQuantity: number;
-    order: number;
-    sort: number;
+    isNew?: boolean;
+    isBest?: boolean;
+    category?: string[];
+    sort?: number;
   };
   createdAt: string;
   updatedAt: string;
   content: string;
+}
+
+interface IProductImage {
+  id: string;
+  path: string;
 }
 
 export interface ICategoryPreview {
