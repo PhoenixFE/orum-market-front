@@ -22,114 +22,6 @@ import { ChevronRight } from '@mui/icons-material';
 export default function OrderListTable({ orderList }) {
   const matches = useMediaQuery('(min-width:1200px)');
 
-  const dummyData = {
-    ok: 1,
-    item: [
-      {
-        _id: 3,
-        user_id: 4,
-        products: [
-          {
-            _id: 4,
-            seller_id: 3,
-            state: 'OS310',
-            name: '레고 테크닉 42151 부가티 볼리드',
-            image:
-              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVeCj6YBnrra5lsjOGFCg0R5DGb8YRMOUvQw&usqp=CAU',
-            quantity: 1,
-            price: 45000,
-            reply_id: 1,
-            reply: {
-              rating: 5,
-              content: '아이가 좋아해요.',
-              createdAt: '2023.12.14 10:23:21',
-            },
-          },
-        ],
-        cost: {
-          products: 45000,
-          shippingFees: 3500,
-          discount: {
-            products: 4500,
-            shippingFees: 0,
-          },
-          total: 44000,
-        },
-        address: {
-          name: '학교',
-          value: '서울시 강남구 역삼동 234',
-        },
-        createdAt: '2023.12.15 04:23:21',
-        updatedAt: '2023.12.17 21:23:21',
-        state: 'OS020',
-      },
-      {
-        _id: 2,
-        user_id: 4,
-        products: [
-          {
-            _id: 3,
-            seller_id: 2,
-            state: 'OS010',
-            name: '레고 클래식 라지 조립 박스 10698',
-            image:
-              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT24oMSB7knrHfC5hehAl6Uveo82gmK5QVqJg&usqp=CAU',
-            quantity: 1,
-            price: 48870,
-          },
-          {
-            _id: 4,
-            seller_id: 3,
-            state: 'OS010',
-            name: '레고 테크',
-            image:
-              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT24oMSB7knrHfC5hehAl6Uveo82gmK5QVqJg&usqp=CAU',
-            quantity: 2,
-            price: 90000,
-            reply_id: 2,
-            reply: {
-              rating: 4,
-              content: '배송이 좀 느려요.',
-              createdAt: '2023.12.15 21:23:21',
-            },
-          },
-          {
-            _id: 4,
-            seller_id: 3,
-            state: 'OS010',
-            name: ' 부가티 볼리드',
-            image:
-              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVeCj6YBnrra5lsjOGFCg0R5DGb8YRMOUvQw&usqp=CAU',
-            quantity: 2,
-            price: 90000,
-            reply_id: 2,
-            reply: {
-              rating: 4,
-              content: '배송이 좀 느려요.',
-              createdAt: '2023.12.15 21:23:21',
-            },
-          },
-        ],
-        cost: {
-          products: 138840,
-          shippingFees: 3500,
-          discount: {
-            products: 13880,
-            shippingFees: 3500,
-          },
-          total: 124960,
-        },
-        address: {
-          name: '집',
-          value: '서울시 강남구 역삼동 123',
-        },
-        createdAt: '2023.12.14 00:23:21',
-        updatedAt: '2023.12.16 10:23:21',
-        state: 'OS040',
-      },
-    ],
-  };
-
   const orderState = (list) =>
     ORDER_STATE.codes
       .filter((state) => state.code === list)
@@ -164,7 +56,7 @@ export default function OrderListTable({ orderList }) {
             <Table aria-label="결제내역">
               <TableHead>
                 <TableRow>
-                  <TableHeaderCell align="center" sx={{ width: '120px' }}>
+                  <TableHeaderCell align="center" sx={{ width: '160px' }}>
                     결제일
                     <br />
                     <Typography variant="caption">[주문번호]</Typography>
@@ -178,12 +70,12 @@ export default function OrderListTable({ orderList }) {
                   <TableHeaderCell align="center"></TableHeaderCell>
                 </TableRow>
               </TableHead>
-              {dummyData.item.map((list) => (
+              {orderList.map((list) => (
                 <TableBody>
                   {list.products.map((product) => (
                     <TableRow>
                       <TableCell align="center" sx={{ minWidth: '80px' }}>
-                        {list.createdAt} <br />
+                        {formatDate(list.createdAt)} <br />
                         <Typography variant="caption">
                           [주문번호 : {list._id}]
                         </Typography>
@@ -193,7 +85,7 @@ export default function OrderListTable({ orderList }) {
                           component="img"
                           height="150"
                           style={{ width: '150px', objectFit: 'cover' }}
-                          image={product.image}
+                          image={product.image.path}
                           alt={product.name}
                         />
                       </TableCell>
@@ -299,10 +191,10 @@ export default function OrderListTable({ orderList }) {
                     padding: '10px',
                   }}
                 >
-                  <Typography variant="body2">
+                  <Typography variant="body2" fontWeight={700}>
                     총 결제 금액 <br />
                     <Typography variant="caption">
-                      상품금액 {list.cost.products.toLocaleString()} + 배송비{' '}
+                      상품금액 {list.cost.products.toLocaleString()} + 배송비
                       {list.cost.shippingFees.toLocaleString()}
                     </Typography>
                   </Typography>
