@@ -4,7 +4,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Paper,
   Button,
   Typography,
   Table,
@@ -18,11 +17,16 @@ import {
 import formatDate from '../../lib/formatDate';
 import { ORDER_STATE } from '../../constants';
 import { ChevronRight } from '@mui/icons-material';
+import { IOrderItem } from '../../type';
 
-export default function OrderListTable({ orderList }) {
+export default function OrderListTable({
+  orderList,
+}: {
+  orderList: IOrderItem[];
+}) {
   const matches = useMediaQuery('(min-width:1200px)');
 
-  const orderState = (list) =>
+  const orderState = (list: string) =>
     ORDER_STATE.codes
       .filter((state) => state.code === list)
       .map((stateValue) => (
