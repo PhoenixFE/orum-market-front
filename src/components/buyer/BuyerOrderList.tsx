@@ -4,7 +4,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Paper,
   Box,
   Button,
   Grid,
@@ -12,6 +11,7 @@ import {
   TableContainer,
   Table,
   useMediaQuery,
+  styled,
 } from '@mui/material';
 
 import OrderListTable from './OrderListTable';
@@ -50,22 +50,22 @@ export default function BuyerOrdeList() {
   const tableHeader = (
     <>
       {matches ? (
-        <TableContainer component={Paper}>
+        <TableContainer>
           <Table aria-label="결제내역">
             <TableHead>
               <TableRow>
-                <TableCell align="center">
+                <TableHeaderCell align="center" sx={{ width: '160px' }}>
                   결제일
-                  <br /> (주문번호)
-                </TableCell>
-                <TableCell align="center">상품명</TableCell>
-                <TableCell align="center">수량</TableCell>
-                <TableCell align="center">
-                  총 결제금액 <br />
-                  (배송비)
-                </TableCell>
-                <TableCell align="center">주문처리상태</TableCell>
-                <TableCell align="center"></TableCell>
+                  <br />
+                  <Typography variant="caption">[주문번호]</Typography>
+                </TableHeaderCell>
+                <TableHeaderCell align="center" sx={{ width: '100px' }}>
+                  이미지
+                </TableHeaderCell>
+                <TableHeaderCell align="center">상품정보</TableHeaderCell>
+                <TableHeaderCell align="center">상품금액</TableHeaderCell>
+                <TableHeaderCell align="center">주문상태</TableHeaderCell>
+                <TableHeaderCell align="center"></TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -96,3 +96,7 @@ export default function BuyerOrdeList() {
     </>
   );
 }
+
+const TableHeaderCell = styled(TableCell)({
+  fontWeight: '700',
+});

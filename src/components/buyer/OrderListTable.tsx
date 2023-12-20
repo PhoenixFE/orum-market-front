@@ -52,7 +52,7 @@ export default function OrderListTable({ orderList }) {
     <>
       {matches ? (
         <>
-          <TableContainer component={Paper}>
+          <TableContainer>
             <Table aria-label="결제내역">
               <TableHead>
                 <TableRow>
@@ -104,14 +104,14 @@ export default function OrderListTable({ orderList }) {
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell colSpan={6}>
+                    <TableCell colSpan={6} sx={{ padding: '0' }}>
                       <Box
                         sx={{
                           display: 'flex',
                           flexDirection: 'row',
                           justifyContent: 'flex-end',
                           alignItems: 'center',
-                          paddingX: '16px',
+                          padding: '6px 16px 40px 16px',
                         }}
                       >
                         <Typography variant="body2" fontWeight={700}>
@@ -137,7 +137,10 @@ export default function OrderListTable({ orderList }) {
       ) : (
         <>
           {orderList.map((list) => (
-            <Card sx={{ marginBottom: '20px' }} key={list._id}>
+            <Card
+              sx={{ marginBottom: '20px', boxShadow: 'none' }}
+              key={list._id}
+            >
               <OrderListBox>
                 <Typography variant="body1" fontWeight={700}>
                   {formatDate(list.createdAt)}
@@ -184,15 +187,7 @@ export default function OrderListTable({ orderList }) {
                 </OrderProductList>
               ))}
               <Card>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '10px',
-                  }}
-                >
+                <OrderPriceBox>
                   <Typography variant="body2" fontWeight={700}>
                     총 결제 금액 <br />
                     <Typography variant="caption">
@@ -205,7 +200,7 @@ export default function OrderListTable({ orderList }) {
                   <Typography variant="body2" fontWeight={700}>
                     {list.cost.total.toLocaleString()}원
                   </Typography>
-                </Box>
+                </OrderPriceBox>
               </Card>
             </Card>
           ))}
@@ -219,7 +214,7 @@ const OrderListBox = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '15px',
+  padding: '15px 0 15px 15px ',
   borderBottom: '1px solid #e2e2e2',
 });
 
@@ -239,4 +234,14 @@ const OrderReviewBox = styled(Box)({
 
 const TableHeaderCell = styled(TableCell)({
   fontWeight: '700',
+});
+
+const OrderPriceBox = styled(Box)({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '10px',
+  marginBottom: '15px',
+  borderBottom: '1px solid #e2e2e2',
 });
