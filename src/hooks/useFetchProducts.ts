@@ -1,11 +1,10 @@
 import { api } from '../api/api';
 import { useQuery } from 'react-query';
-import { IProductListQuery } from '../type';
 
-export const useFetchProducts = ({ page, limit, ...restQuery }) => {
+export const useFetchProducts = ({ ...restQuery }) => {
   return useQuery(
-    ['productList', { page, limit, ...restQuery }],
-    () => api.getProductList({ page, limit, ...restQuery }),
+    ['productList', { ...restQuery }],
+    () => api.getProductList({ ...restQuery }),
     {
       keepPreviousData: true,
     },

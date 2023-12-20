@@ -18,7 +18,6 @@ import ProductManager from './components/seller/ProductManager.tsx';
 import SellerOrderManager from './components/seller/SellerOrderManager.tsx';
 import SignInPage from './pages/user/SignIn.tsx';
 import SignUpPage from './pages/user/SignUp.tsx';
-import { CategoryList } from './pages/product/CategoryList.tsx';
 import { SearchPage } from './pages/product/SearchPage.tsx';
 import CheckOut from './pages/user/CheckOut.tsx';
 import BuyerRecentlyView from './components/buyer/BuyerRecentlyView.tsx';
@@ -32,7 +31,6 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { index: true, path: '/', element: <Home /> },
-      { path: '/category/:category', element: <CategoryList /> },
       { path: '/product', element: <SearchPage /> },
       { path: '/product/:id', element: <ProductDetail /> },
       { path: '/cart', element: <MyCart /> },
