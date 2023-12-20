@@ -12,6 +12,8 @@ import PaymentIcon from '@mui/icons-material/Payment';
 import { IProduct } from '../../type';
 import { Link } from 'react-router-dom';
 import useAddToCart from '../../hooks/useAddToCart';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 interface ProductCardProps {
   product: IProduct;
@@ -24,9 +26,14 @@ export default function ProductCard({ product }: ProductCardProps) {
     <>
       <StyledCard>
         <CardActionArea component={Link} to={`/product/${product._id}`}>
-          <ProductImage
-            image={product.mainImages[0].path}
+          <LazyLoadImage
+            src={product.mainImages[0].path}
+            effect="blur"
             title={product.name}
+            alt={product.name}
+            width="100%"
+            height="200px"
+            style={{ objectFit: 'cover' }}
           />
           <ProductDetails>
             <Typography variant="h6">{product.name}</Typography>
@@ -61,12 +68,6 @@ const StyledCard = styled(Card)({
   position: 'relative',
   boxShadow: 'none',
   borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-});
-
-const ProductImage = styled(CardMedia)({
-  height: '200px',
-  backgroundSize: 'cover',
-  backgroundColor: 'grey.50',
 });
 
 const ProductDetails = styled(Box)({
