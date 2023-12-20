@@ -20,7 +20,7 @@ export interface IProduct {
   content: string;
 }
 
-interface IProductImage {
+export interface IProductImage {
   id: string;
   path: string;
 }
