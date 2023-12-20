@@ -2,7 +2,6 @@ import {
   Box,
   Card,
   CardActionArea,
-  CardMedia,
   IconButton,
   Typography,
   styled,

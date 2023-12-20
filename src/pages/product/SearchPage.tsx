@@ -16,7 +16,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { CircularProgress } from '@mui/material';
 
 import ProductCard from './ProductCard';
 import { SearchSection } from '../../components/search/SearchSection';
@@ -39,7 +38,7 @@ export function SearchPage() {
     searchResult,
     '최신순',
   ) as any;
-  const [itemsPerPage, setItemsPerPage] = useState(4);
+  const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPrice, setSelectedPrice] = useState('전체');
@@ -57,7 +56,7 @@ export function SearchPage() {
   function toggleSidebar() {
     setIsSidebarOpen(!isSidebarOpen);
   }
-  const productListQuery = {};
+  const productListQuery = { page: 1, limit: itemsPerPage };
   const { data, error, isLoading } = useFetchProducts(productListQuery);
 
   useEffect(() => {
