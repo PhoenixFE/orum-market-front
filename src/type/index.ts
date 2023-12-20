@@ -61,7 +61,7 @@ export interface IOrderItem {
   _id: number;
   user_id: number;
   state: string;
-  products: IProduct[];
+  products: IOrderProduct[];
   cost: {
     discount: number[];
     products: number;
@@ -71,6 +71,24 @@ export interface IOrderItem {
   address: string[];
   createdAt: string;
   updatedAt: string;
+}
+
+interface IOrderProduct {
+  _id: number;
+  quantity: number;
+  seller_id: number;
+  name: string;
+  image: {
+    id: string;
+    path: string;
+  };
+  price: number;
+  extra: {
+    isNew: boolean;
+    isBest: boolean;
+    category: string[];
+    sort: number;
+  };
 }
 
 export interface IUserInfo {
