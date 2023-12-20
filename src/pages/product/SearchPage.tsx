@@ -3,6 +3,7 @@ import {
   Button,
   Grid,
   Grow,
+  Skeleton,
   Slide,
   Typography,
   styled,
@@ -15,6 +16,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { CircularProgress } from '@mui/material';
 
 import ProductCard from './ProductCard';
 import { SearchSection } from '../../components/search/SearchSection';
@@ -22,7 +24,6 @@ import { useSearchStore, useRecentViewProductStore } from '../../lib/store';
 import StickyNavbar from '../../components/NavigationBar';
 import { useSort } from '../../hooks/useSort';
 import { useEffect, useState } from 'react';
-import { api } from '../../api/api';
 import { IProduct } from '../../type';
 import {
   CATEGORY,
@@ -30,6 +31,7 @@ import {
   PRICE_RANGE,
   SHIPPING_FEE,
 } from '../../constants';
+import { useFetchProducts } from '../../hooks/useFetchProducts';
 
 export function SearchPage() {
   const { searchResult, setSearchResult } = useSearchStore();
@@ -42,12 +44,12 @@ export function SearchPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPrice, setSelectedPrice] = useState('전체');
   const [selectedShippingFee, setSelectedShippingFee] = useState('전체');
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
   const { addRecentViewProduct } = useRecentViewProductStore() as {
     addRecentViewProduct: Function;
   };
 
-  // useAddRecentlyViewed(product);
   const handleSaveRecentlyViewed = (product: IProduct) => {
     addRecentViewProduct({ ...product });
   };
@@ -55,19 +57,20 @@ export function SearchPage() {
   function toggleSidebar() {
     setIsSidebarOpen(!isSidebarOpen);
   }
+  const productListQuery = {};
+  const { data, error, isLoading } = useFetchProducts(productListQuery);
 
   useEffect(() => {
-    const fetchAllProducts = async () => {
-      try {
-        const response = await api.getProductList();
-        setSearchResult(response.data.item);
-      } catch (error) {
-        console.error('상품 검색 실패:', error);
-      }
-    };
+    if (data) {
+      setSearchResult(Array.isArray(data.data.item) ? data.data.item : []);
+      setIsDataFetched(true);
+    }
+  }, [data, setSearchResult]);
 
-    fetchAllProducts();
-  }, []);
+  if (error) {
+    console.error('Error fetching products:', error);
+    return <div>Error fetching products</div>;
+  }
 
   const handleDisplayChange = (value: number) => {
     setItemsPerPage(value);
@@ -85,7 +88,7 @@ export function SearchPage() {
   const filteredProducts = sortedProducts.filter((product: IProduct) => {
     const withinCategory =
       selectedCategory === 'all' ||
-      product.extra.category.includes(selectedCategory);
+      product.extra?.category?.includes(selectedCategory);
     const withinPriceRange =
       product.price >= selectedPriceRange.min &&
       product.price <= selectedPriceRange.max;
@@ -106,23 +109,23 @@ export function SearchPage() {
     setSelectedShippingFee('전체');
   };
 
-  // 상품 목록 Grid
-  const productGrid = (
-    <Grid container spacing={4} rowSpacing={8}>
-      {filteredProducts.map((product: IProduct) => (
-        <Grow
-          in={true}
-          key={product._id}
-          style={{ transformOrigin: '0 0 0' }}
-          {...{ timeout: 1000 }}
-          onClick={() => handleSaveRecentlyViewed(product)}
-        >
-          <Grid item {...getItemSize()}>
-            <ProductCard product={product} />
+  const ProductSkeleton = () => {
+    return (
+      <Grid container spacing={4} m={4}>
+        {Array.from(new Array(itemsPerPage)).map((_, index) => (
+          <Grid item key={index} {...getItemSize()}>
+            <Skeleton variant="rectangular" height={200} />
+            <Skeleton variant="text" />
+            <Skeleton variant="text" />
           </Grid>
-        </Grow>
-      ))}
-      {filteredProducts.length === 0 && (
+        ))}
+      </Grid>
+    );
+  };
+
+  const renderNoProductsMessage = () => {
+    if (!isLoading && isDataFetched && filteredProducts.length === 0) {
+      return (
         <Grid item xs={12} style={{ height: '100%' }}>
           <Box
             display="flex"
@@ -135,7 +138,54 @@ export function SearchPage() {
             </Typography>
           </Box>
         </Grid>
-      )}
+      );
+    }
+    return null;
+  };
+
+  const renderProductsOrSkeletons = () => {
+    if (isLoading) {
+      return <ProductSkeleton />;
+    }
+
+    return (
+      <>
+        {filteredProducts.map((product: IProduct) => (
+          <Grow
+            in={true}
+            key={product._id}
+            style={{ transformOrigin: '0 0 0' }}
+            {...{ timeout: 1000 }}
+            onClick={() => handleSaveRecentlyViewed(product)}
+          >
+            <Grid item {...getItemSize()}>
+              <ProductCard product={product} />
+            </Grid>
+          </Grow>
+        ))}
+        {/* {filteredProducts.length === 0 && (
+          <Grid item xs={12} style={{ height: '100%' }}>
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: '100%' }}
+            >
+              <Typography variant="h6" color="textSecondary">
+                찾으시는 상품이 없습니다.
+              </Typography>
+            </Box>
+          </Grid>
+        )} */}
+      </>
+    );
+  };
+
+  // 상품 목록 Grid
+  const productGrid = (
+    <Grid container spacing={4} rowSpacing={8}>
+      {renderProductsOrSkeletons()}
+      {renderNoProductsMessage()}
     </Grid>
   );
 

@@ -20,9 +20,10 @@ export function SearchSection() {
 
     try {
       const response = await api.searchProducts(inputValue, 0, 999999);
-      setSearchResult(response.data.item);
+      setSearchResult(response.data.item || []);
     } catch (error) {
       console.error('Failed to search products', error);
+      setSearchResult([]);
     }
   };
 
@@ -61,14 +62,14 @@ export function SearchSection() {
             />
           </FormControl>
         </form>
-        {searchResult.length > 0 && searchQuery && (
+        {searchResult && searchResult.length > 0 && searchQuery && (
           <Typography variant="body1" sx={{ mt: 2 }}>
             <strong>'{searchQuery}'</strong> 검색 결과{' '}
             <span style={{ color: 'red' }}>{searchResult.length}</span>개의
             상품이 있습니다.
           </Typography>
         )}
-        {searchResult.length === 0 && searchQuery && (
+        {searchResult && searchResult.length === 0 && searchQuery && (
           <Typography variant="body1" sx={{ mt: 2 }}>
             <strong>'{searchQuery}'</strong> 검색 결과가 없습니다.
           </Typography>

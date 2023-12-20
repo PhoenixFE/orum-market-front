@@ -122,7 +122,8 @@ export const api = {
   // 상품 목록 조회
   getProductList: (query: IProductListQuery = {}) => {
     const queryString = new URLSearchParams(query as any).toString();
-    return axiosInstance.get(`/products/?${queryString}`);
+    const response = axiosInstance.get(`/products/?${queryString}`);
+    return response;
   },
 
   // 상품 카테고리 조회

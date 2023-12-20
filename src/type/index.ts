@@ -102,3 +102,10 @@ export interface IRecentlyViewedStore {
   viewdItems: IProduct[];
   addRecentViewProduct: (newItem: IProduct) => void;
 }
+
+export interface IProductListQuery {
+  category?: string;
+  sort?: string;
+  page?: number;
+  limit?: number;
+}
