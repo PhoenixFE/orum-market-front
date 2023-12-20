@@ -13,12 +13,16 @@ import { Link } from 'react-router-dom';
 import useAddToCart from '../../hooks/useAddToCart';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import { memo } from 'react';
 
 interface ProductCardProps {
   product: IProduct;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({
+  product,
+}: ProductCardProps) {
+  // export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = useAddToCart();
 
   return (
@@ -59,7 +63,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </StyledCard>
     </>
   );
-}
+});
 
 const StyledCard = styled(Card)({
   display: 'flex',

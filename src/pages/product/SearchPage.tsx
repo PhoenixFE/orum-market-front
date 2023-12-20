@@ -17,7 +17,6 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
-import ProductCard from './ProductCard';
 import { SearchSection } from '../../components/search/SearchSection';
 import { useSearchStore, useRecentViewProductStore } from '../../lib/store';
 import StickyNavbar from '../../components/NavigationBar';
@@ -31,6 +30,7 @@ import {
   SHIPPING_FEE,
 } from '../../constants';
 import { useFetchProducts } from '../../hooks/useFetchProducts';
+import { ProductCard } from './ProductCard';
 
 export function SearchPage() {
   const { searchResult, setSearchResult } = useSearchStore();
@@ -56,7 +56,7 @@ export function SearchPage() {
   function toggleSidebar() {
     setIsSidebarOpen(!isSidebarOpen);
   }
-  const productListQuery = { page: 1, limit: itemsPerPage };
+  const productListQuery = {};
   const { data, error, isLoading } = useFetchProducts(productListQuery);
 
   useEffect(() => {
