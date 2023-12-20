@@ -119,10 +119,12 @@ export default function OrderListTable({ orderList }) {
                         </Typography>
                         <Typography variant="body2">
                           &nbsp;상품금액 {list.cost.products.toLocaleString()} +
-                          배송비 {list.cost.shippingFees.toLocaleString()} =
+                          {list.cost.shippingFees === 0
+                            ? '배송비 무료 ='
+                            : `배송비 ${list.cost.shippingFees.toLocaleString()} =`}
                         </Typography>
                         <Typography variant="body2" fontWeight={700}>
-                          {list.cost.total.toLocaleString()}원
+                          &nbsp;{list.cost.total.toLocaleString()}원
                         </Typography>
                       </Box>
                     </TableCell>
@@ -194,8 +196,10 @@ export default function OrderListTable({ orderList }) {
                   <Typography variant="body2" fontWeight={700}>
                     총 결제 금액 <br />
                     <Typography variant="caption">
-                      상품금액 {list.cost.products.toLocaleString()} + 배송비
-                      {list.cost.shippingFees.toLocaleString()}
+                      상품금액 {list.cost.products.toLocaleString()} +
+                      {list.cost.shippingFees === 0
+                        ? '배송비 무료'
+                        : `배송비 ${list.cost.shippingFees.toLocaleString()}`}
                     </Typography>
                   </Typography>
                   <Typography variant="body2" fontWeight={700}>
