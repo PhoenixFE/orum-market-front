@@ -8,15 +8,20 @@ import {
   Typography,
   List,
   ListItem,
-  ListItemText,
   FormControlLabel,
   Checkbox,
   Grid,
   Divider,
+  FormLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { ICartItem, ICartStore } from '../../type';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box } from '@mui/system';
+import DaumPost from '../../components/\bDaumPost';
 declare const IMP: any;
 
 export default function CheckOut() {
@@ -40,6 +45,8 @@ export default function CheckOut() {
     subAddress: '',
   });
 
+  const [openDialog, setOpenDialog] = useState(false);
+
   const userId = localStorage.getItem('_id');
 
   const addressNameRef = useRef<HTMLInputElement>(null);
@@ -49,10 +56,14 @@ export default function CheckOut() {
     const singleProduct = location.state?.product;
     if (singleProduct) {
       setCheckoutItems([singleProduct]);
-      setTotalCost(singleProduct.price);
+      setTotalCost(singleProduct.price + singleProduct.shippingFees);
     } else {
       setCheckoutItems(items);
-      setTotalCost(items.reduce((total, item) => total + item.price, 0));
+      const total = items.reduce(
+        (total, item) => total + item.price + item.shippingFees,
+        0,
+      );
+      setTotalCost(total);
     }
   }, [items, location.state?.product]);
 
@@ -81,6 +92,31 @@ export default function CheckOut() {
 
     fetchUserInfo();
   }, []);
+
+  const handleAddressSearchComplete = (data) => {
+    let fullAddress = data.address;
+    let extraAddress = '';
+
+    if (data.addressType === 'R') {
+      if (data.bname !== '') {
+        extraAddress += data.bname;
+      }
+      if (data.buildingName !== '') {
+        extraAddress +=
+          extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
+      }
+    }
+
+    // 주소 데이터를 deliveryInfo에 설정
+    setDeliveryInfo((prevInfo) => ({
+      ...prevInfo,
+      mainAddress: fullAddress,
+      subAddress: extraAddress,
+    }));
+
+    // 다이얼로그 닫기
+    setOpenDialog(false);
+  };
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -202,6 +238,7 @@ export default function CheckOut() {
           <Box
             sx={{
               display: 'flex',
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
             }}
@@ -224,48 +261,87 @@ export default function CheckOut() {
           <Typography variant="h6" fontWeight={700} my={3}>
             배송지 정보
           </Typography>
-
-          <TextField
-            label="수령인"
-            value={deliveryInfo.receiver}
-            fullWidth
-            margin="normal"
-            disabled
-          />
-          <TextField
-            label="연락처"
-            value={deliveryInfo.tel}
-            fullWidth
-            margin="normal"
-            disabled
-          />
-          <TextField
-            inputRef={addressNameRef}
-            placeholder="배송지 이름"
-            name="name"
-            value={deliveryInfo.addressName}
-            onChange={handleAddressChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            inputRef={addressValueRef}
-            placeholder="성남시 중원구 광명로 293"
-            name="value"
-            value={deliveryInfo.mainAddress}
-            onChange={handleAddressChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            inputRef={addressValueRef}
-            placeholder="상세 주소 입력"
-            name="value"
-            value={deliveryInfo.subAddress}
-            onChange={handleAddressChange}
-            fullWidth
-            margin="normal"
-          />
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+            gap={1}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
+              <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
+                수령인
+              </FormLabel>
+              <TextField
+                value={deliveryInfo.receiver}
+                placeholder="수령인 이름을 적으세요"
+                fullWidth
+              />
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
+              <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
+                연락처
+              </FormLabel>
+              <TextField
+                value={deliveryInfo.tel}
+                placeholder="ex) 01012341234"
+                fullWidth
+              />
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
+              <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
+                배송지
+              </FormLabel>
+              <TextField
+                value={deliveryInfo.addressName}
+                placeholder="배송지 이름"
+                fullWidth
+              />
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center' }} gap={1}>
+              <TextField
+                value={deliveryInfo.mainAddress}
+                placeholder="성남시 중원구 광명로 293"
+                fullWidth
+                onChange={(e) =>
+                  setDeliveryInfo({
+                    ...deliveryInfo,
+                    mainAddress: e.target.value,
+                  })
+                }
+              />
+              <Button
+                variant="outlined"
+                color="primary"
+                sx={{ width: '100px', height: '56px' }}
+                onClick={() => setOpenDialog(true)}
+              >
+                주소검색
+              </Button>
+              <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                <DialogTitle>주소 검색</DialogTitle>
+                <DialogContent>
+                  <DaumPost onSearchComplete={handleAddressSearchComplete} />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setOpenDialog(false)}>닫기</Button>
+                </DialogActions>
+              </Dialog>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center' }} gap={5}>
+              <TextField
+                value={deliveryInfo.subAddress}
+                placeholder="상세 주소 입력"
+                fullWidth
+                onChange={(e) =>
+                  setDeliveryInfo({
+                    ...deliveryInfo,
+                    subAddress: e.target.value,
+                  })
+                }
+              />
+            </Box>
+          </Box>
         </Grid>
 
         {/* Right section */}
@@ -308,7 +384,7 @@ export default function CheckOut() {
                     {item.shippingFees == 0 ? (
                       <Typography variant="body2">무료배송</Typography>
                     ) : (
-                      <Typography variant="body2" fontWeight={700}>
+                      <Typography variant="body2">
                         배송비{' '}
                         {item.shippingFees.toLocaleString('KR-kr', {
                           style: 'currency',
@@ -328,7 +404,7 @@ export default function CheckOut() {
               ))}
             </List>
           )}
-          <Typography variant="h6" sx={{ my: 2 }}>
+          <Typography variant="h6" sx={{ my: 2, fontWeight: '800' }}>
             총 금액: {totalCost.toLocaleString()} 원
           </Typography>
           <Box
@@ -338,6 +414,7 @@ export default function CheckOut() {
               justifyContent: 'end',
               alignItems: 'end',
             }}
+            mt={5}
           >
             <FormControlLabel
               required
@@ -366,6 +443,7 @@ export default function CheckOut() {
               justifyContent: 'end',
               alignItems: 'center',
             }}
+            mt={2}
             gap={1}
           >
             <Button
