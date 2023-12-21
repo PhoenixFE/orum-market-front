@@ -25,6 +25,7 @@ import { ICartItem, ICartStore } from '../../type';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box } from '@mui/system';
 import DaumPost from '../../components/\bDaumPost';
+import AddressListDialog from '../../components/address/AddressListDialog';
 declare const IMP: any;
 
 export default function CheckOut() {
@@ -48,8 +49,9 @@ export default function CheckOut() {
     subAddress: '',
   });
   const [tabValue, setTabValue] = useState(0);
-
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openAddressDialog, setOpenAddressDialog] = useState(false);
+  const [addressList, setAddressList] = useState([]);
+  const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
 
   const userId = localStorage.getItem('_id');
 
@@ -86,6 +88,7 @@ export default function CheckOut() {
           mainAddress: response.data.item.extra.address[0].mainAddress,
           subAddress: response.data.item.extra.address[0].subAddress,
         });
+        setAddressList(response.data.item.extra.address);
       } catch (error) {
         console.error('사용자 정보를 가져오는데 실패했습니다', error);
       }
@@ -93,7 +96,7 @@ export default function CheckOut() {
 
     fetchUserInfo();
   }, []);
-
+  console.log('addressList', addressList);
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
@@ -120,7 +123,7 @@ export default function CheckOut() {
     }));
 
     // 다이얼로그 닫기
-    setOpenDialog(false);
+    setOpenAddressDialog(false);
   };
 
   const handleReceiverChange = (e) => {
@@ -288,14 +291,45 @@ export default function CheckOut() {
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
               }}
             >
-              <Typography variant="body1">{deliveryInfo.receiver}</Typography>
-              <Typography variant="body1">{deliveryInfo.tel}</Typography>
-              <Typography variant="body1">
-                {deliveryInfo.mainAddress} {deliveryInfo.subAddress}
-              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Typography variant="body1">{deliveryInfo.receiver}</Typography>
+                <Typography variant="body1">{deliveryInfo.tel}</Typography>
+                <Typography variant="body1">
+                  {deliveryInfo.mainAddress} {deliveryInfo.subAddress}
+                </Typography>
+              </Box>
+              <Button
+                variant="outlined"
+                color="inherit"
+                style={{ height: '56px' }}
+                onClick={() => setIsAddressDialogOpen(true)}
+              >
+                배송지 목록
+              </Button>
+              <AddressListDialog
+                isOpen={isAddressDialogOpen}
+                onClose={() => setIsAddressDialogOpen(false)}
+                addresses={addressList}
+                onSelect={(selectedAddress) => {
+                  setDeliveryInfo({
+                    ...deliveryInfo,
+                    addressName: selectedAddress.addressName,
+                    receiver: selectedAddress.receiver,
+                    tel: selectedAddress.tel,
+                    mainAddress: selectedAddress.mainAddress,
+                    subAddress: selectedAddress.subAddress,
+                  });
+                }}
+              />
             </Box>
           )}
 
@@ -356,17 +390,22 @@ export default function CheckOut() {
                   variant="outlined"
                   color="primary"
                   sx={{ width: '100px', height: '56px' }}
-                  onClick={() => setOpenDialog(true)}
+                  onClick={() => setOpenAddressDialog(true)}
                 >
                   주소검색
                 </Button>
-                <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                <Dialog
+                  open={openAddressDialog}
+                  onClose={() => setOpenAddressDialog(false)}
+                >
                   <DialogTitle>주소 검색</DialogTitle>
                   <DialogContent>
                     <DaumPost onSearchComplete={handleAddressSearchComplete} />
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)}>닫기</Button>
+                    <Button onClick={() => setOpenAddressDialog(false)}>
+                      닫기
+                    </Button>
                   </DialogActions>
                 </Dialog>
               </Box>
@@ -419,6 +458,7 @@ export default function CheckOut() {
                       width: '80px',
                       height: '80px',
                       marginRight: '20px',
+                      objectFit: 'cover',
                     }}
                   />
                   <Box>
