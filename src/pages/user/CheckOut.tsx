@@ -17,6 +17,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Tabs,
+  Tab,
+  styled,
 } from '@mui/material';
 import { ICartItem, ICartStore } from '../../type';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -44,13 +47,11 @@ export default function CheckOut() {
     mainAddress: '',
     subAddress: '',
   });
+  const [tabValue, setTabValue] = useState(0);
 
   const [openDialog, setOpenDialog] = useState(false);
 
   const userId = localStorage.getItem('_id');
-
-  const addressNameRef = useRef<HTMLInputElement>(null);
-  const addressValueRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const singleProduct = location.state?.product;
@@ -93,6 +94,10 @@ export default function CheckOut() {
     fetchUserInfo();
   }, []);
 
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
   const handleAddressSearchComplete = (data) => {
     let fullAddress = data.address;
     let extraAddress = '';
@@ -118,9 +123,16 @@ export default function CheckOut() {
     setOpenDialog(false);
   };
 
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setAddress((prev) => ({ ...prev, [name]: value }));
+  const handleReceiverChange = (e) => {
+    setDeliveryInfo({ ...deliveryInfo, receiver: e.target.value });
+  };
+
+  const handleTelChange = (e) => {
+    setDeliveryInfo({ ...deliveryInfo, tel: e.target.value });
+  };
+
+  const handleAddressNameChange = (e) => {
+    setDeliveryInfo({ ...deliveryInfo, addressName: e.target.value });
   };
 
   // const handlePurchase = async () => {
@@ -225,6 +237,7 @@ export default function CheckOut() {
   //   status: 'paid';
   //   success: true;
   // }
+  console.log('deliveryInfo', deliveryInfo);
 
   return (
     <Container sx={{ marginY: '50px' }}>
@@ -261,87 +274,117 @@ export default function CheckOut() {
           <Typography variant="h6" fontWeight={700} my={3}>
             배송지 정보
           </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-            gap={1}
+          <CustomTabs
+            variant="fullWidth"
+            value={tabValue}
+            onChange={handleTabChange}
+            aria-aria-label="address tabs"
           >
-            <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
-              <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
-                수령인
-              </FormLabel>
-              <TextField
-                value={deliveryInfo.receiver}
-                placeholder="수령인 이름을 적으세요"
-                fullWidth
-              />
+            <CustomTab label="기본주소" />
+            <CustomTab label="새로입력" />
+          </CustomTabs>
+
+          {tabValue === 0 && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Typography variant="body1">{deliveryInfo.receiver}</Typography>
+              <Typography variant="body1">{deliveryInfo.tel}</Typography>
+              <Typography variant="body1">
+                {deliveryInfo.mainAddress} {deliveryInfo.subAddress}
+              </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
-              <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
-                연락처
-              </FormLabel>
-              <TextField
-                value={deliveryInfo.tel}
-                placeholder="ex) 01012341234"
-                fullWidth
-              />
+          )}
+
+          {tabValue === 1 && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+              gap={1}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
+                <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
+                  수령인
+                </FormLabel>
+                <TextField
+                  value={deliveryInfo.receiver}
+                  placeholder="수령인 이름을 적으세요"
+                  fullWidth
+                  onChange={handleReceiverChange}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
+                <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
+                  연락처
+                </FormLabel>
+                <TextField
+                  value={deliveryInfo.tel}
+                  placeholder="ex) 01012341234"
+                  fullWidth
+                  onChange={handleTelChange}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
+                <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
+                  배송지
+                </FormLabel>
+                <TextField
+                  value={deliveryInfo.addressName}
+                  placeholder="배송지 이름"
+                  fullWidth
+                  onChange={handleAddressNameChange}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }} gap={1}>
+                <TextField
+                  value={deliveryInfo.mainAddress}
+                  placeholder="성남시 중원구 광명로 293"
+                  fullWidth
+                  onChange={(e) =>
+                    setDeliveryInfo({
+                      ...deliveryInfo,
+                      mainAddress: e.target.value,
+                    })
+                  }
+                />
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  sx={{ width: '100px', height: '56px' }}
+                  onClick={() => setOpenDialog(true)}
+                >
+                  주소검색
+                </Button>
+                <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                  <DialogTitle>주소 검색</DialogTitle>
+                  <DialogContent>
+                    <DaumPost onSearchComplete={handleAddressSearchComplete} />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={() => setOpenDialog(false)}>닫기</Button>
+                  </DialogActions>
+                </Dialog>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }} gap={5}>
+                <TextField
+                  value={deliveryInfo.subAddress}
+                  placeholder="상세 주소 입력"
+                  fullWidth
+                  onChange={(e) =>
+                    setDeliveryInfo({
+                      ...deliveryInfo,
+                      subAddress: e.target.value,
+                    })
+                  }
+                />
+              </Box>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
-              <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
-                배송지
-              </FormLabel>
-              <TextField
-                value={deliveryInfo.addressName}
-                placeholder="배송지 이름"
-                fullWidth
-              />
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center' }} gap={1}>
-              <TextField
-                value={deliveryInfo.mainAddress}
-                placeholder="성남시 중원구 광명로 293"
-                fullWidth
-                onChange={(e) =>
-                  setDeliveryInfo({
-                    ...deliveryInfo,
-                    mainAddress: e.target.value,
-                  })
-                }
-              />
-              <Button
-                variant="outlined"
-                color="primary"
-                sx={{ width: '100px', height: '56px' }}
-                onClick={() => setOpenDialog(true)}
-              >
-                주소검색
-              </Button>
-              <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-                <DialogTitle>주소 검색</DialogTitle>
-                <DialogContent>
-                  <DaumPost onSearchComplete={handleAddressSearchComplete} />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={() => setOpenDialog(false)}>닫기</Button>
-                </DialogActions>
-              </Dialog>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center' }} gap={5}>
-              <TextField
-                value={deliveryInfo.subAddress}
-                placeholder="상세 주소 입력"
-                fullWidth
-                onChange={(e) =>
-                  setDeliveryInfo({
-                    ...deliveryInfo,
-                    subAddress: e.target.value,
-                  })
-                }
-              />
-            </Box>
-          </Box>
+          )}
         </Grid>
 
         {/* Right section */}
@@ -500,3 +543,20 @@ export default function CheckOut() {
     </Container>
   );
 }
+
+const CustomTab = styled(Tab)({
+  '&.MuiTab-root': {
+    backgroundColor: '#eee', // 탭의 기본 배경색을 옅은 회색으로 설정
+  },
+  '&.Mui-selected': {
+    border: '1px solid #000',
+    backgroundColor: '#fff',
+  },
+  marginBottom: '20px',
+});
+
+const CustomTabs = styled(Tabs)({
+  '.MuiTabs-indicator': {
+    display: 'none',
+  },
+});
