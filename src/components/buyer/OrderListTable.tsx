@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   TableContainer,
   TableHead,
@@ -20,7 +20,7 @@ import { ChevronRight } from '@mui/icons-material';
 import formatDate from '../../lib/formatDate';
 import { ORDER_STATE } from '../../constants';
 import { IOrderItem } from '../../type';
-import RatingModal from './modal/ratingModal';
+import RatingModal from './modal/RatingModal';
 import { api } from '../../api/api';
 
 export default function OrderListTable({
@@ -168,6 +168,7 @@ export default function OrderListTable({
                       <TableCell align="center">
                         <Link
                           to={`/user/${id}/buyer-orderlist/${list._id}`}
+                          onClick={handleMoveTo}
                           state={{ productId: list._id }}
                         >
                           <Button sx={{ padding: '0', margin: '0' }}>

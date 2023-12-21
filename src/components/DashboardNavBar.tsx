@@ -1,11 +1,10 @@
 import Divider from '@mui/material/Divider';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import MailIcon from '@mui/icons-material/Mail';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Link, useLocation } from 'react-router-dom';
@@ -36,7 +35,12 @@ export default function DashboardNavBar({ dashboardMenu }: IDashboardMenu) {
             <ListItem key={items.id} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
-                  {items.id % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  <KeyboardArrowRightIcon
+                    style={{
+                      color:
+                        selectedMenu === items.url ? 'inherit' : 'darkgray',
+                    }}
+                  />
                 </ListItemIcon>
                 <Link
                   to={items.url}
@@ -47,8 +51,7 @@ export default function DashboardNavBar({ dashboardMenu }: IDashboardMenu) {
                     primaryTypographyProps={{
                       fontSize: '16',
                       letterSpacing: 0,
-                      fontWeight:
-                        selectedMenu === items.url ? 'bold' : 'medium',
+                      fontWeight: selectedMenu === items.url ? '700' : '300',
                     }}
                     onClick={() => setSelectedMenu(items.url)}
                   />
@@ -68,7 +71,12 @@ export default function DashboardNavBar({ dashboardMenu }: IDashboardMenu) {
             <ListItem key={items.id} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
-                  {items.id % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  <KeyboardArrowRightIcon
+                    style={{
+                      color:
+                        selectedMenu === items.url ? 'inherit' : 'darkgray',
+                    }}
+                  />
                 </ListItemIcon>
                 <Link
                   to={items.url}
@@ -79,8 +87,7 @@ export default function DashboardNavBar({ dashboardMenu }: IDashboardMenu) {
                     primaryTypographyProps={{
                       fontSize: '16',
                       letterSpacing: 0,
-                      fontWeight:
-                        selectedMenu === items.url ? 'bold' : 'medium',
+                      fontWeight: selectedMenu === items.url ? '700' : '300',
                     }}
                     onClick={() => setSelectedMenu(items.url)}
                   />
