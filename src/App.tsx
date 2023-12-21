@@ -84,7 +84,15 @@ function App() {
               },
             },
           },
-
+          MuiTextField: {
+            styleOverrides: {
+              root: {
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 0,
+                },
+              },
+            },
+          },
           MuiButton: {
             styleOverrides: {
               root: {
@@ -92,6 +100,28 @@ function App() {
                   backgroundColor: '#EF5B2A',
                   color: '#fff',
                 },
+                borderRadius: 0,
+              },
+            },
+          },
+          MuiDialog: {
+            styleOverrides: {
+              paper: {
+                borderRadius: 0,
+              },
+            },
+          },
+          MuiCard: {
+            styleOverrides: {
+              root: {
+                borderRadius: 0,
+              },
+            },
+          },
+          MuiModal: {
+            styleOverrides: {
+              root: {
+                borderRadius: 0,
               },
             },
           },

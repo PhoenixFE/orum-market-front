@@ -5,15 +5,14 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  ListItem,
   Typography,
 } from '@mui/material';
 
 type AddressListDialogProps = {
   isOpen: boolean;
   onClose: () => void;
-  addresses: any[]; // replace 'any' with the actual type of 'addresses'
-  onSelect: (address: any) => void; // replace 'any' with the actual type of 'address'
+  addresses: any[];
+  onSelect: (address: any) => void;
 };
 
 const AddressListDialog: React.FC<AddressListDialogProps> = ({
@@ -63,6 +62,7 @@ const AddressListDialog: React.FC<AddressListDialogProps> = ({
                 onSelect(address);
                 onClose();
               }}
+              sx={{ borderRadius: '0' }}
             >
               선택
             </Button>
