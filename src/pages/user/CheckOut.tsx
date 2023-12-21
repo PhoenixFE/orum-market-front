@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { useCartStore } from '../../lib/store';
 import { api } from '../../api/api';
 import {
@@ -21,7 +22,13 @@ import {
   Tab,
   styled,
 } from '@mui/material';
-import { ICartItem, ICartStore } from '../../type';
+import {
+  IAddressData,
+  IAddressIamPort,
+  ICartItem,
+  ICartStore,
+  IUserInfo,
+} from '../../type';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box } from '@mui/system';
 import DaumPost from '../../components/\bDaumPost';
@@ -34,17 +41,31 @@ export default function CheckOut() {
   const location = useLocation();
   const [checkoutItems, setCheckoutItems] = useState<ICartItem[]>([]);
   const [totalCost, setTotalCost] = useState(0);
-  const [userInfo, setUserInfo] = useState({
-    name: '집',
+  const [userInfo, setUserInfo] = useState<IUserInfo>({
+    id: 0,
+    name: '',
     email: '',
+    address: '',
+    extra: {
+      address: [
+        {
+          addressName: '',
+          receiver: '',
+          tel: 0,
+          name: '',
+          mainAddress: '',
+          subAddress: '',
+        },
+      ],
+    },
   });
-  const [address, setAddress] = useState({});
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
-  const [deliveryInfo, setDeliveryInfo] = useState({
-    addressName: '집',
-    receiver: '홍길동',
-    tel: '01012341234',
+  const [deliveryInfo, setDeliveryInfo] = useState<IAddressData>({
+    addressName: '',
+    receiver: '',
+    tel: 0,
+    name: '',
     mainAddress: '',
     subAddress: '',
   });
@@ -52,8 +73,10 @@ export default function CheckOut() {
   const [openAddressDialog, setOpenAddressDialog] = useState(false);
   const [addressList, setAddressList] = useState([]);
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
+  const [addAddressToBook, setAddAddressToBook] = useState(false);
 
   const userId = localStorage.getItem('_id');
+  const isCheckoutItemEmpty = checkoutItems.length === 0;
 
   useEffect(() => {
     const singleProduct = location.state?.product;
@@ -63,7 +86,7 @@ export default function CheckOut() {
     } else {
       setCheckoutItems(items);
       const total = items.reduce(
-        (total, item) => total + item.price + item.shippingFees,
+        (total, item) => total + item.price + (item.shippingFees ?? 0),
         0,
       );
       setTotalCost(total);
@@ -77,18 +100,24 @@ export default function CheckOut() {
           throw new Error('사용자 ID가 없습니다');
         }
         const response = await api.getUserInfo(userId);
-        setUserInfo({
-          name: response.data.item.name,
-          email: response.data.item.email,
-        });
-        setDeliveryInfo({
-          addressName: response.data.item.extra.address[0].addressName,
-          receiver: response.data.item.extra.address[0].receiver,
-          tel: response.data.item.extra.address[0].tel,
-          mainAddress: response.data.item.extra.address[0].mainAddress,
-          subAddress: response.data.item.extra.address[0].subAddress,
-        });
-        setAddressList(response.data.item.extra.address);
+        const userData = response.data.item;
+
+        setUserInfo(userData);
+
+        const addresses = userData.extra?.address || [];
+
+        if (addresses.length > 0) {
+          const defaultAddress = addresses[0];
+          setDeliveryInfo({
+            addressName: defaultAddress.addressName,
+            receiver: defaultAddress.receiver,
+            tel: defaultAddress.tel,
+            mainAddress: defaultAddress.mainAddress,
+            subAddress: defaultAddress.subAddress,
+          });
+        }
+
+        setAddressList(addresses);
       } catch (error) {
         console.error('사용자 정보를 가져오는데 실패했습니다', error);
       }
@@ -96,12 +125,12 @@ export default function CheckOut() {
 
     fetchUserInfo();
   }, []);
-  console.log('addressList', addressList);
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
-  const handleAddressSearchComplete = (data) => {
+  const handleAddressSearchComplete = (data: IAddressIamPort) => {
     let fullAddress = data.address;
     let extraAddress = '';
 
@@ -126,30 +155,46 @@ export default function CheckOut() {
     setOpenAddressDialog(false);
   };
 
-  const handleReceiverChange = (e) => {
+  const handleReceiverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDeliveryInfo({ ...deliveryInfo, receiver: e.target.value });
   };
 
-  const handleTelChange = (e) => {
-    setDeliveryInfo({ ...deliveryInfo, tel: e.target.value });
+  const handleTelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDeliveryInfo({ ...deliveryInfo, tel: Number(e.target.value) });
   };
 
-  const handleAddressNameChange = (e) => {
+  const handleAddressNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDeliveryInfo({ ...deliveryInfo, addressName: e.target.value });
   };
 
   const handlePurchase = async () => {
+    const orderData = {
+      products: checkoutItems.map((item) => ({
+        _id: item._id,
+        quantity: 1,
+      })),
+      value: deliveryInfo,
+    };
     try {
-      const orderData = {
-        products: checkoutItems.map((item) => ({
-          _id: item._id,
-          quantity: 1,
-        })),
-        value: deliveryInfo,
-      };
-
       await api.checkOut(orderData);
       alert('주문이 완료되었습니다.');
+      if (addAddressToBook) {
+        const addresses = userInfo.extra.address || [];
+        const newAddress = {
+          ...deliveryInfo,
+          id: uuidv4(),
+        };
+        const updateAddressData = {
+          ...userInfo,
+          extra: {
+            ...userInfo.extra,
+            address: [...addresses, newAddress],
+          },
+        };
+        console.log('updateAddressData', updateAddressData);
+
+        await api.updateUserInfo(userId, updateAddressData);
+      }
       if (location.state?.product === undefined) {
         clearCart();
       }
@@ -159,7 +204,6 @@ export default function CheckOut() {
     }
   };
 
-  const isCheckoutItemEmpty = checkoutItems.length === 0;
   const handlePurchaseEnabled = () => {
     return agreedToTerms && agreedToPrivacy && !isCheckoutItemEmpty;
   };
@@ -173,8 +217,8 @@ export default function CheckOut() {
       amount: totalCost,
       buyer_email: userInfo.email,
       buyer_name: userInfo.name,
-      buyer_tel: '010-1234-5678',
-      buyer_addr: address.value,
+      buyer_tel: deliveryInfo.tel,
+      buyer_addr: deliveryInfo.mainAddress,
       buyer_postcode: '123-456',
     };
 
@@ -200,34 +244,6 @@ export default function CheckOut() {
   interface PaymentResponse {
     success: boolean;
   }
-  // 결제 성공 response 예시
-  // {
-  //   apply_num: '';
-  //   bank_name: null;
-  //   buyer_addr: '1';
-  //   buyer_email: 'jin@gmail.com';
-  //   buyer_name: 'Jinwoo Choi';
-  //   buyer_postcode: '123-456';
-  //   buyer_tel: '010-1234-5678';
-  //   card_name: null;
-  //   card_number: '';
-  //   card_quota: 0;
-  //   currency: 'KRW';
-  //   custom_data: null;
-  //   imp_uid: 'imp_045064202407';
-  //   merchant_uid: 'mid_1702745063484';
-  //   name: '주문명:결제테스트';
-  //   paid_amount: 47000;
-  //   paid_at: 1702745085;
-  //   pay_method: 'point';
-  //   pg_provider: 'kakaopay';
-  //   pg_tid: 'T57dd3e83ad74821055e';
-  //   pg_type: 'payment';
-  //   receipt_url: 'https://mockup-pg-web.kakao.com/v1/confirmation/p/T57dd3e83ad74821055e/4f2a3da6fddf5e8fd2ac750cfaaf9d792d99c49e2b1b631d843d36cfd6cc3893';
-  //   status: 'paid';
-  //   success: true;
-  // }
-  console.log('deliveryInfo', deliveryInfo);
 
   return (
     <Container sx={{ marginY: '50px' }}>
@@ -268,7 +284,7 @@ export default function CheckOut() {
             variant="fullWidth"
             value={tabValue}
             onChange={handleTabChange}
-            aria-aria-label="address tabs"
+            aria-label="address tabs"
           >
             <CustomTab label="기본주소" />
             <CustomTab label="새로입력" />
@@ -297,7 +313,7 @@ export default function CheckOut() {
               <Button
                 variant="outlined"
                 color="inherit"
-                style={{ height: '56px', borderRadius: '0' }}
+                style={{ height: '56px' }}
                 onClick={() => setIsAddressDialogOpen(true)}
               >
                 배송지 목록
@@ -376,7 +392,7 @@ export default function CheckOut() {
                 <Button
                   variant="outlined"
                   color="primary"
-                  sx={{ width: '100px', height: '56px', borderRadius: '0' }}
+                  sx={{ width: '100px', height: '56px' }}
                   onClick={() => setOpenAddressDialog(true)}
                 >
                   주소검색
@@ -409,6 +425,15 @@ export default function CheckOut() {
                   }
                 />
               </Box>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={addAddressToBook}
+                    onChange={(e) => setAddAddressToBook(e.target.checked)}
+                  />
+                }
+                label="주소록에 추가"
+              />
             </Box>
           )}
         </Grid>
@@ -451,17 +476,21 @@ export default function CheckOut() {
                   <Box>
                     <Typography variant="h6">{item.name}</Typography>
 
-                    {item.shippingFees == 0 ? (
-                      <Typography variant="body2">무료배송</Typography>
-                    ) : (
-                      <Typography variant="body2">
-                        배송비{' '}
-                        {item.shippingFees.toLocaleString('KR-kr', {
-                          style: 'currency',
-                          currency: 'KRW',
-                        })}
-                      </Typography>
-                    )}
+                    {item.shippingFees !== undefined &&
+                      item.shippingFees == 0 && (
+                        <Typography variant="body2">무료배송</Typography>
+                      )}
+
+                    {item.shippingFees !== undefined &&
+                      item.shippingFees > 0 && (
+                        <Typography variant="body2">
+                          배송비{' '}
+                          {item.shippingFees.toLocaleString('KR-kr', {
+                            style: 'currency',
+                            currency: 'KRW',
+                          })}
+                        </Typography>
+                      )}
                     <Typography variant="body1" fontWeight={700}>
                       {item.price.toLocaleString('KR-kr', {
                         style: 'currency',
@@ -533,7 +562,6 @@ export default function CheckOut() {
                 border:
                   '1px solid ' +
                   (handlePurchaseEnabled() ? '#f7e600' : 'white'),
-                borderRadius: '0',
               }}
               disabled={!handlePurchaseEnabled()}
             >
@@ -560,7 +588,7 @@ export default function CheckOut() {
               onClick={() => requestPayment('kcp')}
               variant="outlined"
               color="primary"
-              style={{ height: '56px', borderRadius: '0' }}
+              style={{ height: '56px' }}
               disabled={!handlePurchaseEnabled()}
             >
               일반카드 결제하기
@@ -579,7 +607,7 @@ export default function CheckOut() {
               onClick={handlePurchase}
               variant="outlined"
               color="inherit"
-              style={{ height: '56px', borderRadius: '0' }}
+              style={{ height: '56px' }}
               disabled={!handlePurchaseEnabled()}
             >
               테스트 결제

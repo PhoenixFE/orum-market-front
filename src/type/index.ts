@@ -41,8 +41,12 @@ export interface ICartItem {
   _id: number;
   name: string;
   price: number;
+  shippingFees?: number;
   quantity: number;
-  mainImages: string[];
+  mainImages: {
+    id: string;
+    path: string;
+  }[];
 }
 
 export interface ICartStore {
@@ -113,13 +117,14 @@ export interface IUserInfo {
   name: string;
   address?: string;
   extra: {
-    addressBook: [
+    address: [
       {
+        receiver: string;
         addressName: string;
         tel: number;
         name: string;
-        address_main: string;
-        address_sub: string;
+        mainAddress: string;
+        subAddress: string;
       },
     ];
   };
@@ -161,6 +166,7 @@ export interface IBookmarkItem {
     };
   };
 }
+
 export interface IDashboardMenu {
   dashboardMenu: {
     buyer: {
@@ -174,4 +180,24 @@ export interface IDashboardMenu {
       url: string;
     }[];
   };
+}
+
+export interface IAddressData {
+  addressName?: string;
+  receiver?: string;
+  tel?: number;
+  name?: string;
+  mainAddress?: string;
+  subAddress?: string;
+}
+
+export interface IAddressIamPort {
+  address: string;
+  address_detail: string;
+  zonecode: string;
+  addressType: string;
+  bname: string;
+  bname1: string;
+  bname2: string;
+  buildingName: string;
 }
