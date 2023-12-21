@@ -168,6 +168,7 @@ export default function OrderListTable({
                       <TableCell align="center">
                         <Link
                           to={`/user/${id}/buyer-orderlist/${list._id}`}
+                          onClick={handleMoveTo}
                           state={{ productId: list._id }}
                         >
                           <Button sx={{ padding: '0', margin: '0' }}>
