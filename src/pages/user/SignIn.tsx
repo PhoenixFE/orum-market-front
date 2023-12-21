@@ -166,19 +166,6 @@ export default function SignInPage() {
   );
 }
 
-const headerHeight = '64px';
-const footerHeight = '138px';
-
-// const MainContainer = styled(Container)`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   height: calc(100vh - ${headerHeight} - ${footerHeight});
-//   margin-top: 0;
-//   padding-top: ${headerHeight};
-//   max-width: 50%;
-// `;
-
 const Form = styled.form`
   display: flex;
   flex-direction: column;

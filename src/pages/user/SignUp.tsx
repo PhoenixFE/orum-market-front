@@ -91,7 +91,13 @@ export default function SignUpPage() {
       }
     } catch (error) {
       console.error(error);
-      setEmailError('이메일 확인에 실패했습니다.');
+      if ((error as Error & { response?: any }).response) {
+        setEmailError(
+          (error as Error & { response?: any }).response?.data.message,
+        );
+      } else {
+        setEmailError('이메일 확인에 실패했습니다.');
+      }
     } finally {
       setIsCheckingEmail(false);
     }
@@ -103,55 +109,58 @@ export default function SignUpPage() {
       maxWidth="xs"
       sx={{
         height: '100vh-114px',
-        marginY: '100px',
+        marginY: '50px',
         borderRadius: '10px',
       }}
     >
-      <h1 style={{ textAlign: 'center' }}>회원가입</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>회원가입</h1>
       <Form onSubmit={handleSubmit}>
         <Box sx={{ width: '100%' }}>
-          <TextField
-            type="email"
-            name="email"
-            variant="outlined"
-            label="이메일"
-            fullWidth
-            value={formData.email}
-            onChange={handleChange}
-            required
-            error={!!emailError}
-            helperText={emailError}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="check email availability"
-                    onClick={checkEmailAvailability}
-                    edge="end"
-                    disabled={
-                      isCheckingEmail ||
-                      formData.email === '' ||
-                      !validateEmail(formData.email) ||
-                      isEmailAvailable // Disable button if email has been checked and is available
-                    }
-                  >
-                    {isCheckingEmail ? (
-                      <CircularProgress size={24} color="inherit" />
-                    ) : isEmailAvailable ? (
-                      <CheckIcon color="success" />
-                    ) : (
-                      <CheckIcon />
-                    )}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-            FormHelperTextProps={{
-              sx: {
-                color: isEmailAvailable ? 'success.main' : '',
-              },
-            }}
-          />
+          <Grid container spacing={1} alignItems="flex-start">
+            <Grid item xs={true}>
+              <TextField
+                type="email"
+                name="email"
+                label="이메일"
+                variant="outlined"
+                fullWidth
+                value={formData.email}
+                onChange={handleChange}
+                required
+                error={!!emailError}
+                helperText={emailError}
+              />
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                size="large"
+                aria-label="check email availability"
+                onClick={checkEmailAvailability}
+                disabled={
+                  isCheckingEmail ||
+                  formData.email === '' ||
+                  !validateEmail(formData.email) ||
+                  isEmailAvailable
+                }
+                sx={{ height: '56px' }}
+              >
+                {isCheckingEmail ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <>
+                    <Typography>
+                      {isEmailAvailable ? (
+                        <CheckIcon sx={{ color: 'success.main' }} />
+                      ) : (
+                        '이메일 중복 확인'
+                      )}
+                    </Typography>
+                  </>
+                )}
+              </Button>
+            </Grid>
+          </Grid>
           {isEmailAvailable && !emailError && (
             <FormHelperText sx={{ color: 'success.main' }}>
               사용 가능한 이메일입니다.
@@ -211,7 +220,7 @@ export default function SignUpPage() {
           }}
         >
           <SubmitButton
-            variant="outlined"
+            variant="contained"
             type="submit"
             size="large"
             sx={{ width: '100%', marginTop: '20px' }}

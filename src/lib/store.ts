@@ -14,7 +14,7 @@ export const useUserStore = create(
   persist(
     (set) => ({
       isLoggedIn: false,
-      logIn: (accessToken: string, refreshToken: string, expiresIn: number) => {
+      logIn: (accessToken: string, refreshToken: string) => {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         set({ isLoggedIn: true });
