@@ -9,16 +9,27 @@ import {
 import { persist } from 'zustand/middleware';
 
 // 로그인 상태 관리 store
+let tokenTimeoutId: NodeJS.Timeout;
 export const useUserStore = create(
   persist(
     (set) => ({
       isLoggedIn: false,
-      logIn: (accessToken: string, refreshToken: string) => {
+      logIn: (accessToken: string, refreshToken: string, expiresIn: number) => {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         set({ isLoggedIn: true });
+
+        if (tokenTimeoutId) {
+          clearTimeout(tokenTimeoutId);
+        }
+        tokenTimeoutId = setTimeout(() => {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          set({ isLoggedIn: false });
+        }, 7200000);
       },
       logOut: () => {
+        clearTimeout(tokenTimeoutId);
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         set({ isLoggedIn: false });
