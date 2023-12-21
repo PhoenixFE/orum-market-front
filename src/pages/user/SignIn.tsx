@@ -86,12 +86,12 @@ export default function SignInPage() {
       maxWidth="xs"
       sx={{
         height: '100vh-114px',
-        marginY: '100px',
+        marginY: '50px',
         borderRadius: '10px',
         background: 'primary.main',
       }}
     >
-      <h1 style={{ textAlign: 'center' }}>로그인</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>로그인</h1>
       <Form onSubmit={handleSubmit} id="sign-in-form">
         <TextField
           id="email"
@@ -140,7 +140,7 @@ export default function SignInPage() {
           variant="outlined"
           fullWidth
           startIcon={<Login />}
-          sx={{ mt: 3, mb: 2 }}
+          sx={{ mt: 3, mb: 2, height: '56px' }}
         >
           로그인
         </Button>

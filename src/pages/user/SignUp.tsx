@@ -220,10 +220,10 @@ export default function SignUpPage() {
           }}
         >
           <SubmitButton
-            variant="contained"
+            variant="outlined"
             type="submit"
             size="large"
-            sx={{ width: '100%', marginTop: '20px' }}
+            sx={{ width: '100%', marginTop: '20px', height: '56px' }}
             disabled={!isEmailAvailable || isCheckingEmail}
           >
             일반 회원가입
