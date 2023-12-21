@@ -138,42 +138,26 @@ export default function CheckOut() {
     setDeliveryInfo({ ...deliveryInfo, addressName: e.target.value });
   };
 
-  // const handlePurchase = async () => {
-  //   if (!address.name.trim()) {
-  //     alert('배송지 이름을 입력해주세요.');
-  //     if (addressNameRef.current) {
-  //       addressNameRef.current.focus();
-  //     }
-  //     return;
-  //   }
+  const handlePurchase = async () => {
+    try {
+      const orderData = {
+        products: checkoutItems.map((item) => ({
+          _id: item._id,
+          quantity: 1,
+        })),
+        value: deliveryInfo,
+      };
 
-  //   if (!address.value.trim()) {
-  //     alert('배송지 주소를 입력해주세요.');
-  //     if (addressValueRef.current) {
-  //       addressValueRef.current.focus();
-  //     }
-  //     return;
-  //   }
-
-  //   try {
-  //     const orderData = {
-  //       products: checkoutItems.map((item) => ({
-  //         _id: item._id,
-  //         quantity: 1,
-  //       })),
-  //       value: address,
-  //     };
-
-  //     await api.checkOut(orderData);
-  //     alert('주문이 완료되었습니다.');
-  //     if (location.state?.product === undefined) {
-  //       clearCart();
-  //     }
-  //     navigate('/');
-  //   } catch (error) {
-  //     console.error('주문 실패:', error);
-  //   }
-  // };
+      await api.checkOut(orderData);
+      alert('주문이 완료되었습니다.');
+      if (location.state?.product === undefined) {
+        clearCart();
+      }
+      navigate('/');
+    } catch (error) {
+      console.error('주문 실패:', error);
+    }
+  };
 
   const isCheckoutItemEmpty = checkoutItems.length === 0;
   const handlePurchaseEnabled = () => {
@@ -199,13 +183,16 @@ export default function CheckOut() {
     }
 
     IMP.init('imp38488078');
-    IMP.request_pay(paymentData, (response: PaymentResponse) => {
-      // 결제 완료 후 콜백 함수
+    IMP.request_pay(paymentData, async (response: PaymentResponse) => {
       if (response.success) {
-        // 결제 성공 시 로직
         console.log('결제 성공', response);
+        try {
+          await handlePurchase();
+          alert('결제가 완료되었습니다.');
+        } catch (error) {
+          console.error('결제 정보 저장 실패:', error);
+        }
       } else {
-        // 결제 실패 시 로직
         console.error('결제 실패', response);
       }
     });
@@ -310,7 +297,7 @@ export default function CheckOut() {
               <Button
                 variant="outlined"
                 color="inherit"
-                style={{ height: '56px' }}
+                style={{ height: '56px', borderRadius: '0' }}
                 onClick={() => setIsAddressDialogOpen(true)}
               >
                 배송지 목록
@@ -389,7 +376,7 @@ export default function CheckOut() {
                 <Button
                   variant="outlined"
                   color="primary"
-                  sx={{ width: '100px', height: '56px' }}
+                  sx={{ width: '100px', height: '56px', borderRadius: '0' }}
                   onClick={() => setOpenAddressDialog(true)}
                 >
                   주소검색
@@ -546,6 +533,7 @@ export default function CheckOut() {
                 border:
                   '1px solid ' +
                   (handlePurchaseEnabled() ? '#f7e600' : 'white'),
+                borderRadius: '0',
               }}
               disabled={!handlePurchaseEnabled()}
             >
@@ -572,11 +560,30 @@ export default function CheckOut() {
               onClick={() => requestPayment('kcp')}
               variant="outlined"
               color="primary"
-              style={{ height: '56px' }}
+              style={{ height: '56px', borderRadius: '0' }}
               disabled={!handlePurchaseEnabled()}
             >
               일반카드 결제하기
             </Button>{' '}
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'end',
+              alignItems: 'center',
+            }}
+            mt={2}
+            gap={1}
+          >
+            <Button
+              onClick={handlePurchase}
+              variant="outlined"
+              color="inherit"
+              style={{ height: '56px', borderRadius: '0' }}
+              disabled={!handlePurchaseEnabled()}
+            >
+              테스트 결제
+            </Button>
           </Box>
         </Grid>
       </Grid>
