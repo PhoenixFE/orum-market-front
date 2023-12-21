@@ -11,9 +11,12 @@ import {
   ListItemText,
   FormControlLabel,
   Checkbox,
+  Grid,
+  Divider,
 } from '@mui/material';
 import { ICartItem, ICartStore } from '../../type';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Box } from '@mui/system';
 declare const IMP: any;
 
 export default function CheckOut() {
@@ -25,11 +28,17 @@ export default function CheckOut() {
   const [userInfo, setUserInfo] = useState({
     name: '집',
     email: '',
-    address: '',
   });
-  const [address, setAddress] = useState({ name: '', value: userInfo.address });
+  const [address, setAddress] = useState({});
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
+  const [deliveryInfo, setDeliveryInfo] = useState({
+    addressName: '집',
+    receiver: '홍길동',
+    tel: '01012341234',
+    mainAddress: '',
+    subAddress: '',
+  });
 
   const userId = localStorage.getItem('_id');
 
@@ -57,7 +66,13 @@ export default function CheckOut() {
         setUserInfo({
           name: response.data.item.name,
           email: response.data.item.email,
-          address: response.data.item.address,
+        });
+        setDeliveryInfo({
+          addressName: response.data.item.extra.address[0].addressName,
+          receiver: response.data.item.extra.address[0].receiver,
+          tel: response.data.item.extra.address[0].tel,
+          mainAddress: response.data.item.extra.address[0].mainAddress,
+          subAddress: response.data.item.extra.address[0].subAddress,
         });
       } catch (error) {
         console.error('사용자 정보를 가져오는데 실패했습니다', error);
@@ -72,59 +87,48 @@ export default function CheckOut() {
     setAddress((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePurchase = async () => {
-    if (!address.name.trim()) {
-      alert('배송지 이름을 입력해주세요.');
-      if (addressNameRef.current) {
-        addressNameRef.current.focus();
-      }
-      return;
-    }
+  // const handlePurchase = async () => {
+  //   if (!address.name.trim()) {
+  //     alert('배송지 이름을 입력해주세요.');
+  //     if (addressNameRef.current) {
+  //       addressNameRef.current.focus();
+  //     }
+  //     return;
+  //   }
 
-    if (!address.value.trim()) {
-      alert('배송지 주소를 입력해주세요.');
-      if (addressValueRef.current) {
-        addressValueRef.current.focus();
-      }
-      return;
-    }
+  //   if (!address.value.trim()) {
+  //     alert('배송지 주소를 입력해주세요.');
+  //     if (addressValueRef.current) {
+  //       addressValueRef.current.focus();
+  //     }
+  //     return;
+  //   }
 
-    try {
-      const orderData = {
-        products: checkoutItems.map((item) => ({
-          _id: item._id,
-          quantity: 1,
-        })),
-        value: address,
-      };
+  //   try {
+  //     const orderData = {
+  //       products: checkoutItems.map((item) => ({
+  //         _id: item._id,
+  //         quantity: 1,
+  //       })),
+  //       value: address,
+  //     };
 
-      await api.checkOut(orderData);
-      alert('주문이 완료되었습니다.');
-      if (location.state?.product === undefined) {
-        clearCart();
-      }
-      navigate('/');
-    } catch (error) {
-      console.error('주문 실패:', error);
-    }
-  };
+  //     await api.checkOut(orderData);
+  //     alert('주문이 완료되었습니다.');
+  //     if (location.state?.product === undefined) {
+  //       clearCart();
+  //     }
+  //     navigate('/');
+  //   } catch (error) {
+  //     console.error('주문 실패:', error);
+  //   }
+  // };
 
   const isCheckoutItemEmpty = checkoutItems.length === 0;
   const handlePurchaseEnabled = () => {
     return agreedToTerms && agreedToPrivacy && !isCheckoutItemEmpty;
   };
 
-  // function requestPayment() {
-  //   PortOne.requestPayment({
-  //     storeId: 'store-6303d710-90d0-4d2d-8536-bb48f6ab4f21',
-  //     paymentId: 'paymentId_{now()}',
-  //     orderName: '나이키 와플 트레이너 2 SD',
-  //     totalAmount: 1000,
-  //     currency: 'CURRENCY_KRW',
-  //     pgProvider: 'PG_PROVIDER_TOSSPAYMENTS',
-  //     payMethod: 'CARD',
-  //   });
-  // }
   function requestPayment(pg: string) {
     let paymentData = {
       pg: 'kcp',
@@ -187,115 +191,234 @@ export default function CheckOut() {
   // }
 
   return (
-    <Container>
-      <Typography variant="h2">결제하기</Typography>
-      {isCheckoutItemEmpty ? (
-        <Typography variant="h4">장바구니가 비어있습니다.</Typography>
-      ) : (
-        <List sx={{ mb: 2 }}>
-          {checkoutItems.map((item, index) => (
-            <ListItem key={index}>
-              <img
-                src={item.mainImages[0]}
-                alt={item.name}
-                style={{ width: '100px', height: '100px', marginRight: '20px' }}
-              />
-              <ListItemText primary={item.name} />
-            </ListItem>
-          ))}
-        </List>
-      )}
-      <TextField
-        label="이름"
-        value={userInfo.name}
-        fullWidth
-        margin="normal"
-        disabled
-      />
-      <TextField
-        label="연락처"
-        value={userInfo.email}
-        fullWidth
-        margin="normal"
-        disabled
-      />
-      <TextField
-        inputRef={addressNameRef}
-        label="배송지 이름"
-        name="name"
-        value={address.name}
-        onChange={handleAddressChange}
-        fullWidth
-        margin="normal"
-      />
-      <TextField
-        inputRef={addressValueRef}
-        label="배송지 주소"
-        name="value"
-        value={address.value}
-        onChange={handleAddressChange}
-        fullWidth
-        margin="normal"
-      />
-      <Typography variant="h6" sx={{ my: 2 }}>
-        총 금액: ₩{totalCost.toLocaleString()}
+    <Container sx={{ marginY: '50px' }}>
+      <Typography variant="h4" fontWeight={700} mb={5}>
+        결제하기
       </Typography>
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={agreedToTerms}
-            onChange={(e) => setAgreedToTerms(e.target.checked)}
+      <Grid container spacing={3}>
+        {/* Left section */}
+        <Grid item xs={12} md={7} sx={{ padding: '2rem' }}>
+          <Divider />
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Typography variant="h6" fontWeight={700} my={3}>
+              주문 고객
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+              }}
+            >
+              <Typography variant="body1">{userInfo.name}</Typography>
+              <Typography variant="body1">{userInfo.email}</Typography>
+            </Box>
+          </Box>
+          <Divider />
+          <Typography variant="h6" fontWeight={700} my={3}>
+            배송지 정보
+          </Typography>
+
+          <TextField
+            label="수령인"
+            value={deliveryInfo.receiver}
+            fullWidth
+            margin="normal"
+            disabled
           />
-        }
-        label="이용약관에 동의합니다. (필수)"
-      />
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={agreedToPrivacy}
-            onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+          <TextField
+            label="연락처"
+            value={deliveryInfo.tel}
+            fullWidth
+            margin="normal"
+            disabled
           />
-        }
-        label="비회원 개인정보수집 이용에 동의합니다. (필수)"
-      />
-      {/* <Button
-        onClick={requestKakaoPayment}
-        variant="contained"
-        color="primary"
-        disabled={!handlePurchaseEnabled()}
-      >
-        카카오페이 결제하기
-      </Button>{' '} */}
-      <Button
-        onClick={() => requestPayment('kakao')}
-        variant="text"
-        style={{
-          backgroundColor: '#FEE500',
-          color: 'black',
-          fontWeight: 'bold',
-          padding: '10px 20px',
-          margin: '10px 0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-        disabled={!handlePurchaseEnabled()}
-      >
-        <img
-          src="/assets/kakaopay.png" // 카카오페이 로고 이미지 경로
-          alt="카카오페이"
-          style={{ marginRight: '10px', height: '24px' }}
-        />
-        카카오페이
-      </Button>{' '}
-      <Button
-        onClick={() => requestPayment('kcp')}
-        variant="outlined"
-        color="primary"
-        disabled={!handlePurchaseEnabled()}
-      >
-        일반카드 결제하기
-      </Button>{' '}
+          <TextField
+            inputRef={addressNameRef}
+            placeholder="배송지 이름"
+            name="name"
+            value={deliveryInfo.addressName}
+            onChange={handleAddressChange}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            inputRef={addressValueRef}
+            placeholder="성남시 중원구 광명로 293"
+            name="value"
+            value={deliveryInfo.mainAddress}
+            onChange={handleAddressChange}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            inputRef={addressValueRef}
+            placeholder="상세 주소 입력"
+            name="value"
+            value={deliveryInfo.subAddress}
+            onChange={handleAddressChange}
+            fullWidth
+            margin="normal"
+          />
+        </Grid>
+
+        {/* Right section */}
+        <Grid
+          item
+          xs={12}
+          md={5}
+          mt={2}
+          sx={{
+            padding: '2rem',
+          }}
+        >
+          <Typography variant="h6" fontWeight={700} mb={3}>
+            주문 내역
+          </Typography>
+          {isCheckoutItemEmpty ? (
+            <Typography variant="h4">장바구니가 비어있습니다.</Typography>
+          ) : (
+            <List sx={{ mb: 2 }}>
+              {checkoutItems.map((item, index) => (
+                <ListItem
+                  key={index}
+                  sx={{
+                    alignItems: 'start',
+                    borderBottom: '1px solid lightgray',
+                  }}
+                >
+                  <img
+                    src={item.mainImages[0].path}
+                    alt={item.name}
+                    style={{
+                      width: '80px',
+                      height: '80px',
+                      marginRight: '20px',
+                    }}
+                  />
+                  <Box>
+                    <Typography variant="h6">{item.name}</Typography>
+
+                    {item.shippingFees == 0 ? (
+                      <Typography variant="body2">무료배송</Typography>
+                    ) : (
+                      <Typography variant="body2" fontWeight={700}>
+                        배송비{' '}
+                        {item.shippingFees.toLocaleString('KR-kr', {
+                          style: 'currency',
+                          currency: 'KRW',
+                        })}
+                      </Typography>
+                    )}
+                    <Typography variant="body1" fontWeight={700}>
+                      {item.price.toLocaleString('KR-kr', {
+                        style: 'currency',
+                        currency: 'KRW',
+                      })}
+                    </Typography>
+                  </Box>
+                  <Divider />
+                </ListItem>
+              ))}
+            </List>
+          )}
+          <Typography variant="h6" sx={{ my: 2 }}>
+            총 금액: {totalCost.toLocaleString()} 원
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'end',
+              alignItems: 'end',
+            }}
+          >
+            <FormControlLabel
+              required
+              control={
+                <Checkbox
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                />
+              }
+              label="이용약관에 동의합니다. (필수)"
+            />
+            <FormControlLabel
+              required
+              control={
+                <Checkbox
+                  checked={agreedToPrivacy}
+                  onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+                />
+              }
+              label="비회원 개인정보수집 이용에 동의합니다. (필수)"
+            />
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'end',
+              alignItems: 'center',
+            }}
+            gap={1}
+          >
+            <Button
+              onClick={() => requestPayment('kakao')}
+              style={{
+                height: '56px',
+                color: handlePurchaseEnabled() ? '#111' : '#aaa',
+                fontWeight: 'bold',
+                padding: '10px 20px',
+                margin: '10px 0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: handlePurchaseEnabled()
+                  ? '#f7e600'
+                  : '#e0e0e0',
+                border:
+                  '1px solid ' +
+                  (handlePurchaseEnabled() ? '#f7e600' : 'white'),
+              }}
+              disabled={!handlePurchaseEnabled()}
+            >
+              {handlePurchaseEnabled() ? (
+                <img
+                  src="/assets/kakaopay.png"
+                  alt="카카오페이"
+                  style={{ marginRight: '10px', height: '24px' }}
+                />
+              ) : (
+                <img
+                  src="/assets/kakaopay.png"
+                  alt="카카오페이"
+                  style={{
+                    marginRight: '10px',
+                    height: '24px',
+                    opacity: '0.3',
+                  }}
+                />
+              )}
+              카카오페이 결제하기
+            </Button>{' '}
+            <Button
+              onClick={() => requestPayment('kcp')}
+              variant="outlined"
+              color="primary"
+              style={{ height: '56px' }}
+              disabled={!handlePurchaseEnabled()}
+            >
+              일반카드 결제하기
+            </Button>{' '}
+          </Box>
+        </Grid>
+      </Grid>
     </Container>
   );
 }

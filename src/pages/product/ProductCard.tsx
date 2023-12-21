@@ -9,11 +9,12 @@ import {
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PaymentIcon from '@mui/icons-material/Payment';
 import { IProduct } from '../../type';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useAddToCart from '../../hooks/useAddToCart';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { memo } from 'react';
+import { useUserStore } from '../../lib/store';
 
 interface ProductCardProps {
   product: IProduct;
@@ -22,8 +23,26 @@ interface ProductCardProps {
 export const ProductCard = memo(function ProductCard({
   product,
 }: ProductCardProps) {
-  // export default function ProductCard({ product }: ProductCardProps) {
+  const { isLoggedIn } = useUserStore() as { isLoggedIn: boolean };
+  const navigate = useNavigate();
+
+  const handleNotLoggedIn = () => {
+    const confirmLogin = confirm(
+      '로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?',
+    );
+    if (confirmLogin) {
+      navigate('/sign-in');
+    }
+  };
   const handleAddToCart = useAddToCart();
+  const perchaseProduct = () => {
+    if (!isLoggedIn) {
+      handleNotLoggedIn();
+    } else {
+      alert('결제 페이지로 이동합니다');
+      navigate('/checkout', { state: { product } });
+    }
+  };
 
   return (
     <>
@@ -56,7 +75,7 @@ export const ProductCard = memo(function ProductCard({
           <IconButton onClick={() => handleAddToCart(product)}>
             <ShoppingCartIcon />
           </IconButton>
-          <IconButton>
+          <IconButton onClick={perchaseProduct}>
             <PaymentIcon />
           </IconButton>
         </ProductActions>
