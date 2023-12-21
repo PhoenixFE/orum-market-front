@@ -1,7 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Editor } from '@toast-ui/react-editor';
-import '@toast-ui/editor/dist/toastui-editor.css';
 
 import {
   FormControl,
@@ -39,8 +37,6 @@ export default function ProductUpdate() {
   const [priceError, setPriceError] = useState('');
   const [shippingFeesError, setShippingFeesError] = useState('');
   const [contentError, setContentError] = useState('');
-
-  const editorRef = useRef();
 
   useEffect(() => {
     fetchProduct();
@@ -184,12 +180,9 @@ export default function ProductUpdate() {
   };
 
   //상품 설명 onChange
-  const contentChange = () => {
-    const editorData = editorRef.current.getInstance().getMarkdown();
-    setProductData({
-      ...productData,
-      content: editorData,
-    });
+  const contentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setProductData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -348,16 +341,13 @@ export default function ProductUpdate() {
         <>
           상품 설명:
           {productData.content && (
-            <Editor
-              ref={editorRef}
-              initialValue={productData.content}
-              previewStyle="vertical"
-              height="400px"
-              width="100%"
-              initialEditType="markdown"
-              useCommandShortcut={true}
+            <TextField
+              type="text"
+              name="content"
+              placeholder="상품 설명을 입력하세요."
+              value={productData.content}
               onChange={contentChange}
-            />
+            ></TextField>
           )}
           {!isValid && productData.content.length > 0 ? (
             <div style={{ color: 'red' }}>{contentError}</div>

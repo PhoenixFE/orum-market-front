@@ -7,19 +7,22 @@ export interface IProduct {
   quantity: number;
   show: boolean;
   active: boolean;
-  mainImages: string[];
+  mainImages: IProductImage[];
+  buyQuantity: number;
   extra: {
-    isNew: boolean;
-    isBest: boolean;
-    category: string[];
-    quantity: number;
-    buyQuantity: number;
-    order: number;
-    sort: number;
+    isNew?: boolean;
+    isBest?: boolean;
+    category?: string[];
+    sort?: number;
   };
   createdAt: string;
   updatedAt: string;
   content: string;
+}
+
+export interface IProductImage {
+  id: string;
+  path: string;
 }
 
 export interface ICategoryPreview {
@@ -58,7 +61,7 @@ export interface IOrderItem {
   _id: number;
   user_id: number;
   state: string;
-  products: IProduct[];
+  products: IOrderProduct[];
   cost: {
     discount: number[];
     products: number;
@@ -68,6 +71,24 @@ export interface IOrderItem {
   address: string[];
   createdAt: string;
   updatedAt: string;
+}
+
+interface IOrderProduct {
+  _id: number;
+  quantity: number;
+  seller_id: number;
+  name: string;
+  image: {
+    id: string;
+    path: string;
+  };
+  price: number;
+  extra: {
+    isNew: boolean;
+    isBest: boolean;
+    category: string[];
+    sort: number;
+  };
 }
 
 export interface IUserInfo {
@@ -96,6 +117,28 @@ export interface ISearchState {
 }
 
 export interface IRecentlyViewedStore {
-  viewdItems: IProduct[];
+  viewItems: IProduct[];
   addRecentViewProduct: (newItem: IProduct) => void;
+}
+
+export interface IProductListQuery {
+  category?: string;
+  sort?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface IDashboardMenu {
+  dashboardMenu: {
+    buyer: {
+      id: number;
+      title: string;
+      url: string;
+    }[];
+    seller: {
+      id: number;
+      title: string;
+      url: string;
+    }[];
+  };
 }

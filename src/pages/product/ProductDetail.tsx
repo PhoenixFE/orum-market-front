@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IProduct, IUserStore } from '../../type';
+import { IProduct, IProductImage, IUserStore } from '../../type';
 import { api } from '../../api/api';
 import {
   Box,
@@ -149,7 +149,7 @@ export default function ProductDetail() {
   );
 }
 
-const ProductImageGallery = ({ images }: { images: string[] }) => {
+const ProductImageGallery = ({ images }: { images: IProductImage[] }) => {
   const [selectedImage, setSelectedImage] = useState(images[0]);
   const imageContainerStyle = {
     overflow: 'hidden',
@@ -173,7 +173,7 @@ const ProductImageGallery = ({ images }: { images: string[] }) => {
       }}
     >
       <ImageList sx={imageListStyle} cols={3} gap={9}>
-        {images.map((image: string, index: number) => (
+        {images.map((image) => (
           <ImageListItem key={image.id}>
             <img
               src={image.path}
@@ -307,7 +307,7 @@ const ProductDetailsCard: React.FC<IProductDetailsCard> = ({
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {generateQualityIcons(product.extra.sort)}
+            {generateQualityIcons(product.extra.sort || 0)}
           </Box>
           <Typography
             variant="body2"
@@ -315,35 +315,12 @@ const ProductDetailsCard: React.FC<IProductDetailsCard> = ({
             fontWeight={700}
             sx={{ ml: 1 }}
           >
-            {getQualityName(product.extra.sort)}
+            {getQualityName(product.extra.sort || 0)}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
             {` (하<중<상<최상)`}
           </Typography>
         </Stack>
-
-        {/* 수량 버튼 */}
-        {/* <Box my={2}>
-          <Typography variant="subtitle1">수량</Typography>
-          <OutlinedInput
-            id="outlined-adornment-quantity"
-            value={product.quantity}
-            startAdornment={
-              <InputAdornment position="start">
-                <IconButton>
-                  <RemoveIcon />
-                </IconButton>
-              </InputAdornment>
-            }
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton>
-                  <AddIcon />
-                </IconButton>
-              </InputAdornment>
-            }
-          />
-        </Box> */}
 
         {/* 구매 장바구니 북마크 버튼 */}
         <Stack spacing={2} direction="column" mt={5}>

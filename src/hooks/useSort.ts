@@ -6,6 +6,11 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
   const [currentSortOrder, setCurrentSortOrder] = useState(initialSortOrder);
 
   useEffect(() => {
+    if (!Array.isArray(products)) {
+      setSortedProducts([]);
+      return;
+    }
+
     let sorted = [...products];
     switch (currentSortOrder) {
       case '최신순':

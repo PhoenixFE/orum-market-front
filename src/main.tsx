@@ -14,15 +14,16 @@ import { BuyerHome } from './components/buyer/BuyerHome.tsx';
 import ProductCreate from './components/seller/ProductCreate.tsx';
 import ProductUpdate from './components/seller/ProductUpdate.tsx';
 import SellerInfo from './components/seller/SellerInfo.tsx';
-import SellerOrderList from './components/seller/SellerOrderList.tsx';
 import ProductManager from './components/seller/ProductManager.tsx';
+import SellerOrderManager from './components/seller/SellerOrderManager.tsx';
 import SignInPage from './pages/user/SignIn.tsx';
 import SignUpPage from './pages/user/SignUp.tsx';
-import { CategoryList } from './pages/product/CategoryList.tsx';
 import { SearchPage } from './pages/product/SearchPage.tsx';
 import CheckOut from './pages/user/CheckOut.tsx';
 import BuyerRecentlyView from './components/buyer/BuyerRecentlyView.tsx';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
+const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
     path: '/',
@@ -30,7 +31,6 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { index: true, path: '/', element: <Home /> },
-      { path: '/category/:category', element: <CategoryList /> },
       { path: '/product', element: <SearchPage /> },
       { path: '/product/:id', element: <ProductDetail /> },
       { path: '/cart', element: <MyCart /> },
@@ -59,8 +59,8 @@ const router = createBrowserRouter([
         element: <BuyerFavorite />,
       },
       {
-        path: '/user/:id/product-manager',
-        element: <ProductManager />,
+        path: '/user/:id/seller-order-manager',
+        element: <SellerOrderManager />,
       },
       {
         path: '/user/:id/product-create',
@@ -75,8 +75,8 @@ const router = createBrowserRouter([
         element: <SellerInfo />,
       },
       {
-        path: '/user/:id/seller-orderlist',
-        element: <SellerOrderList />,
+        path: '/user/:id/product-manager',
+        element: <ProductManager />,
       },
       {
         path: '/user/:id/recently-viewed-items',
@@ -87,5 +87,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <RouterProvider router={router} />,
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+  </QueryClientProvider>,
 );

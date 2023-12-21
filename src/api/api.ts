@@ -8,7 +8,7 @@ const REFRESH_URL = '/users/refresh';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 1000 * 5,
+  timeout: 1000 * 20,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -120,7 +120,11 @@ export const api = {
     axiosInstance.patch(`/users/${_id}`, userData),
 
   // 상품 목록 조회
-  getProductList: (query = '') => axiosInstance.get(`/products/?${query}`),
+  getProductList: (query: IProductListQuery = {}) => {
+    const queryString = new URLSearchParams(query as any).toString();
+    const response = axiosInstance.get(`/products/?${queryString}`);
+    return response;
+  },
 
   // 상품 카테고리 조회
   getProductListByCategory: (extraQuery: string) =>
@@ -168,14 +172,20 @@ export const api = {
     }),
 
   // 판매자 상품 목록 조회
-  getSellerProductInfo: (_id: number) =>
-    axiosInstance.get(`/seller/products/${_id}`),
+  getSellerProductInfo: () => axiosInstance.get(`/seller/products/`),
 
   // 상품 결제
   checkOut: (orderData: any) => axiosInstance.post('/orders/', orderData),
 
   // 구매자 구매 목록 조회
   getOrderProductInfo: () => axiosInstance.get('/orders/'),
+
+  //판매자 주문 목록 조회
+  getOrderState: () => axiosInstance.get('seller/orders/'),
+
+  //판매자 주문상태 관리
+  updateOrderState: (product_id: number) =>
+    axiosInstance.patch(`/seller/orders/${product_id}`, product_id),
 
   // 북마크 조회
   getBookmark: (product_id: number) =>
@@ -192,4 +202,12 @@ export const api = {
 
   // 내 북마크 목록 조회
   getMyBookMark: () => axiosInstance.get('/bookmarks/'),
+
+  // 구매자 구매 상세 조회
+  getOrderProductDetail: (order_id: number) =>
+    axiosInstance.get(`/orders/${order_id}`),
 };
+
+interface IProductListQuery {
+  page?: number;
+}

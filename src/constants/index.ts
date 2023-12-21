@@ -14,7 +14,7 @@ export const DASHBOARD_MENU = {
     },
     {
       id: 3,
-      title: '주문 내역',
+      title: '내 주문 내역',
       url: `/user/${_id}/buyer-orderlist`,
     },
     {
@@ -32,8 +32,8 @@ export const DASHBOARD_MENU = {
   seller: [
     {
       id: 1,
-      title: '판매자 대시보드',
-      url: `/user/${_id}/seller-orderlist`,
+      title: '판매 상품 관리',
+      url: `/user/${_id}/product-manager`,
     },
     {
       id: 2,
@@ -42,8 +42,8 @@ export const DASHBOARD_MENU = {
     },
     {
       id: 3,
-      title: '상품 관리',
-      url: `/user/${_id}/product-manager`,
+      title: '주문 관리',
+      url: `/user/${_id}/seller-order-manager`,
     },
   ],
 };

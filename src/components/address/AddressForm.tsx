@@ -10,9 +10,10 @@ export default function AddressForm({
 }) {
   return (
     <>
-      <Typography variant="h6" fontWeight={700} mb={3}>
+      <Typography variant="h5" fontWeight={700} marginBottom={1}>
         {title}
       </Typography>
+
       <form onSubmit={(e) => submit(e)}>
         <FormLabel>배송지명*</FormLabel>
         <TextField
@@ -23,7 +24,7 @@ export default function AddressForm({
           size="small"
           fullWidth
           required
-          sx={{ marginBottom: '1rem' }}
+          sx={{ marginBottom: '10px' }}
           onChange={func}
         />
         <FormLabel>수령인*</FormLabel>
@@ -35,7 +36,7 @@ export default function AddressForm({
           size="small"
           fullWidth
           required
-          sx={{ marginBottom: '1rem' }}
+          sx={{ marginBottom: '10px' }}
           onChange={func}
         />
         <FormLabel>연락처*</FormLabel>
@@ -47,7 +48,7 @@ export default function AddressForm({
           size="small"
           fullWidth
           required
-          sx={{ marginBottom: '1rem' }}
+          sx={{ marginBottom: '10px' }}
           onChange={func}
         />
         <FormLabel>배송 주소*</FormLabel>
@@ -59,7 +60,7 @@ export default function AddressForm({
           size="small"
           fullWidth
           required
-          sx={{ marginBottom: '0.4rem' }}
+          sx={{ marginBottom: '6px' }}
           onChange={func}
         />
         <TextField
@@ -70,10 +71,9 @@ export default function AddressForm({
           size="small"
           fullWidth
           required
-          sx={{ marginBottom: '1rem' }}
           onChange={func}
         />
-        <Box sx={{ display: 'flex', flexDirection: 'row' }} gap={3} my={3}>
+        <Box sx={{ display: 'flex', flexDirection: 'row' }} gap={1.2} my={1.6}>
           <Button type="submit" size="large" variant="contained" fullWidth>
             저장
           </Button>

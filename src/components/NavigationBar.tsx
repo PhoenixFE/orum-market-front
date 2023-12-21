@@ -15,7 +15,7 @@ import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import TuneIcon from '@mui/icons-material/Tune';
 import AppsRoundedIcon from '@mui/icons-material/AppsRounded';
 import { styled, useTheme } from '@mui/material/styles';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { SORT_OPTIONS } from '../constants';
 
 interface INavigationBar {
@@ -38,10 +38,9 @@ export default function NavigationBar({
   const theme = useTheme();
   const isMdDown = useMediaQuery(theme.breakpoints.down('md'));
 
-  const onSortChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    const newSortOrder = event.target.value as string;
-    setSelectedSortOrder(newSortOrder);
-    handleSort(newSortOrder);
+  const onSortChange = (sortValue: string) => {
+    setSelectedSortOrder(sortValue);
+    handleSort(sortValue);
   };
 
   const handleGridChange = (value: number) => {
@@ -63,7 +62,7 @@ export default function NavigationBar({
           <IconButton onClick={handleToggel}>
             <TuneIcon
               style={{
-                color: isSidebarOpen ? 'black' : 'lightgray',
+                color: isSidebarOpen ? 'inherit' : 'darkgray',
               }}
             />
           </IconButton>
@@ -80,7 +79,7 @@ export default function NavigationBar({
                 id="filter-select"
                 value={selectedSortOrder}
                 label="Filter"
-                onChange={onSortChange}
+                onChange={(event) => onSortChange(event.target.value as string)}
               >
                 {SORT_OPTIONS.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
@@ -97,7 +96,7 @@ export default function NavigationBar({
                 key={option.value}
                 value={option.value}
                 color="inherit"
-                onClick={onSortChange}
+                onClick={() => onSortChange(option.value)}
                 sx={{
                   fontWeight: isSortSelected(option.value) ? '700' : '300',
                 }}
@@ -108,7 +107,7 @@ export default function NavigationBar({
             <IconButton
               onClick={() => handleGridChange(4)}
               sx={{
-                color: itemsPerPage === 4 ? 'black' : 'lightgray',
+                color: itemsPerPage === 4 ? 'inherit' : 'darkgray',
               }}
             >
               <GridViewRoundedIcon />
@@ -116,7 +115,7 @@ export default function NavigationBar({
             <IconButton
               onClick={() => handleGridChange(8)}
               sx={{
-                color: itemsPerPage === 8 ? 'black' : 'lightgray',
+                color: itemsPerPage === 8 ? 'inherit' : 'darkgray',
               }}
             >
               <AppsRoundedIcon />
@@ -139,10 +138,10 @@ const StickyNavbar = styled(AppBar)(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
 }));
 
-const NavbarContent = styled(Toolbar)(({ theme }) => ({
+const NavbarContent = styled(Toolbar)({
   display: 'flex',
   justifyContent: 'space-between',
   padding: 0,
   margin: '0 auto',
   width: '100%',
-}));
+});
