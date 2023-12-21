@@ -28,7 +28,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { api } from '../../api/api';
 import { CATEGORY, QUALITY } from '../../constants/index';
-import { IProduct } from '../../type';
+import { IUpdateProduct } from '../../type';
 
 import {
   validateProductName,
@@ -64,14 +64,15 @@ const initCreateData = {
     sort: 1,
   },
 };
-
 export default function ProductCreate() {
   const userId = localStorage.getItem('_id');
 
   const [productData, setProductData] =
-    useState<Partial<IProduct>>(initCreateData);
+    useState<IUpdateProduct>(initCreateData);
   const [isValid, setIsValid] = useState(true);
-  const [filePreview, setFilePreview] = useState([]);
+  const [filePreview, setFilePreview] = useState<
+    { id: string; path: string }[]
+  >([]);
   const [italic, setItalic] = useState(false);
   const [fontWeight, setFontWeight] = useState('normal');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -86,7 +87,7 @@ export default function ProductCreate() {
   const [contentError, setContentError] = useState('');
 
   // 사진 클릭시 팝업
-  const handleClickOpen = (image) => {
+  const handleClickOpen = (image: any) => {
     setSelectedImage(image);
     setOpenDialog(true);
   };
@@ -140,13 +141,16 @@ export default function ProductCreate() {
   //뒤로가기
   const handleMoveBack = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
     if (window.confirm('작성한 내용이 저장되지 않습니다. 취소하시겠습니까?'))
       navigate(-1);
   };
 
   //카테고리 상태값 업데이트
-  const handleCategoryChange = (event, newCategory) => {
+  const handleCategoryChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newCategory: string | null,
+  ) => {
+    event.preventDefault();
     if (newCategory !== null) {
       setSelectedCategory(newCategory);
       setProductData({
@@ -160,9 +164,11 @@ export default function ProductCreate() {
   };
 
   //품질 상태값 업데이트
-  const handleQualityChange = (event, newQuality) => {
+  const handleQualityChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newQuality: string | number,
+  ) => {
     if (newQuality !== null) {
-      // Prevent deselecting all options
       setSelectedQuality(newQuality);
       setProductData({
         ...productData,
@@ -185,7 +191,7 @@ export default function ProductCreate() {
       const response = await api.createProduct(productData);
       setProductData(response.data.item);
       alert('판매 상품 등록이 완료되었습니다.');
-      navigate(`/user/${userId}/seller-orderlist`);
+      navigate(`/user/${userId}/product-manager`);
     } catch (error) {
       console.error('API Error:', error);
     }
@@ -244,7 +250,6 @@ export default function ProductCreate() {
     });
   };
 
-  console.log('preview', filePreview);
   console.log('data', productData);
 
   return (

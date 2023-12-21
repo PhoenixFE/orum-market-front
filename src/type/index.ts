@@ -1,3 +1,4 @@
+export type IUpdateProduct = Partial<IProduct>;
 export interface IProduct {
   _id: number;
   seller_id: number;
@@ -12,7 +13,7 @@ export interface IProduct {
   extra: {
     isNew?: boolean;
     isBest?: boolean;
-    category?: string[];
+    category: string[];
     sort?: number;
   };
   createdAt: string;
@@ -21,7 +22,7 @@ export interface IProduct {
 }
 
 export interface IProductImage {
-  id: string;
+  img_id: string;
   path: string;
 }
 
@@ -85,20 +86,25 @@ export interface IOrderItemDetail extends IOrderItem {
 
 interface IOrderProduct {
   _id: number;
-  quantity: number;
   seller_id: number;
+  state: string;
   name: string;
   image: {
     id: string;
     path: string;
   };
+  quantity: number;
   price: number;
-  extra: {
-    isNew: boolean;
-    isBest: boolean;
-    category: string[];
-    sort: number;
-  };
+  history: [
+    {
+      actor: number;
+      updated: {
+        state: string;
+        memo: string;
+      };
+      createdAt: string;
+    },
+  ];
 }
 
 export interface IUserInfo {

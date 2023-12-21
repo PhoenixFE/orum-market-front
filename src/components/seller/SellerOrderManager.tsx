@@ -8,58 +8,41 @@ import {
   Paper,
   Typography,
   Box,
-  Button,
   Select,
   MenuItem,
   InputLabel,
   FormControl,
+  Button,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { api } from '../../api/api';
-import { IProduct, IOrderItem } from '../../type';
-import { CATEGORY, QUALITY, ORDER_STATE } from '../../constants/index';
-import { Link } from 'react-router-dom';
+import { IOrderItem } from '../../type';
+import { QUALITY, ORDER_STATE } from '../../constants/index';
 import formatDate from '../../lib/formatDate';
-import { localURL } from '../../lib/localURL';
 
 export default function SellerOrderManager() {
-  const _id = localStorage.getItem('_id');
-  const [productList, setProductList] = useState<IProduct[]>([]);
-  const [sortedProductList, setSortedProductList] = useState<IProduct[]>([]);
+  const [sortedOrderList, setSortedOrderList] = useState<IOrderItem[]>([]);
   const [sortOrder, setSortOrder] = useState('최신순');
   const [orderList, setOrderList] = useState<IOrderItem[]>([]);
 
   useEffect(() => {
-    const fetchSellerProductData = async () => {
+    const getOrderState = async () => {
       try {
-        const response = await api.getProductList();
-        const getMatchItem = response.data.item.filter(
-          (id: IProduct) => id.seller_id === Number(_id),
-        );
-        setProductList(getMatchItem);
+        const response = await api.getOrderState();
+        const orderState = response.data.item;
+        setSortedOrderList(orderState);
+        setOrderList(orderState);
       } catch (error) {
-        console.log('상품 목록 조회에 실패했습니다', error);
+        console.log('판매자의 주문상태 조회 실패', error);
       }
     };
-    fetchSellerProductData();
-  }, []);
-
-  useEffect(() => {
-    const getOrderProductInfo = async () => {
-      try {
-        const response = await api.getOrderProductInfo();
-        setOrderList(response.data.item);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getOrderProductInfo();
+    getOrderState();
   }, []);
 
   // SORT 정렬
   useEffect(() => {
-    let sorted = [...productList];
+    let sorted = [...orderList];
     switch (sortOrder) {
       case '최신순':
         sorted.sort(
@@ -74,31 +57,71 @@ export default function SellerOrderManager() {
         );
         break;
       case '가-하':
-        sorted.sort((a, b) => a.price - b.price);
+        sorted.sort((a, b) => a.cost.total - b.cost.total);
         break;
       case '하-가':
-        sorted.sort((a, b) => b.price - a.price);
+        sorted.sort((a, b) => b.cost.total - a.cost.total);
         break;
       default:
         break;
     }
-    setSortedProductList(sorted);
-  }, [productList, sortOrder]);
+    setSortedOrderList(sorted);
+  }, [orderList, sortOrder]);
 
-  if (productList.length === 0) {
+  if (orderList.length === 0) {
     return (
       <>
         <Typography variant="h3" sx={{ marginBottom: '1rem' }}>
-          등록된 물품이 없습니다.
+          주문된 상품이 존재하지 않습니다.
         </Typography>
-        <Link to={`/user/${_id}/product-create`}>
-          <Button type="button" variant="contained" size="large">
-            물품 등록하러 가기
-          </Button>
-        </Link>
       </>
     );
   }
+
+  const getQualityName = (quantity: number) => {
+    const qualityItem = QUALITY.find((q) => q.value === quantity);
+    return qualityItem ? qualityItem.name : 'Unknown Quality';
+  };
+
+  const handleOrderStateChange = (
+    _id: number,
+    product_id: number,
+    selectedOrderState: string,
+  ) => {
+    const updatedOrderList: IOrderItem[] = orderList.map((order) => {
+      if (order.products.some((product) => product._id === product_id)) {
+        return {
+          ...order,
+          state: selectedOrderState,
+        };
+      }
+      return order;
+    });
+    setOrderList(updatedOrderList);
+    setSortedOrderList(updatedOrderList);
+  };
+
+  const updateOderState = async (_id: number, product_id: number) => {
+    try {
+      const selectedProduct = sortedOrderList.find(
+        (product) => product._id === _id,
+      );
+
+      if (selectedProduct) {
+        await api.updateOrderState(
+          _id,
+          selectedProduct.products[0]._id,
+          selectedProduct.state,
+        );
+
+        alert('해당 상품의 배송 상태가 수정되었습니다.');
+      } else {
+        console.log('상품을 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.log('상품 배송상태 수정 오류', error);
+    }
+  };
 
   return (
     <>
@@ -126,76 +149,101 @@ export default function SellerOrderManager() {
           </Select>
         </FormControl>
         <TableContainer component={Paper}>
-          <Table aria-label="구매내역">
+          <Table aria-label="판매내역">
             <TableHead>
               <TableRow>
                 <TableCell align="center">
                   등록일자
                   <br /> (등록번호)
                 </TableCell>
-                <TableCell align="center">카테고리</TableCell>
+
                 <TableCell align="center">이미지</TableCell>
                 <TableCell align="center">상품명</TableCell>
+                <TableCell align="center">품질</TableCell>
                 <TableCell align="center">가격</TableCell>
+                <TableCell align="center">배송료</TableCell>
                 <TableCell align="center">배송상태</TableCell>
-
+                <TableCell align="center"></TableCell>
                 <TableCell align="center"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {sortedProductList.map((rows) => (
-                <TableRow key={rows._id}>
-                  <TableCell align="center">
-                    <Typography variant="body2" color="text.secondary">
-                      {formatDate(rows.createdAt)}
-                    </Typography>
-                    ({rows._id})
-                  </TableCell>
-                  <TableCell align="center">
-                    {CATEGORY.depth2
-                      .filter(
-                        (category) =>
-                          category.dbCode === rows.extra.category[1],
-                      )
-                      .map((categoryName) => (
-                        <Typography key={categoryName.id} variant="body2">
-                          {categoryName.name}
-                        </Typography>
-                      ))}
-                  </TableCell>
-                  <TableCell align="center">
-                    <img
-                      src={`${rows.mainImages[0].path}`}
-                      alt={`${rows.mainImages[0].id}`}
-                      style={{
-                        width: '80px',
-                        height: '80px',
-                        objectFit: 'cover',
-                        borderRadius: '5px',
+              {sortedOrderList.map((orderItem) =>
+                orderItem.products.map((productItem) => (
+                  <TableRow key={orderItem._id}>
+                    <TableCell align="center">
+                      <Typography variant="body2" color="text.secondary">
+                        {formatDate(orderItem.createdAt)}
+                      </Typography>
+                      ({orderItem._id})
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <img
+                        key={productItem.image.id}
+                        src={productItem.image.path}
+                        alt={'File Preview'}
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          objectFit: 'cover',
+                          borderRadius: '5px',
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">{productItem.name}</TableCell>
+                    <TableCell align="center">
+                      {' '}
+                      {getQualityName(productItem.quantity)}
+                    </TableCell>
+                    <TableCell align="center">
+                      {productItem.price.toLocaleString()}원
+                    </TableCell>
+                    <TableCell align="center">
+                      {orderItem.cost.shippingFees.toLocaleString()}원
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Select
+                        label="주문 상태"
+                        value={productItem.state}
+                        onChange={(e) =>
+                          handleOrderStateChange(
+                            orderItem._id,
+                            productItem._id,
+                            e.target.value,
+                          )
+                        }
+                      >
+                        {ORDER_STATE.codes.map((state) => (
+                          <MenuItem key={state.code} value={state.code}>
+                            {state.value}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Button
+                        type="button"
+                        variant="contained"
+                        onClick={() =>
+                          updateOderState(orderItem._id, productItem._id)
+                        }
+                      >
+                        수정하기
+                      </Button>
+                    </TableCell>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 1,
                       }}
-                    />
-                  </TableCell>
-                  <TableCell align="center">
-                    <Link to={`/product/${rows._id}`}>{rows.name}</Link>
-                  </TableCell>
-                  <TableCell align="center">
-                    {rows.price.toLocaleString()}원
-                  </TableCell>
-                  <TableCell align="center">
-                    {ORDER_STATE.codes.find(
-                      (state) => state.code === orderList[0]?.state,
-                    )?.value || 'Unknown State'}
-                  </TableCell>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: 1,
-                    }}
-                  ></Box>
-                </TableRow>
-              ))}
+                    ></Box>
+                  </TableRow>
+                )),
+              )}
             </TableBody>
           </Table>
         </TableContainer>

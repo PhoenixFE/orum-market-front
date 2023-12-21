@@ -7,21 +7,25 @@ export const validatePassword = (password: string) => {
   return password.length >= 8;
 };
 
-export const validateProductName = (name: string) => {
-  return name.length >= 2;
+export const validateProductName = (name: string | undefined) => {
+  return name !== undefined && name.length >= 2;
 };
 
-export const validateProductContent = (content: string) => {
-  return content.length >= 10;
+export const validateProductContent = (content: string | undefined) => {
+  return content !== undefined && content.length >= 10;
 };
 
-export const validateProductPrice = (price: number | string): boolean => {
+export const validateProductPrice = (
+  price: number | string | undefined,
+): boolean => {
   const numricPrice = typeof price === 'string' ? parseFloat(price) : price;
   return Number.isInteger(numricPrice);
 };
 
-export const validateProductShippingFees = (shippingFees: number) => {
-  return shippingFees % 1 === 0;
+export const validateProductShippingFees = (
+  shippingFees: number | undefined,
+) => {
+  return shippingFees !== undefined && shippingFees % 1 === 0;
 };
 
 export const validateTel = (tel: string) => {

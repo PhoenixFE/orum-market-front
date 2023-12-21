@@ -1,6 +1,6 @@
 import axios from 'axios';
 import initCreateData from '../../src/components/seller/ProductCreate';
-import { IProduct } from '../type';
+import { IUpdateProduct } from '../type';
 import { useUserStore } from '../lib/store';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -157,7 +157,7 @@ export const api = {
     }),
 
   // 상품 수정
-  updateProduct: (_id: string, productData: IProduct) =>
+  updateProduct: (_id: string, productData: IUpdateProduct) =>
     axiosInstance.patch(`/seller/products/${_id}`, productData),
 
   // 상품 삭제
@@ -183,9 +183,11 @@ export const api = {
   //판매자 주문 목록 조회
   getOrderState: () => axiosInstance.get('seller/orders/'),
 
-  //판매자 주문상태 관리
-  updateOrderState: (product_id: number) =>
-    axiosInstance.patch(`/seller/orders/${product_id}`, product_id),
+  //판매자 주문상태 수정
+  updateOrderState: (_id: number, product_id: number, state: any) =>
+    axiosInstance.patch(`/seller/orders/${_id}/products/${product_id}`, {
+      state,
+    }),
 
   // 북마크 조회
   getBookmark: (product_id: number) =>

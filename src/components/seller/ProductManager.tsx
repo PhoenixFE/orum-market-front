@@ -11,11 +11,11 @@ import {
   Paper,
   Typography,
   Box,
-  Button,
   Select,
   MenuItem,
   InputLabel,
   FormControl,
+  Button,
   ToggleButton,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
@@ -53,9 +53,10 @@ export default function ProductManager() {
       try {
         const response = await api.getOrderState();
         const orderState = response.data.item;
+        // setProductList(orderState);
         setOrderList(orderState);
       } catch (error) {
-        console.log('주문상태오류', error);
+        console.log('판매자의 주문상태 조회 실패', error);
       }
     };
     getOrderState();
@@ -92,18 +93,13 @@ export default function ProductManager() {
     return (
       <>
         <Typography variant="h3" sx={{ marginBottom: '1rem' }}>
-          등록된 물품이 없습니다.
+          주문된 상품이 존재하지 않습니다.
         </Typography>
-        <Link to={`/user/${_id}/product-create`}>
-          <Button type="button" variant="contained" size="large">
-            물품 등록하러 가기
-          </Button>
-        </Link>
       </>
     );
   }
 
-  const getOrderStateLabel = (productId) => {
+  const getOrderStateLabel = (productId: number) => {
     const orderItem = orderList.find((order) =>
       order.products.some((product) => product._id === productId),
     );
@@ -146,7 +142,7 @@ export default function ProductManager() {
           </Select>
         </FormControl>
         <TableContainer component={Paper}>
-          <Table aria-label="구매내역">
+          <Table aria-label="판매내역">
             <TableHead>
               <TableRow>
                 <TableCell align="center">
