@@ -14,18 +14,26 @@ import { Close } from '@mui/icons-material';
 import deleteBookmark from '../../lib/deleteBookmark';
 import { api } from '../../api/api';
 import useAddToCart from '../../hooks/useAddToCart';
+import { IBookmarkItem, IProduct } from '../../type';
 
-export default function BookmarkListTable({ myBookmarkList }) {
+export default function BookmarkListTable({
+  myBookmarkList,
+}: {
+  myBookmarkList: IBookmarkItem[];
+}) {
   // 아이템 사이즈를 계산하는 함수
   const getItemSize = () => {
     return { xs: 12, sm: 6, md: 4, lg: 3, xl: 3 };
   };
 
-  const handleSearchProduct = async (productId) => {
+  // 장바구니 추가를 위한 상품 api 조회
+  const handleSearchProduct = async (productId: number) => {
     const response = await api.getProductList();
-    const product = response.data.item.find((item) => item._id === productId);
+    console.log('response', response);
+    const products: IProduct[] = response.data.item;
+    const product = products.find((item) => item._id === productId);
 
-    handleAddToCart(product);
+    product && handleAddToCart(product);
   };
 
   const handleAddToCart = useAddToCart();

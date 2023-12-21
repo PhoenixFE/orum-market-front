@@ -107,7 +107,7 @@ export default function BuyerInfo() {
     e.preventDefault();
 
     try {
-      const addressArray = Array.isArray(userInfo.extra.address)
+      const addressArray = Array.isArray(userInfo?.extra?.address)
         ? userInfo.extra.address
         : [];
 
@@ -115,7 +115,7 @@ export default function BuyerInfo() {
       const updateFormData = {
         ...userInfo,
         extra: {
-          ...userInfo.extra,
+          ...userInfo?.extra,
           address: [...addressArray, { id: uuid, ...addressData }],
         },
       };
@@ -136,14 +136,14 @@ export default function BuyerInfo() {
 
     if (confirmRemoveAddress) {
       try {
-        const addressArray = userInfo.extra.address.filter(
+        const addressArray = userInfo?.extra.address.filter(
           (list) => list.id !== addressId,
         );
 
         const updateFormData = {
           ...userInfo,
           extra: {
-            ...userInfo.extra,
+            ...userInfo?.extra,
             address: addressArray,
           },
         };
@@ -161,7 +161,7 @@ export default function BuyerInfo() {
   // Edit Address
   const handleEditAddress = (editAddressId) => {
     setIsEditAddress(true);
-    const selectAddress = userInfo.extra.address.find(
+    const selectAddress = userInfo?.extra.address.find(
       (item) => item.id === editAddressId,
     );
 

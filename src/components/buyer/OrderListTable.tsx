@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   TableContainer,
   TableHead,
@@ -14,10 +15,13 @@ import {
   CardContent,
   styled,
 } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { ChevronRight } from '@mui/icons-material';
 import formatDate from '../../lib/formatDate';
 import { ORDER_STATE } from '../../constants';
-import { ChevronRight } from '@mui/icons-material';
 import { IOrderItem } from '../../type';
+import RatingModal from './modal/ratingModal';
+import { api } from '../../api/api';
 
 export default function OrderListTable({
   orderList,
@@ -25,8 +29,17 @@ export default function OrderListTable({
   orderList: IOrderItem[];
 }) {
   const matches = useMediaQuery('(min-width:1200px)');
+  const id = localStorage.getItem('_id');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [ratingValue, setRatingValue] = useState(0);
+  const [replies, setReplies] = useState({
+    order_id: 0,
+    product_id: 0,
+    rating: 0,
+    content: '',
+  });
 
-  const orderState = (list: string) =>
+  const orderState = (list: string, order_id: number, product_id: number) =>
     ORDER_STATE.codes
       .filter((state) => state.code === list)
       .map((stateValue) => (
@@ -40,24 +53,69 @@ export default function OrderListTable({
           >
             {stateValue.value}
           </Typography>
-          <OrderReviewBox>
-            {stateValue.value === '배송 완료' ? (
-              <Button variant="outlined" size="small" fullWidth>
-                별점평가
-              </Button>
-            ) : (
-              ''
-            )}
-          </OrderReviewBox>
+
+          {stateValue.value === '배송 완료' ? (
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => handleModalOpen(product_id, order_id)}
+            >
+              별점후기
+            </Button>
+          ) : (
+            ''
+          )}
         </Box>
       ));
 
+  const handleMoveTo = () => {
+    window.scrollTo(0, 0);
+  };
+
+  const handleModalOpen = (product_id, order_id) => {
+    setIsModalOpen(true);
+    setReplies({
+      ...replies,
+      order_id: order_id,
+      product_id: product_id,
+    });
+  };
+
+  const handleCloseBtn = () => {
+    setIsModalOpen(false);
+    setRatingValue(0);
+  };
+
+  const submitRating = async () => {
+    try {
+      const updateReplies = {
+        ...replies,
+        rating: ratingValue,
+        content: 'done',
+      };
+
+      await api.addRating(updateReplies);
+      setIsModalOpen(false);
+      alert('후기가 등록되었습니다!');
+    } catch (error) {
+      console.log('후기 등록에 실패했습니다.', error);
+    }
+  };
+
   return (
     <>
+      <RatingModal
+        open={isModalOpen}
+        handleClose={() => handleCloseBtn()}
+        ratingValue={ratingValue}
+        setRatingValue={setRatingValue}
+        handleCloseBtn={handleCloseBtn}
+        submitRating={submitRating}
+      />
       {matches ? (
         <>
           <TableContainer>
-            <Table aria-label="결제내역">
+            <Table aria-label="구매내역">
               <TableHead>
                 <TableRow>
                   <TableHeaderCell align="center" sx={{ width: '160px' }}>
@@ -75,9 +133,9 @@ export default function OrderListTable({
                 </TableRow>
               </TableHead>
               {orderList.map((list) => (
-                <TableBody>
+                <TableBody key={list._id}>
                   {list.products.map((product) => (
-                    <TableRow>
+                    <TableRow key={product._id}>
                       <TableCell align="center" sx={{ minWidth: '80px' }}>
                         {formatDate(list.createdAt)} <br />
                         <Typography variant="caption">
@@ -93,17 +151,29 @@ export default function OrderListTable({
                           alt={product.name}
                         />
                       </TableCell>
-                      <TableCell align="left"> {product.name}</TableCell>
+                      <TableCell align="left">
+                        <Link
+                          to={`/product/${product._id}`}
+                          style={{ textDecoration: 'none', color: 'inherit' }}
+                        >
+                          {product.name}
+                        </Link>
+                      </TableCell>
                       <TableCell align="center">
                         {product.price.toLocaleString()}원
                       </TableCell>
                       <TableCell align="center">
-                        {orderState(list.state)}
+                        {orderState(list.state, list._id, product._id)}
                       </TableCell>
                       <TableCell align="center">
-                        <Button sx={{ padding: '0', margin: '0' }}>
-                          상세보기 <ChevronRight />
-                        </Button>
+                        <Link
+                          to={`/user/${id}/buyer-orderlist/${list._id}`}
+                          state={{ productId: list._id }}
+                        >
+                          <Button sx={{ padding: '0', margin: '0' }}>
+                            상세보기 <ChevronRight />
+                          </Button>
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -125,7 +195,9 @@ export default function OrderListTable({
                           &nbsp;상품금액 {list.cost.products.toLocaleString()} +
                           {list.cost.shippingFees === 0
                             ? ' 배송비 무료 ='
-                            : ` 배송비 ${list.cost.shippingFees.toLocaleString()} =`}
+                            : ` 배송비 ${list.cost.shippingFees.toLocaleString()}`}{' '}
+                          - 할인금액&nbsp;
+                          {list.cost.discount.products.toLocaleString()} ={' '}
                         </Typography>
                         <Typography variant="body2" fontWeight={700}>
                           &nbsp;{list.cost.total.toLocaleString()}원
@@ -140,6 +212,7 @@ export default function OrderListTable({
         </>
       ) : (
         <>
+          {/* 해상도 1200px 이하 */}
           {orderList.map((list) => (
             <Card
               sx={{ marginBottom: '20px', boxShadow: 'none' }}
@@ -149,16 +222,22 @@ export default function OrderListTable({
                 <Typography variant="body1" fontWeight={700}>
                   {formatDate(list.createdAt)}
                 </Typography>
-                <Button sx={{ padding: '0', margin: '0' }}>
-                  상세보기 <ChevronRight />
-                </Button>
+                <Link
+                  to={`/user/${id}/buyer-orderlist/${list._id}`}
+                  onClick={handleMoveTo}
+                  state={{ productId: list._id }}
+                >
+                  <Button sx={{ padding: '0', margin: '0' }}>
+                    상세보기 <ChevronRight />
+                  </Button>
+                </Link>
               </OrderListBox>
               {list.products.map((product) => (
                 <OrderProductList key={product._id}>
                   <CardMedia
                     component="img"
                     height="180"
-                    style={{ width: '200px', objectFit: 'cover' }}
+                    style={{ width: '180px', objectFit: 'cover' }}
                     image={product.image.path}
                     alt={product.name}
                     sx={{ padding: '15px' }}
@@ -173,20 +252,25 @@ export default function OrderListTable({
                       variant="subtitle2"
                       fontStyle={{ color: '#646464' }}
                     >
-                      주문번호: {product._id}
+                      주문번호: {list._id}
                     </Typography>
-                    <Typography
-                      variant="body1"
-                      fontWeight={700}
-                      textOverflow={'ellipsis'}
-                      marginTop={0.3}
+                    <Link
+                      to={`/product/${product._id}`}
+                      style={{ textDecoration: 'none', color: 'inherit' }}
                     >
-                      {product.name}
-                    </Typography>
+                      <Typography
+                        variant="body1"
+                        fontWeight={700}
+                        textOverflow={'ellipsis'}
+                        marginTop={0.3}
+                      >
+                        {product.name}
+                      </Typography>
+                    </Link>
                     <Typography variant="body1" marginTop={0.5}>
                       {product.price.toLocaleString()}원
                     </Typography>
-                    {orderState(list.state)}
+                    {orderState(list.state, list._id, product._id)}
                   </CardContent>
                 </OrderProductList>
               ))}
@@ -198,7 +282,8 @@ export default function OrderListTable({
                       상품금액 {list.cost.products.toLocaleString()} +
                       {list.cost.shippingFees === 0
                         ? ' 배송비 무료'
-                        : ` 배송비 ${list.cost.shippingFees.toLocaleString()}`}
+                        : ` 배송비 ${list.cost.shippingFees.toLocaleString()}`}{' '}
+                      - 할인금액 {list.cost.discount.products.toLocaleString()}
                     </Typography>
                   </Typography>
                   <Typography variant="body2" fontWeight={700}>
@@ -227,13 +312,6 @@ const OrderProductList = styled(Box)({
   alignItems: 'flex-start',
   justifyContent: 'flex-start',
   borderBottom: '1px solid #e2e2e2',
-});
-
-const OrderReviewBox = styled(Box)({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  paddingRight: '10px',
 });
 
 const TableHeaderCell = styled(TableCell)({

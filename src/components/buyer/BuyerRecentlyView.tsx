@@ -18,7 +18,10 @@ export default function BuyerRecentlyView() {
   };
 
   const recentlyViewedItems = localStorage?.getItem('recentlyViewed');
-  const viewItems = JSON.parse(recentlyViewedItems)?.state?.viewItems;
+  const viewItems =
+    recentlyViewedItems && JSON.parse(recentlyViewedItems)?.state?.viewItems;
+
+  console.log(viewItems);
 
   if (!viewItems || viewItems?.length === 0) {
     return (

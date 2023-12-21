@@ -22,6 +22,7 @@ import { SearchPage } from './pages/product/SearchPage.tsx';
 import CheckOut from './pages/user/CheckOut.tsx';
 import BuyerRecentlyView from './components/buyer/BuyerRecentlyView.tsx';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import BuyerOrderDetail from './components/buyer/BuyerOrderDetail.tsx';
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
@@ -81,6 +82,10 @@ const router = createBrowserRouter([
       {
         path: '/user/:id/recently-viewed-items',
         element: <BuyerRecentlyView />,
+      },
+      {
+        path: '/user/:id/buyer-orderlist/:id',
+        element: <BuyerOrderDetail />,
       },
     ],
   },

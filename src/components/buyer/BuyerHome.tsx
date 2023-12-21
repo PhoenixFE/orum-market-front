@@ -26,7 +26,7 @@ export const BuyerHome = () => {
 
   let emptyListMessage = '';
 
-  const emptyList = (listType) => {
+  const emptyList = (listType: string) => {
     if (listType === 'order') {
       emptyListMessage = '주문내역이 없습니다.';
     } else if (listType === 'favorite') {

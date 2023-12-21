@@ -206,6 +206,9 @@ export const api = {
   // 구매자 구매 상세 조회
   getOrderProductDetail: (order_id: number) =>
     axiosInstance.get(`/orders/${order_id}`),
+
+  // 후기 등록(별점)
+  addRating: (ratingData: any) => axiosInstance.post(`/replies`, ratingData),
 };
 
 interface IProductListQuery {
