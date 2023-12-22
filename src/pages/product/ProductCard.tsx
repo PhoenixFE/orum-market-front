@@ -48,15 +48,25 @@ export const ProductCard = memo(function ProductCard({
     <>
       <StyledCard>
         <CardActionArea component={Link} to={`/product/${product._id}`}>
-          <LazyLoadImage
-            src={product.mainImages[0].path}
-            effect="blur"
-            title={product.name}
-            alt={product.name}
-            width="100%"
-            height="200px"
-            style={{ objectFit: 'cover' }}
-          />
+          {product.mainImages.length > 0 && (
+            <LazyLoadImage
+              src={product.mainImages[0].path}
+              alt={product.name}
+              width="100%"
+              height="100%"
+              effect="blur"
+            />
+          )}
+
+          {product.mainImages.length === 0 && (
+            <LazyLoadImage
+              src="/assets/no-image.jpg"
+              alt={product.name}
+              width="100%"
+              height="100%"
+              effect="blur"
+            />
+          )}
           <ProductDetails>
             <Typography variant="h6">{product.name}</Typography>
             <Typography variant="h6" color="inherit" fontWeight={700}>
