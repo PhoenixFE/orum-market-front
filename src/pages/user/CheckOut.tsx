@@ -31,7 +31,7 @@ import {
 } from '../../type';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box } from '@mui/system';
-import DaumPost from '../../components/\bDaumPost';
+import DaumPost from '../../components/DaumPost';
 import AddressListDialog from '../../components/address/AddressListDialog';
 declare const IMP: any;
 
