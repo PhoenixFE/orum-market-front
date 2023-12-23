@@ -627,12 +627,12 @@ export default function CheckOut() {
                   }}
                 />
               )}
-              카카오페이 결제하기
+              카카오페이 결제
             </Button>
             <Button
               onClick={handlePurchase}
               variant="outlined"
-              color="inherit"
+              color="primary"
               style={{ height: '56px' }}
               disabled={!handlePurchaseEnabled()}
             >
@@ -640,7 +640,10 @@ export default function CheckOut() {
             </Button>
           </Box>
 
-          <Button onClick={() => setShowMoreItems(!showMoreItems)}>
+          <Button
+            onClick={() => setShowMoreItems(!showMoreItems)}
+            color="inherit"
+          >
             결제 수단 더보기
             {showMoreItems ? ' ▲' : ' ▼'}
           </Button>
@@ -660,7 +663,7 @@ export default function CheckOut() {
                 <Button
                   onClick={() => requestPayment(pg.id)}
                   variant="outlined"
-                  color="primary"
+                  color="inherit"
                   fullWidth
                   style={{ height: '56px' }}
                   disabled={!handlePurchaseEnabled()}
