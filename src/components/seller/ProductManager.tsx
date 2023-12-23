@@ -109,14 +109,6 @@ export default function ProductManager() {
     return '판매중';
   };
 
-  if (productList.length === 0 && !isLoading) {
-    return (
-      <Typography variant="h3" sx={{ marginBottom: '1rem' }}>
-        판매중인 상품이 존재하지 않습니다.
-      </Typography>
-    );
-  }
-
   return (
     <>
       <Link to={`/user/${_id}/product-create`}>
@@ -164,6 +156,12 @@ export default function ProductManager() {
               </TableRow>
             </TableHead>
             <TableBody>
+              {productList.length === 0 && !isLoading && (
+                <Typography variant="h5" sx={{ marginBottom: '1rem' }}>
+                  판매중인 상품이 존재하지 않습니다.
+                </Typography>
+              )}
+
               {isLoading ? (
                 <SkeletonTable rows={5} columns={7} />
               ) : (

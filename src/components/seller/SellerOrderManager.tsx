@@ -173,6 +173,11 @@ export default function SellerOrderManager() {
               </TableRow>
             </TableHead>
             <TableBody>
+              {orderList.length === 0 && !isLoading && (
+                <Typography variant="h5" sx={{ marginBottom: '1rem' }}>
+                  주문 건이 존재하지 않습니다. 분발하세요.
+                </Typography>
+              )}
               {isLoading && <SkeletonTable rows={5} columns={9} />}
               {sortedOrderList.map((orderItem) =>
                 orderItem.products.map((productItem) => (
