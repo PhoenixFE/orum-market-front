@@ -122,7 +122,7 @@ export interface IUserInfo {
         id: number;
         addressName: string;
         receiver: string;
-        tel: number;
+        tel: number | string;
         mainAddress: string;
         subAddress: string;
         name: string;
@@ -187,7 +187,7 @@ export interface IAddressData {
   id?: number;
   addressName?: string;
   receiver?: string;
-  tel?: number | string | null;
+  tel?: number | string;
   name?: string;
   mainAddress?: string;
   subAddress?: string;
