@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IProduct, IProductImage, IUserStore } from '../../type';
 import { api } from '../../api/api';
@@ -13,6 +13,7 @@ import {
   IconButton,
   ImageList,
   ImageListItem,
+  Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
@@ -150,7 +151,9 @@ export default function ProductDetail() {
 }
 
 const ProductImageGallery = ({ images }: { images: IProductImage[] }) => {
-  const [selectedImage, setSelectedImage] = useState(images[0].path);
+  const [selectedImage, setSelectedImage] = useState(
+    images && images[0] ? images[0].path : '',
+  );
   const imageContainerStyle = {
     overflow: 'hidden',
     position: 'relative',
@@ -164,6 +167,53 @@ const ProductImageGallery = ({ images }: { images: IProductImage[] }) => {
     height: '100%',
   };
 
+  interface OverlaySkeletonProps {
+    imageUrl?: string;
+  }
+
+  const OverlaySkeleton: React.FC<OverlaySkeletonProps> = ({ imageUrl }) => {
+    return (
+      <Box
+        sx={{
+          position: 'relative',
+          width: '100%',
+          paddingTop: '100%',
+          overflow: 'hidden',
+          height: 0,
+          margin: '10px 10px',
+        }}
+      >
+        <Skeleton
+          variant="rectangular"
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'gray',
+          }}
+        />
+
+        {imageUrl && (
+          <Box
+            component="img"
+            src={imageUrl}
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '80%',
+              height: 'auto',
+              opacity: 0.7,
+            }}
+          />
+        )}
+      </Box>
+    );
+  };
+
   return (
     <Box
       sx={{
@@ -173,42 +223,52 @@ const ProductImageGallery = ({ images }: { images: IProductImage[] }) => {
         alignItems: 'center',
       }}
     >
-      <Box sx={imageContainerStyle}>
-        <img
-          src={selectedImage}
-          alt="Selected-Image"
-          style={{
-            borderRadius: '5px',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
-        />
-      </Box>
-      <ImageList sx={imageListStyle} cols={3} gap={9}>
-        {images.map((image) => (
-          <ImageListItem key={image.id}>
+      {(!images || images.length === 0) && (
+        <>
+          <OverlaySkeleton imageUrl="../../assets/orum-favicon-orange.png" />
+        </>
+      )}
+
+      {images.length > 0 && (
+        <>
+          <Box sx={imageContainerStyle}>
             <img
-              src={image.path}
-              alt={`Product ${image.id}`}
-              loading="lazy"
-              onClick={() => setSelectedImage(image.path)}
+              src={selectedImage}
+              alt="Selected-Image"
               style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
                 width: '100%',
-                height: '200px',
+                height: '100%',
                 objectFit: 'cover',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                border: selectedImage === image.path ? '2px solid #EF5B2A' : '',
-                filter: selectedImage === image.path ? '' : 'brightness(0.5)',
               }}
             />
-          </ImageListItem>
-        ))}
-      </ImageList>
+          </Box>
+          <ImageList sx={imageListStyle} cols={3} gap={9}>
+            {images.map((image) => (
+              <ImageListItem key={image.id}>
+                <img
+                  src={image.path}
+                  alt={`Product ${image.id}`}
+                  loading="lazy"
+                  onClick={() => setSelectedImage(image.path)}
+                  style={{
+                    width: '100%',
+                    height: '200px',
+                    objectFit: 'cover',
+                    cursor: 'pointer',
+                    border:
+                      selectedImage === image.path ? '2px solid #EF5B2A' : '',
+                    filter:
+                      selectedImage === image.path ? '' : 'brightness(0.5)',
+                  }}
+                />
+              </ImageListItem>
+            ))}
+          </ImageList>
+        </>
+      )}
     </Box>
   );
 };
