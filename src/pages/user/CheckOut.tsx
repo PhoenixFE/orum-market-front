@@ -75,6 +75,7 @@ export default function CheckOut() {
   const [addressList, setAddressList] = useState([]);
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
   const [addAddressToBook, setAddAddressToBook] = useState(false);
+  const [showMoreItems, setShowMoreItems] = useState(false);
 
   const userId = localStorage.getItem('_id');
   const isCheckoutItemEmpty = checkoutItems.length === 0;
@@ -209,6 +210,14 @@ export default function CheckOut() {
     return agreedToTerms && agreedToPrivacy && !isCheckoutItemEmpty;
   };
 
+  const pgMembers = [
+    { id: 'kcp', name: 'kcp' },
+    { id: 'html5_inicis', name: 'KG 이니시스' },
+    { id: 'payco', name: 'payco' },
+    { id: 'tosspay', name: 'tosspay' },
+    { id: 'smilepay', name: 'smilepay' },
+    { id: 'danal_tpay', name: '다날' },
+  ];
   function requestPayment(pg: string) {
     let paymentData = {
       pg: 'kcp',
@@ -225,6 +234,26 @@ export default function CheckOut() {
 
     if (pg === 'kakao') {
       paymentData.pg = 'kakaopay';
+    }
+
+    if (pg === 'kcp') {
+      paymentData.pg = 'kcp';
+    }
+    if (pg === 'html5_inicis') {
+      paymentData.pg = 'html5_inicis';
+    }
+
+    if (pg === 'payco') {
+      paymentData.pg = 'payco.PARTNERTEST';
+    }
+    if (pg === 'tosspay') {
+      paymentData.pg = 'tosspay.tosstest';
+    }
+    if (pg === 'smilepay') {
+      paymentData.pg = 'smilepay.cnstest25m';
+    }
+    if (pg === 'danal_tpay') {
+      paymentData.pg = 'danal_tpay';
     }
 
     IMP.init('imp38488078');
@@ -453,7 +482,7 @@ export default function CheckOut() {
             주문 내역
           </Typography>
           {isCheckoutItemEmpty ? (
-            <Typography variant="h4">장바구니가 비어있습니다.</Typography>
+            <Typography variant="h4">주문할 상품이 없습니다.</Typography>
           ) : (
             <List sx={{ mb: 2 }}>
               {checkoutItems.map((item, index) => (
@@ -464,16 +493,30 @@ export default function CheckOut() {
                     borderBottom: '1px solid lightgray',
                   }}
                 >
-                  <img
-                    src={item.mainImages[0].path}
-                    alt={item.name}
-                    style={{
-                      width: '80px',
-                      height: '80px',
-                      marginRight: '20px',
-                      objectFit: 'cover',
-                    }}
-                  />
+                  {item.mainImages.length === 0 ? (
+                    <img
+                      src="/assets/no-image.jpg"
+                      alt={item.name}
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        marginRight: '20px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={item.mainImages[0]?.path}
+                      alt={item.name}
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        marginRight: '20px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  )}
+
                   <Box>
                     <Typography variant="h6">{item.name}</Typography>
 
@@ -543,8 +586,8 @@ export default function CheckOut() {
               justifyContent: 'end',
               alignItems: 'center',
             }}
-            mt={2}
             gap={1}
+            mt={4}
           >
             <Button
               onClick={() => requestPayment('kakao')}
@@ -557,6 +600,7 @@ export default function CheckOut() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                flex: '1',
                 backgroundColor: handlePurchaseEnabled()
                   ? '#f7e600'
                   : '#e0e0e0',
@@ -570,7 +614,7 @@ export default function CheckOut() {
                 <img
                   src="/assets/kakaopay.png"
                   alt="카카오페이"
-                  style={{ marginRight: '10px', height: '24px' }}
+                  style={{ height: '24px' }}
                 />
               ) : (
                 <img
@@ -584,26 +628,7 @@ export default function CheckOut() {
                 />
               )}
               카카오페이 결제하기
-            </Button>{' '}
-            <Button
-              onClick={() => requestPayment('kcp')}
-              variant="outlined"
-              color="primary"
-              style={{ height: '56px' }}
-              disabled={!handlePurchaseEnabled()}
-            >
-              일반카드 결제하기
-            </Button>{' '}
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'end',
-              alignItems: 'center',
-            }}
-            mt={2}
-            gap={1}
-          >
+            </Button>
             <Button
               onClick={handlePurchase}
               variant="outlined"
@@ -611,9 +636,40 @@ export default function CheckOut() {
               style={{ height: '56px' }}
               disabled={!handlePurchaseEnabled()}
             >
-              테스트 결제
+              멋사가 결제
             </Button>
           </Box>
+
+          <Button onClick={() => setShowMoreItems(!showMoreItems)}>
+            결제 수단 더보기
+            {showMoreItems ? ' ▲' : ' ▼'}
+          </Button>
+
+          {showMoreItems && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'end',
+                alignItems: 'center',
+                mt: 2,
+              }}
+              gap={1}
+            >
+              {pgMembers.map((pg) => (
+                <Button
+                  onClick={() => requestPayment(pg.id)}
+                  variant="outlined"
+                  color="primary"
+                  fullWidth
+                  style={{ height: '56px' }}
+                  disabled={!handlePurchaseEnabled()}
+                >
+                  {pg.name} 결제
+                </Button>
+              ))}
+            </Box>
+          )}
         </Grid>
       </Grid>
     </Container>
@@ -622,11 +678,16 @@ export default function CheckOut() {
 
 const CustomTab = styled(Tab)({
   '&.MuiTab-root': {
-    backgroundColor: '#eee', // 탭의 기본 배경색을 옅은 회색으로 설정
+    color: '#777',
+    backgroundColor: '#ccc',
+    fontWeight: '300',
+    fontSize: '0.9rem',
   },
   '&.Mui-selected': {
     border: '1px solid #000',
     backgroundColor: '#fff',
+    fontWeight: '800',
+    fontSize: '1rem',
   },
   marginBottom: '20px',
 });
