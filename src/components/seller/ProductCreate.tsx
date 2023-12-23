@@ -71,10 +71,8 @@ export default function ProductCreate() {
   const [priceError, setPriceError] = useState('');
   const [shippingFeesError, setShippingFeesError] = useState('');
   const [contentError, setContentError] = useState('');
-  const [productFiles, setProductFiles] = useState<FilePreview[]>([]);
 
   const handleFilesChange = (files: FilePreview[]) => {
-    setProductFiles(files);
     setProductData((prevData) => ({
       ...prevData,
       mainImages: [...prevData.mainImages, ...files],
