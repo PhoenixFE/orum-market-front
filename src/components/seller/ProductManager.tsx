@@ -177,16 +177,30 @@ export default function ProductManager() {
                     </TableCell>
 
                     <TableCell align="center">
-                      <img
-                        src={`${rows.mainImages[0].path}`}
-                        alt={`${rows.mainImages[0].id}`}
-                        style={{
-                          width: '80px',
-                          height: '80px',
-                          objectFit: 'cover',
-                          borderRadius: '5px',
-                        }}
-                      />
+                      {rows.mainImages.length === 0 && (
+                        <img
+                          src="../../assets/no-image.jpg"
+                          alt="no image"
+                          style={{
+                            width: '80px',
+                            height: '80px',
+                            objectFit: 'cover',
+                            borderRadius: '5px',
+                          }}
+                        />
+                      )}
+                      {rows.mainImages.length > 1 && (
+                        <img
+                          src={`${rows.mainImages[0].path}`}
+                          alt={`${rows.mainImages[0].id}`}
+                          style={{
+                            width: '80px',
+                            height: '80px',
+                            objectFit: 'cover',
+                            borderRadius: '5px',
+                          }}
+                        />
+                      )}
                     </TableCell>
                     <TableCell align="center">
                       <Link to={`/product/${rows._id}`}>{rows.name}</Link>
