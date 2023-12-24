@@ -19,6 +19,7 @@ import {
   Typography,
   useTheme,
   styled,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Notifications as NotificationsIcon,
@@ -46,6 +47,7 @@ export default function Header() {
   const { items: cartItems } = useCart();
   const cartItemsCount = cartItems.length;
   const _id = localStorage.getItem('_id');
+  const matchesXS = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -91,25 +93,29 @@ export default function Header() {
             <Avatar alt="User Avatar" src="/path/to/your/avatar.jpg" />
           </IconButton>
         </CustomTooltip>
-        <CustomTooltip title="알림">
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-        </CustomTooltip>
-        <Link to="/cart" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <CustomTooltip title="장바구니">
-            <Button color="inherit">
-              <Badge badgeContent={cartItemsCount} color="error">
-                <ShoppingCartIcon />
+        {!matchesXS && (
+          <CustomTooltip title="알림">
+            <IconButton color="inherit">
+              <Badge badgeContent={4} color="error">
+                <NotificationsIcon />
               </Badge>
-              <Typography variant="body1" sx={{ marginLeft: '0.5rem' }}>
-                장바구니
-              </Typography>
-            </Button>
+            </IconButton>
           </CustomTooltip>
-        </Link>
+        )}
+        {!matchesXS && (
+          <Link to="/cart" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <CustomTooltip title="장바구니">
+              <Button color="inherit">
+                <Badge badgeContent={cartItemsCount} color="error">
+                  <ShoppingCartIcon />
+                </Badge>
+                <Typography variant="body1" sx={{ marginLeft: '0.5rem' }}>
+                  장바구니
+                </Typography>
+              </Button>
+            </CustomTooltip>
+          </Link>
+        )}
 
         <Menu
           id="menu-appbar"

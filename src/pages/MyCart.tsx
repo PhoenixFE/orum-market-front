@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import CustomTooltip from '../components/CustomTooltip';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 
 export default function MyCart() {
   const { items, removeFromCart, clearCart } = useCartStore() as {
@@ -36,6 +37,8 @@ export default function MyCart() {
     (total, item) => total + item.price * item.quantity,
     0,
   );
+
+  useScrollToTop();
 
   return (
     <Container sx={{ marginY: '50px' }}>
