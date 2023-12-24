@@ -32,8 +32,8 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { index: true, path: '/', element: <Home /> },
-      { path: '/product', element: <SearchPage /> },
-      { path: '/product/:id', element: <ProductDetail /> },
+      { path: '/products', element: <SearchPage /> },
+      { path: '/products/:productId', element: <ProductDetail /> },
       { path: '/cart', element: <MyCart /> },
       { path: '/checkout', element: <CheckOut /> },
       { path: '/search', element: <SearchPage /> },

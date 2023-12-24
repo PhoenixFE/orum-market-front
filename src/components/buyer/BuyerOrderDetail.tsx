@@ -211,14 +211,7 @@ export default function OrderListTable() {
                     />
                   </TableCell>
 
-                  <TableCell align="left">
-                    <Link
-                      to={`/product/${list._id}`}
-                      style={{ textDecoration: 'none', color: 'inherit' }}
-                    >
-                      {list.name}
-                    </Link>
-                  </TableCell>
+                  <TableCell align="left">{list.name}</TableCell>
                   <TableCell align="center">
                     {list.price.toLocaleString()}원
                   </TableCell>
@@ -248,19 +241,14 @@ export default function OrderListTable() {
                       margin: '0',
                     }}
                   >
-                    <Link
-                      to={`/product/${list._id}`}
-                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    <Typography
+                      variant="body1"
+                      fontWeight={700}
+                      textOverflow={'ellipsis'}
+                      marginTop={0.3}
                     >
-                      <Typography
-                        variant="body1"
-                        fontWeight={700}
-                        textOverflow={'ellipsis'}
-                        marginTop={0.3}
-                      >
-                        {list.name}
-                      </Typography>
-                    </Link>
+                      {list.name}
+                    </Typography>
                     <Typography variant="body1" marginTop={0.5}>
                       {list.price.toLocaleString()}원
                     </Typography>

@@ -29,7 +29,7 @@ import { QUALITY } from '../../constants';
 import CustomTooltip from '../../components/CustomTooltip';
 
 export default function ProductDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { productId } = useParams<{ productId: string }>();
   const userId = localStorage.getItem('_id');
   const [bookmarkId, setBookmarkId] = useState<string | null>(null);
   const [product, setProduct] = useState<IProduct | null>(null);
@@ -42,9 +42,9 @@ export default function ProductDetail() {
   };
 
   const fetchProduct = async () => {
-    if (id) {
+    if (productId) {
       try {
-        const response = await api.getProduct(Number(id));
+        const response = await api.getProduct(Number(productId));
         setProduct(response.data.item);
       } catch (error) {
         console.error('API Error:', error);
@@ -55,14 +55,14 @@ export default function ProductDetail() {
   };
 
   const checkBookmark = async () => {
-    if (!id || !isLoggedIn) {
+    if (!productId || !isLoggedIn) {
       setIsBookmarked(false);
       return;
     }
 
     try {
-      console.log('Bookmark ID:', id);
-      const response = await api.getBookmark(Number(id));
+      console.log('Bookmark ID:', productId);
+      const response = await api.getBookmark(Number(productId));
       if (response.data.ok === 1) {
         setIsBookmarked(true);
         setBookmarkId(response.data.item._id);
@@ -96,7 +96,10 @@ export default function ProductDetail() {
       }
     } else {
       try {
-        const response = await api.addBookmark(Number(id), Number(userId));
+        const response = await api.addBookmark(
+          Number(productId),
+          Number(userId),
+        );
         setIsBookmarked(true);
         alert('북마크가 추가되었습니다.');
         setBookmarkId(response.data.item._id);
@@ -111,7 +114,7 @@ export default function ProductDetail() {
     if (isLoggedIn) {
       checkBookmark();
     }
-  }, [id, isLoggedIn]);
+  }, [productId, isLoggedIn]);
 
   if (!product) {
     return <Typography>상품이 없습니다.</Typography>;

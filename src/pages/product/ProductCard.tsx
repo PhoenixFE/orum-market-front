@@ -48,7 +48,7 @@ export const ProductCard = memo(function ProductCard({
   return (
     <>
       <StyledCard>
-        <CardActionArea component={Link} to={`/product/${product._id}`}>
+        <CardActionArea component={Link} to={`/products/${product._id}`}>
           {product.mainImages.length > 0 && (
             <LazyLoadImage
               src={product.mainImages[0].path}

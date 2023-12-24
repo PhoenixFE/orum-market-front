@@ -99,7 +99,7 @@ export default function MyCart() {
                     )}
                     <ListItemText>
                       <Link
-                        to={`/product/${item._id}`}
+                        to={`/products/${item._id}`}
                         style={{
                           textDecoration: 'none',
                           color: 'inherit',
