@@ -41,7 +41,7 @@ export interface ICartItem {
   _id: number;
   name: string;
   price: number;
-  shippingFees?: number;
+  shippingFees: number;
   quantity: number;
   mainImages: {
     id: string;

@@ -33,11 +33,16 @@ export default function MyCart() {
     maximumFractionDigits: 0,
   });
 
-  const totalCost = items.reduce(
-    (total, item) => total + item.price * item.quantity,
+  const sumShippingfees = items.reduce(
+    (sum, item) => sum + item.shippingFees,
     0,
   );
-
+  const sumPrice = items.reduce((sum, item) => sum + item.price, 0);
+  const totalCost = sumShippingfees + sumPrice;
+  // const totalCost = items.reduce(
+  //   (total, item) => total + item.price + item.shippingFees * item.quantity,
+  //   0,
+  // );
   useScrollToTop();
 
   return (
@@ -47,12 +52,11 @@ export default function MyCart() {
       </Typography>
       <Typography variant="body1">
         {items.length === 0 && <p>장바구니가 비었습니다.</p>}
-        {items.length > 0 && (
-          <p>장바구니에 {items.length} 개의 아이템이 있습니다.</p>
-        )}
+        {items.length > 0 &&
+          `장바구니에 ${items.length}개의 아이템이 있습니다.`}
       </Typography>
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={12} sx={{ padding: '2rem' }}>
+      <Grid container rowGap={10} m={0}>
+        <Grid item xs={12} md={12} sx={{ margin: 0 }}>
           {items.length > 0 && (
             <Box>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -70,62 +74,92 @@ export default function MyCart() {
               <Divider />
               <List>
                 {items.map((item: ICartItem) => (
-                  <ListItem key={item._id} divider>
+                  <ListItem key={item._id} divider sx={{ margin: 0 }}>
                     {item.mainImages.length === 0 ? (
                       <img
                         src="/assets/no-image.jpg"
                         alt={item.name}
-                        style={{ width: '100px', marginRight: '20px' }}
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          marginRight: '20px',
+                          objectFit: 'cover',
+                        }}
                       />
                     ) : (
                       <img
                         src={item.mainImages[0]?.path}
                         alt={item.name}
-                        style={{ width: '100px', marginRight: '20px' }}
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          marginRight: '20px',
+                          objectFit: 'cover',
+                        }}
                       />
                     )}
                     <ListItemText>
                       <Link
                         to={`/product/${item._id}`}
-                        style={{ textDecoration: 'none', color: 'inherit' }}
+                        style={{
+                          textDecoration: 'none',
+                          color: 'inherit',
+                        }}
                       >
                         <CustomTooltip title="해당 상품 페이지로 이동">
                           <Button
                             variant="text"
                             color="inherit"
-                            sx={{ fontSize: '1.2rem', fontWeight: '700' }}
+                            sx={{
+                              fontSize: '1.2rem',
+                              fontWeight: '700',
+                              margin: '0',
+                              padding: '0',
+                            }}
                           >
                             {item.name}
                           </Button>
                         </CustomTooltip>
                       </Link>
-                    </ListItemText>
-                    <ListItemSecondaryAction
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
                       <Typography
                         variant="body1"
                         style={{ minWidth: '60px', fontWeight: '700' }}
-                        textAlign={'right'}
+                        textAlign={'left'}
                       >
                         {currencyFormatter.format(item.price)}
                       </Typography>
-                      <CustomTooltip title="해당 상품만 장바구니에서 삭제">
-                        <IconButton onClick={() => removeFromCart(item._id)}>
-                          <Button
-                            type="button"
-                            variant="text"
-                            sx={{
-                              color: '#000',
-                            }}
+                      {item.shippingFees != undefined &&
+                        item.shippingFees === 0 && (
+                          <Typography variant="body2">무료배송</Typography>
+                        )}
+                      {item.shippingFees != undefined &&
+                        item.shippingFees > 0 && (
+                          <Typography
+                            variant="body1"
+                            style={{ minWidth: '60px' }}
+                            textAlign={'left'}
                           >
-                            <ClearIcon />
-                            삭제
-                          </Button>
-                        </IconButton>
+                            배송비 {currencyFormatter.format(item.shippingFees)}
+                          </Typography>
+                        )}
+                    </ListItemText>
+                    <ListItemSecondaryAction
+                      sx={{
+                        right: '0px',
+                      }}
+                    >
+                      <CustomTooltip title="해당 상품만 장바구니에서 삭제">
+                        <Button
+                          type="button"
+                          variant="text"
+                          sx={{
+                            color: 'inherit',
+                          }}
+                          onClick={() => removeFromCart(item._id)}
+                        >
+                          <ClearIcon sx={{ fontSize: '0.9rem' }} />
+                          삭제
+                        </Button>
                       </CustomTooltip>
                     </ListItemSecondaryAction>
                   </ListItem>
@@ -137,11 +171,26 @@ export default function MyCart() {
                   mb: 2,
                   display: 'flex',
                   justifyContent: 'space-between',
+                  alignItems: 'center',
                 }}
               >
-                <Typography variant="h6" sx={{ my: 2, fontWeight: '800' }}>
-                  총 금액: {currencyFormatter.format(totalCost)}
-                </Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <Typography variant="subtitle2" sx={{ marginTop: 1 }}>
+                    상품금액 {currencyFormatter.format(sumPrice)} + 배송료{' '}
+                    {currencyFormatter.format(sumShippingfees)}
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{ marginBottom: 0.5, fontWeight: '800' }}
+                  >
+                    총 금액: {currencyFormatter.format(totalCost)}
+                  </Typography>
+                </Box>
                 <Box sx={{ display: 'flex' }} gap={2}>
                   <CustomTooltip title="결제 페이지로 이동합니다">
                     <Button
