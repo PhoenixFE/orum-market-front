@@ -28,6 +28,7 @@ import { Box } from '@mui/system';
 import AddressListDialog from '../../components/address/AddressListDialog';
 import NewAddressInput from '../../components/address/NewAddressForm';
 import CustomTooltip from '../../components/CustomTooltip';
+import { useScrollToTop } from '../../hooks/useScrollToTop';
 declare const IMP: any;
 type TelPartsType = {
   telPart1: string;
@@ -84,6 +85,8 @@ export default function CheckOut() {
 
   const userId = localStorage.getItem('_id');
   const isCheckoutItemEmpty = checkoutItems.length === 0;
+
+  useScrollToTop();
 
   useEffect(() => {
     const singleProduct = location.state?.product;

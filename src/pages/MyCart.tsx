@@ -23,8 +23,7 @@ export default function MyCart() {
     removeFromCart: (id: number) => void;
     clearCart: () => void;
   };
-
-  console.log('장바구니 아이템', items);
+  useScrollToTop();
 
   const currencyFormatter = new Intl.NumberFormat('ko-KR', {
     style: 'currency',
@@ -42,18 +41,28 @@ export default function MyCart() {
   //   (total, item) => total + item.price + item.shippingFees * item.quantity,
   //   0,
   // );
-  useScrollToTop();
 
   return (
     <Container sx={{ marginY: '50px' }}>
       <Typography variant="h4" fontWeight={700} mb={5}>
         장바구니
       </Typography>
-      <Typography variant="body1">
-        {items.length === 0 && <p>장바구니가 비었습니다.</p>}
-        {items.length > 0 &&
-          `장바구니에 ${items.length}개의 아이템이 있습니다.`}
-      </Typography>
+
+      {items.length === 0 && (
+        <Box sx={{ display: 'flex', flexDirection: 'column' }} gap={2}>
+          장바구니가 비었습니다.
+          <Link to="/products" style={{ textDecoration: 'none' }}>
+            <Button variant="outlined" color="primary">
+              쇼핑하러 이동하기
+            </Button>
+          </Link>
+        </Box>
+      )}
+      {items.length > 0 && (
+        <Typography variant="body1">
+          장바구니에 {items.length}개의 아이템이 있습니다.
+        </Typography>
+      )}
       <Grid container rowGap={10} m={0}>
         <Grid item xs={12} md={12} sx={{ margin: 0 }}>
           {items.length > 0 && (

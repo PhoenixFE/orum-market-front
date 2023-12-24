@@ -7,7 +7,6 @@ import {
   IconButton,
   useMediaQuery,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
 } from '@mui/material';
@@ -74,13 +73,12 @@ export default function NavigationBar({
 
         {isMdDown ? (
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <InputLabel id="filter-select-label">정렬</InputLabel>
+            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
               <Select
                 labelId="filter-select-label"
                 id="filter-select"
                 value={selectedSortOrder}
-                label="Filter"
+                sx={{ fontSize: '0.9rem', borderRadius: 0 }}
                 onChange={(event) => onSortChange(event.target.value as string)}
               >
                 {SORT_OPTIONS.map((option) => (

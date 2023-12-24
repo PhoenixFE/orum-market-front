@@ -184,6 +184,7 @@ export default function Header() {
           boxShadow: 'none',
           borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
           zIndex: theme.zIndex.drawer + 2,
+          height: '64px',
         }}
       >
         <ToolbarStyled>

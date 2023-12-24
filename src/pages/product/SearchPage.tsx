@@ -22,6 +22,7 @@ import {
 } from '../../constants';
 import { useFetchProducts } from '../../hooks/useFetchProducts';
 import { ProductGrid } from '../../components/search/ProductGrid';
+import { useScrollToTop } from '../../hooks/useScrollToTop';
 
 export function SearchPage() {
   const { searchResult, setSearchResult } = useSearchStore();
@@ -35,6 +36,7 @@ export function SearchPage() {
   const [selectedPrice, setSelectedPrice] = useState('전체');
   const [selectedShippingFee, setSelectedShippingFee] = useState('전체');
   const [isDataFetched, setIsDataFetched] = useState(false);
+  useScrollToTop();
 
   const { addRecentViewProduct } = useRecentViewProductStore() as {
     addRecentViewProduct: Function;

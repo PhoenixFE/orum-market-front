@@ -27,6 +27,7 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 
 import { QUALITY } from '../../constants';
 import CustomTooltip from '../../components/CustomTooltip';
+import { useScrollToTop } from '../../hooks/useScrollToTop';
 
 export default function ProductDetail() {
   const { productId } = useParams<{ productId: string }>();
@@ -35,6 +36,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<IProduct | null>(null);
   const { isLoggedIn } = useUserStore() as IUserStore;
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  useScrollToTop();
 
   const getQualityName = (value: string | number) => {
     const quality = QUALITY.find((quality) => quality.value === value);
@@ -157,6 +159,7 @@ const ProductImageGallery = ({ images }: { images: IProductImage[] }) => {
   const [selectedImage, setSelectedImage] = useState(
     images && images[0] ? images[0].path : '',
   );
+
   const imageContainerStyle = {
     overflow: 'hidden',
     position: 'relative',
@@ -249,8 +252,8 @@ const ProductImageGallery = ({ images }: { images: IProductImage[] }) => {
             />
           </Box>
           <ImageList sx={imageListStyle} cols={3} gap={9}>
-            {images.map((image) => (
-              <ImageListItem key={image.id}>
+            {images.map((image, index) => (
+              <ImageListItem key={index}>
                 <img
                   src={image.path}
                   alt={`Product ${image.id}`}
