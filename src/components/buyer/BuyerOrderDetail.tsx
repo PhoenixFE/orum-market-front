@@ -89,10 +89,6 @@ export default function OrderListTable() {
               <TableCell>{orderDetail?.createdAt}</TableCell>
             </TableRow>
             <TableRow>
-              <BasicHeadCell>주문자</BasicHeadCell>
-              <TableCell>{orderDetail?.value?.name}</TableCell>
-            </TableRow>
-            <TableRow>
               <BasicHeadCell>주문상태</BasicHeadCell>
               <TableCell>{orderState(orderDetail?.state || '')}</TableCell>
             </TableRow>
@@ -135,7 +131,9 @@ export default function OrderListTable() {
             <TableRow>
               <BasicHeadCell>배송비</BasicHeadCell>
               <TableCell>
-                {orderDetail?.cost?.shippingFees?.toLocaleString()}원
+                {orderDetail?.cost?.shippingFees?.toLocaleString()}원 (할인금액:
+                &nbsp;
+                {orderDetail?.cost?.discount.shippingFees.toLocaleString()}원)
               </TableCell>
             </TableRow>
           </TableBody>
@@ -160,11 +158,14 @@ export default function OrderListTable() {
           <TableBody>
             <TableRow>
               <BasicHeadCell>수령인</BasicHeadCell>
-              <TableCell>{orderDetail?.value?.name}</TableCell>
+              <TableCell>{orderDetail?.value?.receiver}</TableCell>
             </TableRow>
             <TableRow>
               <BasicHeadCell>배송주소</BasicHeadCell>
-              <TableCell>{orderDetail?.value?.value}</TableCell>
+              <TableCell>
+                {orderDetail?.value?.mainAddress} +
+                {orderDetail?.value?.subAddress}
+              </TableCell>
             </TableRow>
           </TableBody>
         </BasicTable>
@@ -257,7 +258,6 @@ export default function OrderListTable() {
                 </OrderProductList>
               ))}
             </Card>
-            {/* ))} */}
           </>
         )}
       </TableContainer>

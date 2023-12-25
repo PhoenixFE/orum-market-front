@@ -83,8 +83,9 @@ export interface IOrderItem {
 
 export interface IOrderItemDetail extends IOrderItem {
   value: {
-    name: string;
-    value: string;
+    receiver: string;
+    mainAddress?: string;
+    subAddress?: string;
   };
 }
 
