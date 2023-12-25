@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 // import formatDate from '../../lib/formatDate';
 import { ORDER_STATE } from '../../constants';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { api } from '../../api/api';
 import { IOrderItemDetail } from '../../type';
