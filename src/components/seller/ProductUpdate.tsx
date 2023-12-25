@@ -55,6 +55,10 @@ interface FilePreview {
   id: string;
   path: string;
 }
+type ImageListType = {
+  dataURL?: string;
+  file?: File;
+}[];
 
 export default function ProductUpdate() {
   const [productData, setProductData] = useState<IProduct>(initCreateData);
@@ -67,6 +71,7 @@ export default function ProductUpdate() {
   const [existingImages, setExistingImages] = useState<FilePreview[]>([]);
   const { productId } = useParams();
   const navigate = useNavigate();
+  const [images, setImages] = useState<ImageListType>([]);
 
   const [nameError, setNameError] = useState('');
   const [priceError, setPriceError] = useState('');
@@ -80,6 +85,7 @@ export default function ProductUpdate() {
         (img) => !files.some((file) => file.id === img.id),
       ),
     }));
+    console.log('11productData', productData);
   }, []);
 
   useEffect(() => {
@@ -88,8 +94,9 @@ export default function ProductUpdate() {
         if (productId !== undefined) {
           const response = await api.getProduct(Number(productId));
           const fetchedProductData = response.data.item;
+          console.log('fetchedProductData', fetchedProductData);
           const images = fetchedProductData.mainImages.map(
-            (image: { id: number; path: string }) => ({
+            (image: { id: string; path: string }) => ({
               id: image.id,
               path: image.path,
             }),
@@ -108,7 +115,9 @@ export default function ProductUpdate() {
           ) {
             setExistingImages(images);
             setProductData(fetchedProductData);
+            console.log('fetchedProductData2', fetchedProductData);
             handleFilesChange(images);
+            console.log('images', images);
           }
         }
       } catch (error) {
@@ -441,6 +450,8 @@ export default function ProductUpdate() {
                 onFilesChange={(files: FilePreview[]) =>
                   handleFilesChange(files)
                 }
+                images={images}
+                setImages={(images: ImageListType) => setImages(images)}
               />
             )}
           </Box>

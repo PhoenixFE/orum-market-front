@@ -25,39 +25,40 @@ interface FilePreview {
 interface FileUploadProps {
   originalFiles?: { id: string; path: string }[];
   onFilesChange: (files: FilePreview[]) => void;
+  images: ImageListType;
+  setImages: (images: ImageListType) => void;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({
   originalFiles,
   onFilesChange,
+  images,
+  setImages,
 }) => {
   const { filePreview, isUploading } = useFileUpload(originalFiles);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [images, setImages] = useState(originalFiles || []);
+  // const [images, setImages] = useState(originalFiles || []);
   const maxNumber = 69;
 
   const onChange = (imageList: ImageListType) => {
-    // Update the local state for displaying previews
     setImages(imageList as never[]);
 
-    // Transform the imageList to FilePreview[] and call onFilesChange
     const filePreviews: FilePreview[] = imageList.map((image) => ({
-      id: image.file?.name || 'unknown', // Use the file name or a fallback
-      path: image.dataURL || '', // Use the dataURL as the path
+      id: image.file?.name || 'unknown',
+      path: image.dataURL || '',
     }));
     onFilesChange(filePreviews);
   };
 
   useEffect(() => {
     if (originalFiles && originalFiles.length > 0) {
-      // Transform originalFiles to the expected format for ImageUploading
       const formattedFiles = originalFiles.map((file) => ({
-        ...file, // Spread the original file properties
-        dataURL: file.path, // Set the dataURL property to the image path
+        ...file,
+        dataURL: file.path,
       }));
 
-      setImages(formattedFiles as never[]); // Update the state with the transformed files
+      setImages(formattedFiles as never[]);
     }
   }, [originalFiles]);
 
