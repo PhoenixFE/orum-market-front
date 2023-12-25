@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import ImageUploading, { ImageListType } from 'react-images-uploading';
 import {
   Button,
   Box,
-  Stack,
   Badge,
   CircularProgress,
   Card,
@@ -31,23 +31,35 @@ const FileUpload: React.FC<FileUploadProps> = ({
   originalFiles,
   onFilesChange,
 }) => {
-  const { filePreview, handleFileUpload, handleFileRemove, isUploading } =
-    useFileUpload(originalFiles);
+  const { filePreview, isUploading } = useFileUpload(originalFiles);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [images, setImages] = useState(originalFiles || []);
+  const maxNumber = 69;
+
+  const onChange = (imageList: ImageListType) => {
+    // Update the local state for displaying previews
+    setImages(imageList as never[]);
+
+    // Transform the imageList to FilePreview[] and call onFilesChange
+    const filePreviews: FilePreview[] = imageList.map((image) => ({
+      id: image.file?.name || 'unknown', // Use the file name or a fallback
+      path: image.dataURL || '', // Use the dataURL as the path
+    }));
+    onFilesChange(filePreviews);
+  };
 
   useEffect(() => {
-    if (filePreview) {
-      onFilesChange(filePreview);
-    }
-    console.log('FilePreview useEffect', filePreview);
-  }, []);
+    if (originalFiles && originalFiles.length > 0) {
+      // Transform originalFiles to the expected format for ImageUploading
+      const formattedFiles = originalFiles.map((file) => ({
+        ...file, // Spread the original file properties
+        dataURL: file.path, // Set the dataURL property to the image path
+      }));
 
-  useEffect(() => {
-    if (filePreview) {
-      onFilesChange(filePreview);
+      setImages(formattedFiles as never[]); // Update the state with the transformed files
     }
-  }, [filePreview, originalFiles]);
+  }, [originalFiles]);
 
   const handleOpenDialog = (imagePath: string) => {
     setSelectedImage(imagePath);
@@ -66,73 +78,111 @@ const FileUpload: React.FC<FileUploadProps> = ({
         flexDirection: 'column',
         gap: 2,
         border: '1px solid #e0e0e0',
-        borderRadius: '4px',
+        borderRadius: '0',
         padding: '16px',
       }}
     >
-      <Button
-        component="label"
-        variant="outlined"
-        startIcon={<CloudUploadIcon />}
-        disabled={filePreview ? filePreview.length >= 10 : false}
-      >
-        사진 업로드
-        <input
-          hidden
-          accept="image/*"
-          multiple
-          type="file"
-          onChange={handleFileUpload}
-          onClick={(event) => (event.currentTarget.value = '')}
-        />
-      </Button>
+      사진 업로드: 10장까지 업로드 가능합니다.
       {isUploading && (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <CircularProgress />
         </Box>
       )}
-      <Stack direction="row" spacing={2}>
-        {filePreview &&
-          filePreview.map((image, index) => (
-            <Badge
-              badgeContent={
-                <CloseIcon
-                  onClick={() => handleFileRemove(image.id)}
-                  sx={{
-                    fontSize: '1rem',
-                    color: 'white',
-                    backgroundColor: 'red',
-                    borderRadius: '50%',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      backgroundColor: 'darkred',
-                    },
-                  }}
-                />
-              }
-              overlap="circular"
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              key={image.id}
+      <ImageUploading
+        multiple
+        value={images}
+        onChange={onChange}
+        maxNumber={maxNumber}
+      >
+        {({
+          imageList,
+          onImageUpload,
+          onImageRemoveAll,
+          onImageUpdate,
+          onImageRemove,
+          isDragging,
+          dragProps,
+        }) => (
+          <div className="upload__image-wrapper">
+            <Button
+              style={isDragging ? { color: 'red' } : undefined}
+              sx={{ height: '100px' }}
+              fullWidth
+              variant="outlined"
+              startIcon={<CloudUploadIcon />}
+              onClick={onImageUpload}
+              {...dragProps}
             >
-              {' '}
-              <div onClick={() => handleOpenDialog(image.path)} key={image.id}>
-                <Card sx={{ width: 90, height: 90 }}>
-                  <CardActionArea>
-                    <CardMedia
-                      component="img"
-                      height="90"
-                      image={image.path}
-                      alt={`Preview ${index + 1}`}
-                    />
-                  </CardActionArea>
-                </Card>
-              </div>
-            </Badge>
-          ))}
-      </Stack>
+              클릭하거나 이곳으로 사진을 드래그하세요
+            </Button>
+            &nbsp;
+            <Button variant="text" onClick={onImageRemoveAll}>
+              전체 삭제
+            </Button>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 2,
+              }}
+            >
+              {imageList.map((image, index) => (
+                <div key={index} className="image-item">
+                  <Box gap={1}>
+                    <Badge
+                      badgeContent={
+                        <CloseIcon
+                          onClick={() => onImageRemove(index)}
+                          sx={{
+                            fontSize: '1rem',
+                            color: 'white',
+                            backgroundColor: 'red',
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              backgroundColor: 'darkred',
+                            },
+                          }}
+                        />
+                      }
+                      overlap="circular"
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      key={image.id}
+                    >
+                      {' '}
+                      <div
+                        onClick={() => {
+                          if (typeof image.dataURL === 'string') {
+                            handleOpenDialog(image.dataURL);
+                          }
+                        }}
+                        key={image.id}
+                      >
+                        <Card sx={{ width: 90, height: 90 }}>
+                          <CardActionArea>
+                            <CardMedia
+                              component="img"
+                              height="90"
+                              image={image.dataURL}
+                              alt={`Preview ${index + 1}`}
+                            />
+                          </CardActionArea>
+                        </Card>
+                      </div>{' '}
+                    </Badge>
+                  </Box>
+                  <Button onClick={() => onImageUpdate(index)} variant="text">
+                    수정
+                  </Button>
+                </div>
+              ))}
+            </Box>
+          </div>
+        )}
+      </ImageUploading>
       <Box sx={{ alignSelf: 'center' }}>
         {filePreview && filePreview.length > 0 && (
           <Typography variant="caption">{`${filePreview.length}/10`}</Typography>

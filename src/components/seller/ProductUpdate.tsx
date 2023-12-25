@@ -76,7 +76,9 @@ export default function ProductUpdate() {
   const handleFilesChange = useCallback((files: FilePreview[]) => {
     setProductData((prevData) => ({
       ...prevData,
-      mainImages: [...prevData.mainImages, ...files],
+      mainImages: prevData.mainImages.filter(
+        (img) => !files.some((file) => file.id === img.id),
+      ),
     }));
   }, []);
 
@@ -100,8 +102,14 @@ export default function ProductUpdate() {
             setSelectedQuality(fetchedProductData.extra.sort);
           }
 
-          setProductData(fetchedProductData);
-          handleFilesChange(images);
+          if (
+            JSON.stringify(fetchedProductData.mainImages) !==
+            JSON.stringify(existingImages)
+          ) {
+            setExistingImages(images);
+            setProductData(fetchedProductData);
+            handleFilesChange(images);
+          }
         }
       } catch (error) {
         console.error('Failed to fetch product data:', error);
@@ -207,7 +215,6 @@ export default function ProductUpdate() {
       return;
     }
     if (productData.mainImages.length > 10) {
-      console.log('productData', productData);
       alert('You can upload a maximum of 10 images.');
       return;
     }
@@ -220,7 +227,7 @@ export default function ProductUpdate() {
         const response = await api.updateProduct(productId, productData);
         console.log(response);
         alert('상품 정보가 성공적으로 업데이트되었습니다.');
-        navigate(`/user/seller/products/${productId}`);
+        navigate('/user/seller/products/');
       } else {
         console.error('Invalid product ID');
       }
@@ -248,7 +255,7 @@ export default function ProductUpdate() {
             pt={2}
             px={2}
           >
-            <FormLabel sx={{ fontSize: 'x-large' }}>상품 등록</FormLabel>
+            <FormLabel sx={{ fontSize: 'x-large' }}>상품 수정</FormLabel>
             <Divider />
           </Box>
 
@@ -431,7 +438,9 @@ export default function ProductUpdate() {
             {existingImages && (
               <FileUpload
                 originalFiles={existingImages}
-                onFilesChange={handleFilesChange}
+                onFilesChange={(files: FilePreview[]) =>
+                  handleFilesChange(files)
+                }
               />
             )}
           </Box>
