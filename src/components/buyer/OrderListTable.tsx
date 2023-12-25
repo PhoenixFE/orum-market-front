@@ -29,7 +29,6 @@ export default function OrderListTable({
   orderList: IOrderItem[];
 }) {
   const matches = useMediaQuery('(min-width:1200px)');
-  const id = localStorage.getItem('_id');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ratingValue, setRatingValue] = useState(0);
   const [replies, setReplies] = useState({
