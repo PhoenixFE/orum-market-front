@@ -161,7 +161,8 @@ export const api = {
     axiosInstance.patch(`/seller/products/${_id}`, productData),
 
   // 상품 삭제
-  deleteProduct: (id: string) => axiosInstance.delete(`/seller/products/${id}`),
+  deleteProduct: (_id: string) =>
+    axiosInstance.delete(`/seller/products/${_id}`),
 
   // 파일 업로드
   uploadFile: (formData: any) =>

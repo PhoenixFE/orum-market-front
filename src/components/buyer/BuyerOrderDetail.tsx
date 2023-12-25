@@ -194,7 +194,7 @@ export default function OrderListTable() {
                 <TableHeaderCell align="center" sx={{ width: '100px' }}>
                   이미지
                 </TableHeaderCell>
-                <TableHeaderCell align="center">상품정보</TableHeaderCell>
+                <TableHeaderCell align="center">상품명</TableHeaderCell>
                 <TableHeaderCell align="center">상품금액</TableHeaderCell>
                 <TableHeaderCell align="center">주문상태</TableHeaderCell>
               </TableRow>

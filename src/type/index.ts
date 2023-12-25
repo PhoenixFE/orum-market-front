@@ -1,6 +1,6 @@
 export type IUpdateProduct = Partial<IProduct>;
 export interface IProduct {
-  _id?: number;
+  _id?: number | string;
   seller_id?: number;
   name: string;
   price: number;

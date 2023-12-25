@@ -107,6 +107,17 @@ export default function ProductManager() {
     return '판매중';
   };
 
+  const deleteProduct = async (_id: string) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await api.deleteProduct(_id);
+        setProductList(productList.filter((product) => product._id !== _id));
+      } catch (error) {
+        console.error('Error deleting product:', error);
+      }
+    }
+  };
+
   return (
     <>
       <Link to={`/user/seller/products/new`}>
@@ -150,7 +161,8 @@ export default function ProductManager() {
                 <TableCell align="center">가격</TableCell>
                 <TableCell align="center">주문상태</TableCell>
                 <TableCell align="center">공개여부</TableCell>
-                <TableCell align="center"></TableCell>
+                <TableCell align="center">수정</TableCell>
+                <TableCell align="center">삭제</TableCell>
               </TableRow>
             </TableHead>
             {isLoading ? (
@@ -203,7 +215,7 @@ export default function ProductManager() {
                       )}
                     </TableCell>
                     <TableCell align="center">
-                      <Link to={`/product/${rows._id}`}>{rows.name}</Link>
+                      <Link to={`/products/${rows._id}`}>{rows.name}</Link>
                     </TableCell>
                     <TableCell align="center">
                       {rows.extra.sort
@@ -218,7 +230,9 @@ export default function ProductManager() {
                       {rows.price.toLocaleString()}원
                     </TableCell>
                     <TableCell align="center">
-                      {getOrderStateLabel(rows._id)}
+                      {typeof rows._id === 'number'
+                        ? getOrderStateLabel(rows._id)
+                        : 'Invalid ID'}
                     </TableCell>
                     <TableCell align="center">
                       <ToggleButton
@@ -248,9 +262,22 @@ export default function ProductManager() {
                         state={{ productId: `${rows._id}` }}
                       >
                         <Button type="button" variant="contained">
-                          수정하기
+                          수정
                         </Button>
                       </Link>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Button
+                        type="button"
+                        variant="text"
+                        onClick={() => {
+                          if (typeof rows._id === 'string') {
+                            deleteProduct(rows._id);
+                          }
+                        }}
+                      >
+                        삭제
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
