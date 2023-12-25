@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   AppBar,
@@ -21,20 +21,16 @@ import {
   styled,
   useMediaQuery,
 } from '@mui/material';
-import {
-  Notifications as NotificationsIcon,
-  ShoppingCart as ShoppingCartIcon,
-  Brightness4 as Brightness4Icon,
-  Brightness7 as Brightness7Icon,
-  Logout,
-} from '@mui/icons-material';
+import Logout from '@mui/icons-material/Logout';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LoginIcon from '@mui/icons-material/Login';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useCart, useUserStore } from '../../lib/store';
 import { IUserStore } from '../../type';
-import { ColorModeContext } from '../../App';
 import CustomTooltip from '../CustomTooltip';
+import ThemeSwitch from '../ThemeSwitch';
 
 // 메인 헤더 컴포넌트
 export default function Header() {
@@ -44,7 +40,6 @@ export default function Header() {
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const theme = useTheme();
-  const colorMode = useContext(ColorModeContext);
   const { items: cartItems } = useCart();
   const cartItemsCount = cartItems.length;
   const matchesXS = useMediaQuery(theme.breakpoints.down('sm'));
@@ -214,29 +209,7 @@ export default function Header() {
             sx={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}
             gap={1}
           >
-            <CustomTooltip title="다크모드/라이트모드 전환">
-              <Button
-                onClick={colorMode.toggleColorMode}
-                color="inherit"
-                style={{ fontSize: '1rem' }}
-              >
-                {theme.palette.mode === 'dark' ? (
-                  <>
-                    <Brightness7Icon />
-                    <Typography variant="body1" ml={1}>
-                      라이트모드
-                    </Typography>
-                  </>
-                ) : (
-                  <>
-                    <Brightness4Icon />
-                    <Typography variant="body1" ml={1}>
-                      다크모드
-                    </Typography>
-                  </>
-                )}
-              </Button>
-            </CustomTooltip>
+            <ThemeSwitch />
             {isLoggedIn ? isLoggedInUserButton() : notLoggedInUserButton()}
           </Box>
         </ToolbarStyled>
