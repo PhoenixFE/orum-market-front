@@ -187,7 +187,7 @@ export default function OrderListTable({
                         <Typography variant="body2">
                           &nbsp;상품금액 {list.cost.products.toLocaleString()} +
                           {list.cost.shippingFees === 0
-                            ? ' 배송비 무료 ='
+                            ? ' 배송비 무료'
                             : ` 배송비 ${list.cost.shippingFees.toLocaleString()}`}{' '}
                           - 할인금액&nbsp;
                           {list.cost.discount.products.toLocaleString()} ={' '}
