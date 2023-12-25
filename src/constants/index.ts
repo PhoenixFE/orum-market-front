@@ -8,22 +8,22 @@ export const DASHBOARD_MENU = {
     {
       id: 2,
       title: '내 정보 수정',
-      url: 'info',
+      url: '/user/info',
     },
     {
       id: 3,
       title: '내 주문 내역',
-      url: 'order-list',
+      url: '/user/order-list',
     },
     {
       id: 4,
       title: '찜한 상품',
-      url: 'favorites',
+      url: '/user/favorites',
     },
     {
       id: 5,
       title: '최근 본 상품',
-      url: 'recently-viewed',
+      url: '/user/recently-viewed',
     },
   ],
 
@@ -31,17 +31,17 @@ export const DASHBOARD_MENU = {
     {
       id: 1,
       title: '판매 상품 관리',
-      url: 'seller/products',
+      url: '/user/seller/products',
     },
     {
       id: 2,
       title: '판매자 정보',
-      url: 'seller/info',
+      url: '/user/seller/info',
     },
     {
       id: 3,
       title: '주문 관리',
-      url: 'seller/orders',
+      url: '/user/seller/orders',
     },
   ],
 };
