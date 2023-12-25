@@ -7,7 +7,7 @@ interface LoadingBackdropProps {
   handleClose?: () => void;
 }
 
-const LoadingBackdrop: React.FC<LoadingBackdropProps> = ({
+const CustomBackdrop: React.FC<LoadingBackdropProps> = ({
   open,
   handleClose,
 }) => {
@@ -22,4 +22,4 @@ const LoadingBackdrop: React.FC<LoadingBackdropProps> = ({
   );
 };
 
-export default LoadingBackdrop;
+export default CustomBackdrop;

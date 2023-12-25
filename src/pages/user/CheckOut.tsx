@@ -485,7 +485,7 @@ export default function CheckOut() {
                   onChange={(e) => setAgreedToPrivacy(e.target.checked)}
                 />
               }
-              label="비회원 개인정보수집 이용에 동의합니다. (필수)"
+              label="회원 개인정보수집 이용에 동의합니다. (필수)"
             />
           </Box>
           <Box
