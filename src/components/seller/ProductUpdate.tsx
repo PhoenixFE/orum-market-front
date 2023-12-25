@@ -86,7 +86,6 @@ export default function ProductUpdate() {
         if (productId !== undefined) {
           const response = await api.getProduct(Number(productId));
           const fetchedProductData = response.data.item;
-          console.log('fetchedProductData', fetchedProductData);
           const images = fetchedProductData.mainImages.map(
             (image: { id: number; path: string }) => ({
               id: image.id,
@@ -94,7 +93,12 @@ export default function ProductUpdate() {
             }),
           );
           setExistingImages(images);
-          console.log('existingImages', existingImages);
+          if (fetchedProductData.extra && fetchedProductData.extra.category) {
+            setSelectedCategory(fetchedProductData.extra.category[1]);
+          }
+          if (fetchedProductData.extra && fetchedProductData.extra.sort) {
+            setSelectedQuality(fetchedProductData.extra.sort);
+          }
 
           setProductData(fetchedProductData);
           handleFilesChange(images);
@@ -203,6 +207,7 @@ export default function ProductUpdate() {
       return;
     }
     if (productData.mainImages.length > 10) {
+      console.log('productData', productData);
       alert('You can upload a maximum of 10 images.');
       return;
     }

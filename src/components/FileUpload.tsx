@@ -92,7 +92,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
         </Box>
       )}
       <Stack direction="row" spacing={2}>
-        {originalFiles && <>'original'</>}
         {filePreview &&
           filePreview.map((image, index) => (
             <Badge

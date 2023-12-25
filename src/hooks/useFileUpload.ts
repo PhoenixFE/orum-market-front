@@ -43,6 +43,8 @@ export const useFileUpload = (originalFiles: FilePreview[] = []) => {
     const files = e.target.files;
     if (files) {
       if (files.length + (filePreview ? filePreview.length : 0) > 10) {
+        console.log('filePreview', filePreview);
+        console.log('files', files);
         alert(
           `You can only upload ${
             10 - (filePreview ? filePreview.length : 0)
