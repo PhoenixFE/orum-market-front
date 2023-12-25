@@ -23,18 +23,31 @@ interface FilePreview {
 }
 
 interface FileUploadProps {
+  originalFiles?: { id: string; path: string }[];
   onFilesChange: (files: FilePreview[]) => void;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onFilesChange }) => {
+const FileUpload: React.FC<FileUploadProps> = ({
+  originalFiles,
+  onFilesChange,
+}) => {
   const { filePreview, handleFileUpload, handleFileRemove, isUploading } =
-    useFileUpload();
+    useFileUpload(originalFiles);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
-    onFilesChange(filePreview);
-  }, [filePreview, onFilesChange]);
+    if (filePreview) {
+      onFilesChange(filePreview);
+    }
+    console.log('FilePreview useEffect', filePreview);
+  }, []);
+
+  useEffect(() => {
+    if (filePreview) {
+      onFilesChange(filePreview);
+    }
+  }, [filePreview]);
 
   const handleOpenDialog = (imagePath: string) => {
     setSelectedImage(imagePath);
@@ -60,7 +73,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFilesChange }) => {
         component="label"
         variant="outlined"
         startIcon={<CloudUploadIcon />}
-        disabled={filePreview.length >= 10}
+        disabled={filePreview ? filePreview.length >= 10 : false}
       >
         사진 업로드
         <input
@@ -69,6 +82,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFilesChange }) => {
           multiple
           type="file"
           onChange={handleFileUpload}
+          onClick={(event) => (event.currentTarget.value = '')}
         />
       </Button>
       {isUploading && (
@@ -77,48 +91,49 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFilesChange }) => {
         </Box>
       )}
       <Stack direction="row" spacing={2}>
-        {filePreview.map((image, index) => (
-          <Badge
-            badgeContent={
-              <CloseIcon
-                onClick={() => handleFileRemove(image.id)}
-                sx={{
-                  fontSize: '1rem',
-                  color: 'white',
-                  backgroundColor: 'red',
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: 'darkred',
-                  },
-                }}
-              />
-            }
-            overlap="circular"
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            key={image.id}
-          >
-            {' '}
-            <div onClick={() => handleOpenDialog(image.path)} key={image.id}>
-              <Card sx={{ width: 90, height: 90 }}>
-                <CardActionArea>
-                  <CardMedia
-                    component="img"
-                    height="90"
-                    image={image.path}
-                    alt={`Preview ${index + 1}`}
-                  />
-                </CardActionArea>
-              </Card>
-            </div>
-          </Badge>
-        ))}
+        {filePreview &&
+          filePreview.map((image, index) => (
+            <Badge
+              badgeContent={
+                <CloseIcon
+                  onClick={() => handleFileRemove(image.id)}
+                  sx={{
+                    fontSize: '1rem',
+                    color: 'white',
+                    backgroundColor: 'red',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: 'darkred',
+                    },
+                  }}
+                />
+              }
+              overlap="circular"
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              key={image.id}
+            >
+              {' '}
+              <div onClick={() => handleOpenDialog(image.path)} key={image.id}>
+                <Card sx={{ width: 90, height: 90 }}>
+                  <CardActionArea>
+                    <CardMedia
+                      component="img"
+                      height="90"
+                      image={image.path}
+                      alt={`Preview ${index + 1}`}
+                    />
+                  </CardActionArea>
+                </Card>
+              </div>
+            </Badge>
+          ))}
       </Stack>
       <Box sx={{ alignSelf: 'center' }}>
-        {filePreview.length > 0 && (
+        {filePreview && filePreview.length > 0 && (
           <Typography variant="caption">{`${filePreview.length}/10`}</Typography>
         )}
         <Dialog onClose={handleCloseDialog} open={openDialog}>
