@@ -28,7 +28,6 @@ import { Box } from '@mui/system';
 import AddressListDialog from '../../components/address/AddressListDialog';
 import NewAddressInput from '../../components/address/NewAddressForm';
 import CustomTooltip from '../../components/CustomTooltip';
-import { useScrollToTop } from '../../hooks/useScrollToTop';
 declare const IMP: any;
 type TelPartsType = {
   telPart1: string;
@@ -85,8 +84,6 @@ export default function CheckOut() {
 
   const userId = localStorage.getItem('_id');
   const isCheckoutItemEmpty = checkoutItems.length === 0;
-
-  useScrollToTop();
 
   useEffect(() => {
     const singleProduct = location.state?.product;
@@ -274,7 +271,7 @@ export default function CheckOut() {
   return (
     <Container sx={{ marginY: '50px' }}>
       <Typography variant="h4" fontWeight={700} mb={5}>
-        결제하기
+        주문하기
       </Typography>
       <Grid container rowGap={10} m={0}>
         {/* Left section */}

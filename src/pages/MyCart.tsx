@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import CustomTooltip from '../components/CustomTooltip';
-import { useScrollToTop } from '../hooks/useScrollToTop';
+import MobilePaymentBar from '../components/navbar/MobilePaymentBar';
 
 export default function MyCart() {
   const { items, removeFromCart, clearCart } = useCartStore() as {
@@ -23,7 +23,6 @@ export default function MyCart() {
     removeFromCart: (id: number) => void;
     clearCart: () => void;
   };
-  useScrollToTop();
 
   const currencyFormatter = new Intl.NumberFormat('ko-KR', {
     style: 'currency',
@@ -37,10 +36,6 @@ export default function MyCart() {
   );
   const sumPrice = items.reduce((sum, item) => sum + item.price, 0);
   const totalCost = sumShippingfees + sumPrice;
-  // const totalCost = items.reduce(
-  //   (total, item) => total + item.price + item.shippingFees * item.quantity,
-  //   0,
-  // );
 
   return (
     <Container sx={{ marginY: '50px' }}>
@@ -208,7 +203,7 @@ export default function MyCart() {
                       variant="outlined"
                       style={{ height: '56px' }}
                     >
-                      구매하기
+                      주문하기
                     </Button>
                   </CustomTooltip>
                 </Box>
@@ -217,6 +212,7 @@ export default function MyCart() {
           )}
         </Grid>
       </Grid>
+      <MobilePaymentBar totalCost={totalCost} />
     </Container>
   );
 }
