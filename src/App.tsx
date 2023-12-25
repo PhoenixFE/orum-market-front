@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import './App.css';
-import Header from './components/Header';
+import Header from './components/navbar/Header';
 import { ThemeProvider, Toolbar, createTheme } from '@mui/material';
 import { BreadcrumbsNavBar } from './components/BreadcrumbsNavBar';
 import ScrollTop from './components/ScrollTop';
@@ -9,7 +9,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Fab from '@mui/material/Fab';
 import { useMemo, useState } from 'react';
 import Footer from './components/Footer';
-import MobileNavBar from './components/MobileNavBar';
+import { useScrollToTop } from './hooks/useScrollToTop';
 
 export const ColorModeContext = React.createContext({
   toggleColorMode: () => {},
@@ -34,6 +34,8 @@ function App() {
     }),
     [],
   );
+
+  useScrollToTop();
 
   const theme = useMemo(
     () =>
@@ -147,7 +149,6 @@ function App() {
           </Fab>
         </ScrollTop>
         <Footer />
-        <MobileNavBar />
       </ThemeProvider>
     </ColorModeContext.Provider>
   );
