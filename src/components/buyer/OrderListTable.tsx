@@ -160,7 +160,7 @@ export default function OrderListTable({
                       </TableCell>
                       <TableCell align="center">
                         <Link
-                          to={`/user/${id}/buyer-orderlist/${list._id}`}
+                          to={`/user/order-list/${list._id}`}
                           onClick={handleMoveTo}
                           state={{ productId: list._id }}
                         >
@@ -217,7 +217,7 @@ export default function OrderListTable({
                   {formatDate(list.createdAt)}
                 </Typography>
                 <Link
-                  to={`/user/${id}/buyer-orderlist/${list._id}`}
+                  to={`/user/order-list/${list._id}`}
                   onClick={handleMoveTo}
                   state={{ productId: list._id }}
                 >
