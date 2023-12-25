@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -57,8 +57,6 @@ interface FilePreview {
 }
 
 export default function ProductCreate() {
-  const userId = localStorage.getItem('_id');
-
   const [productData, setProductData] = useState<IProduct>(initCreateData);
   const [isValid, setIsValid] = useState(true);
   const [italic, setItalic] = useState(false);
@@ -72,12 +70,12 @@ export default function ProductCreate() {
   const [shippingFeesError, setShippingFeesError] = useState('');
   const [contentError, setContentError] = useState('');
 
-  const handleFilesChange = (files: FilePreview[]) => {
+  const handleFilesChange = useCallback((files: FilePreview[]) => {
     setProductData((prevData) => ({
       ...prevData,
       mainImages: [...prevData.mainImages, ...files],
     }));
-  };
+  }, []);
 
   const navigate = useNavigate();
 
@@ -164,24 +162,32 @@ export default function ProductCreate() {
   }, [handleAllChange]);
 
   //상품데이터 form submit
-  const productAllSubmit = async (e: React.FormEvent) => {
+  const handleCreateData = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) {
       alert('양식이 올바르지 않습니다.');
+      return;
+    }
+    if (productData.mainImages.length > 10) {
+      alert('You can upload a maximum of 10 images.');
+      return;
+    }
+    if (productData.mainImages.length === 0) {
+      alert('상품 사진을 등록해주세요.');
       return;
     }
     try {
       const response = await api.createProduct(productData);
       setProductData(response.data.item);
       alert('판매 상품 등록이 완료되었습니다.');
-      navigate(`/user/${userId}/product-manager`);
+      navigate(`/user/seller/products`);
     } catch (error) {
       console.error('API Error:', error);
     }
   };
 
   return (
-    <form onSubmit={productAllSubmit}>
+    <form onSubmit={handleCreateData}>
       {/* 제목 */}
       <Box
         sx={{

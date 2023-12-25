@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import { Link, Outlet } from 'react-router-dom';
 import { DASHBOARD_MENU } from '../../constants';
 import DashboardNavBar from '../../components/DashboardNavBar';
+import MobileNavBar from '../../components/navbar/MobileNavBar';
 
 const drawerWidth = 240;
 
@@ -21,10 +22,24 @@ export default function Dashboard(props: Props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const role = localStorage.getItem('role');
-  const dashboardMenu = {
-    buyer: role === 'user' ? DASHBOARD_MENU.buyer : [],
-    seller: role === 'seller' ? DASHBOARD_MENU.seller : [],
-  };
+  const dashboardMenu = React.useMemo(() => {
+    if (role === 'seller') {
+      return {
+        buyer: DASHBOARD_MENU.buyer,
+        seller: DASHBOARD_MENU.seller,
+      };
+    } else if (role === 'user') {
+      return {
+        buyer: DASHBOARD_MENU.buyer,
+        seller: [],
+      };
+    } else {
+      return {
+        buyer: [],
+        seller: [],
+      };
+    }
+  }, [role]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -32,7 +47,6 @@ export default function Dashboard(props: Props) {
 
   const drawer = <DashboardNavBar dashboardMenu={dashboardMenu} />;
 
-  // Remove this const when copying and pasting into your project.
   const container =
     window !== undefined ? () => window().document.body : undefined;
 
@@ -76,14 +90,13 @@ export default function Dashboard(props: Props) {
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
         aria-label="dashboard"
       >
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
           container={container}
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
           sx={{
             display: { xs: 'block', sm: 'none' },
@@ -120,6 +133,7 @@ export default function Dashboard(props: Props) {
       >
         <Toolbar />
         <Outlet />
+        <MobileNavBar />
       </Box>
     </Box>
   );

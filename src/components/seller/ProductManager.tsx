@@ -27,8 +27,6 @@ import formatDate from '../../lib/formatDate';
 import SkeletonTable from './SkeletonTable';
 
 export default function ProductManager() {
-  const _id = localStorage.getItem('_id');
-
   const [productList, setProductList] = useState<IProduct[]>([]);
   const [sortedProductList, setSortedProductList] = useState<IProduct[]>([]);
   const [sortOrder, setSortOrder] = useState('최신순');
@@ -111,7 +109,7 @@ export default function ProductManager() {
 
   return (
     <>
-      <Link to={`/user/${_id}/product-create`}>
+      <Link to={`/user/seller/products/new`}>
         <Button variant="contained">등록하기</Button>
       </Link>
       <Box
@@ -155,17 +153,21 @@ export default function ProductManager() {
                 <TableCell align="center"></TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {productList.length === 0 && !isLoading && (
-                <Typography variant="h5" sx={{ marginBottom: '1rem' }}>
-                  판매중인 상품이 존재하지 않습니다.
-                </Typography>
-              )}
+            {isLoading ? (
+              <SkeletonTable rows={5} columns={7} />
+            ) : (
+              <TableBody>
+                {productList.length === 0 && !isLoading && (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center">
+                      <Typography variant="subtitle1">
+                        판매중인 상품이 존재하지 않습니다.
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
 
-              {isLoading ? (
-                <SkeletonTable rows={5} columns={7} />
-              ) : (
-                sortedProductList.map((rows) => (
+                {sortedProductList.map((rows) => (
                   <TableRow key={rows._id}>
                     <TableCell align="center">
                       <Typography variant="body2" color="text.secondary">
@@ -242,7 +244,7 @@ export default function ProductManager() {
                     </TableCell>
                     <TableCell align="center">
                       <Link
-                        to={`/user/${rows._id}/product-update`}
+                        to={`/user/seller/products/${rows._id}/edit/`}
                         state={{ productId: `${rows._id}` }}
                       >
                         <Button type="button" variant="contained">
@@ -251,9 +253,9 @@ export default function ProductManager() {
                       </Link>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
+                ))}
+              </TableBody>
+            )}
           </Table>
         </TableContainer>
       </Box>
