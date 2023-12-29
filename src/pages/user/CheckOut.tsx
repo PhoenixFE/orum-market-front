@@ -4,7 +4,6 @@ import { useCartStore } from '../../lib/store';
 import { api } from '../../api/api';
 import {
   Container,
-  TextField,
   Button,
   Typography,
   List,
@@ -13,11 +12,6 @@ import {
   Checkbox,
   Grid,
   Divider,
-  FormLabel,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Tabs,
   Tab,
   styled,
@@ -31,9 +25,15 @@ import {
 } from '../../type';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box } from '@mui/system';
-import DaumPost from '../../components/DaumPost';
 import AddressListDialog from '../../components/address/AddressListDialog';
+import NewAddressInput from '../../components/address/NewAddressForm';
+import CustomTooltip from '../../components/CustomTooltip';
 declare const IMP: any;
+type TelPartsType = {
+  telPart1: string;
+  telPart2: string;
+  telPart3: string;
+};
 
 export default function CheckOut() {
   const { items, clearCart } = useCartStore() as ICartStore;
@@ -60,12 +60,12 @@ export default function CheckOut() {
       ],
     },
   });
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
+  const [agreedToPrivacy, setAgreedToPrivacy] = useState<boolean>(false);
   const [deliveryInfo, setDeliveryInfo] = useState<IAddressData>({
     addressName: '',
     receiver: '',
-    tel: 0,
+    tel: '',
     name: '',
     mainAddress: '',
     subAddress: '',
@@ -75,6 +75,12 @@ export default function CheckOut() {
   const [addressList, setAddressList] = useState([]);
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
   const [addAddressToBook, setAddAddressToBook] = useState(false);
+  const [showMoreItems, setShowMoreItems] = useState(false);
+  const [telParts, setTelParts] = useState<TelPartsType>({
+    telPart1: '010',
+    telPart2: '',
+    telPart3: '',
+  });
 
   const userId = localStorage.getItem('_id');
   const isCheckoutItemEmpty = checkoutItems.length === 0;
@@ -156,18 +162,6 @@ export default function CheckOut() {
     setOpenAddressDialog(false);
   };
 
-  const handleReceiverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDeliveryInfo({ ...deliveryInfo, receiver: e.target.value });
-  };
-
-  const handleTelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDeliveryInfo({ ...deliveryInfo, tel: Number(e.target.value) });
-  };
-
-  const handleAddressNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDeliveryInfo({ ...deliveryInfo, addressName: e.target.value });
-  };
-
   const handlePurchase = async () => {
     const orderData = {
       products: checkoutItems.map((item) => ({
@@ -209,6 +203,14 @@ export default function CheckOut() {
     return agreedToTerms && agreedToPrivacy && !isCheckoutItemEmpty;
   };
 
+  const pgMembers = [
+    { id: 'kcp', name: 'kcp' },
+    { id: 'html5_inicis', name: 'KG 이니시스' },
+    { id: 'payco', name: 'payco' },
+    { id: 'tosspay', name: 'tosspay' },
+    { id: 'smilepay', name: 'smilepay' },
+    { id: 'danal_tpay', name: '다날' },
+  ];
   function requestPayment(pg: string) {
     let paymentData = {
       pg: 'kcp',
@@ -223,14 +225,33 @@ export default function CheckOut() {
       buyer_postcode: '123-456',
     };
 
-    if (pg === 'kakao') {
-      paymentData.pg = 'kakaopay';
+    switch (pg) {
+      case 'kakao':
+        paymentData.pg = 'kakaopay';
+        break;
+      case 'kcp':
+        paymentData.pg = 'kcp';
+        break;
+      case 'html5_inicis':
+        paymentData.pg = 'html5_inicis';
+        break;
+      case 'payco':
+        paymentData.pg = 'payco.PARTNERTEST';
+        break;
+      case 'tosspay':
+        paymentData.pg = 'tosspay.tosstest';
+        break;
+      case 'smilepay':
+        paymentData.pg = 'smilepay.cnstest25m';
+        break;
+      case 'danal_tpay':
+        paymentData.pg = 'danal_tpay';
+        break;
     }
 
     IMP.init('imp38488078');
     IMP.request_pay(paymentData, async (response: PaymentResponse) => {
       if (response.success) {
-        console.log('결제 성공', response);
         try {
           await handlePurchase();
           alert('결제가 완료되었습니다.');
@@ -246,14 +267,15 @@ export default function CheckOut() {
     success: boolean;
   }
 
+  console.log('deliveryInfo', deliveryInfo);
   return (
     <Container sx={{ marginY: '50px' }}>
       <Typography variant="h4" fontWeight={700} mb={5}>
-        결제하기
+        주문하기
       </Typography>
-      <Grid container spacing={3}>
+      <Grid container rowGap={10} m={0}>
         {/* Left section */}
-        <Grid item xs={12} md={7} sx={{ padding: '2rem' }}>
+        <Grid item xs={12} md={7} sx={{ margin: 0 }}>
           <Divider />
           <Box
             sx={{
@@ -311,14 +333,16 @@ export default function CheckOut() {
                   {deliveryInfo.mainAddress} {deliveryInfo.subAddress}
                 </Typography>
               </Box>
-              <Button
-                variant="outlined"
-                color="inherit"
-                style={{ height: '56px' }}
-                onClick={() => setIsAddressDialogOpen(true)}
-              >
-                배송지 목록
-              </Button>
+              <CustomTooltip title="배송지 목록에서 고르기">
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  style={{ height: '56px' }}
+                  onClick={() => setIsAddressDialogOpen(true)}
+                >
+                  배송지 목록
+                </Button>
+              </CustomTooltip>
               <AddressListDialog
                 isOpen={isAddressDialogOpen}
                 onClose={() => setIsAddressDialogOpen(false)}
@@ -338,104 +362,17 @@ export default function CheckOut() {
           )}
 
           {tabValue === 1 && (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-              gap={1}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
-                <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
-                  수령인
-                </FormLabel>
-                <TextField
-                  value={deliveryInfo.receiver}
-                  placeholder="수령인 이름을 적으세요"
-                  fullWidth
-                  onChange={handleReceiverChange}
-                />
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
-                <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
-                  연락처
-                </FormLabel>
-                <TextField
-                  value={deliveryInfo.tel}
-                  placeholder="ex) 01012341234"
-                  fullWidth
-                  onChange={handleTelChange}
-                />
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center' }} gap={4}>
-                <FormLabel sx={{ width: '50px', fontWeight: '700' }}>
-                  배송지
-                </FormLabel>
-                <TextField
-                  value={deliveryInfo.addressName}
-                  placeholder="배송지 이름"
-                  fullWidth
-                  onChange={handleAddressNameChange}
-                />
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center' }} gap={1}>
-                <TextField
-                  value={deliveryInfo.mainAddress}
-                  placeholder="성남시 중원구 광명로 293"
-                  fullWidth
-                  onChange={(e) =>
-                    setDeliveryInfo({
-                      ...deliveryInfo,
-                      mainAddress: e.target.value,
-                    })
-                  }
-                />
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  sx={{ width: '100px', height: '56px' }}
-                  onClick={() => setOpenAddressDialog(true)}
-                >
-                  주소검색
-                </Button>
-                <Dialog
-                  open={openAddressDialog}
-                  onClose={() => setOpenAddressDialog(false)}
-                >
-                  <DialogTitle>주소 검색</DialogTitle>
-                  <DialogContent>
-                    <DaumPost onSearchComplete={handleAddressSearchComplete} />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={() => setOpenAddressDialog(false)}>
-                      닫기
-                    </Button>
-                  </DialogActions>
-                </Dialog>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center' }} gap={5}>
-                <TextField
-                  value={deliveryInfo.subAddress}
-                  placeholder="상세 주소 입력"
-                  fullWidth
-                  onChange={(e) =>
-                    setDeliveryInfo({
-                      ...deliveryInfo,
-                      subAddress: e.target.value,
-                    })
-                  }
-                />
-              </Box>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={addAddressToBook}
-                    onChange={(e) => setAddAddressToBook(e.target.checked)}
-                  />
-                }
-                label="주소록에 추가"
-              />
-            </Box>
+            <NewAddressInput
+              deliveryInfo={deliveryInfo}
+              setDeliveryInfo={setDeliveryInfo}
+              telParts={telParts}
+              setTelParts={setTelParts}
+              handleAddressSearchComplete={handleAddressSearchComplete}
+              openAddressDialog={openAddressDialog}
+              setOpenAddressDialog={setOpenAddressDialog}
+              addAddressToBook={addAddressToBook}
+              setAddAddressToBook={setAddAddressToBook}
+            />
           )}
         </Grid>
 
@@ -444,16 +381,16 @@ export default function CheckOut() {
           item
           xs={12}
           md={5}
-          mt={2}
           sx={{
-            padding: '2rem',
+            margin: 0,
+            paddingLeft: { md: 5 },
           }}
         >
           <Typography variant="h6" fontWeight={700} mb={3}>
             주문 내역
           </Typography>
           {isCheckoutItemEmpty ? (
-            <Typography variant="h4">장바구니가 비어있습니다.</Typography>
+            <Typography variant="h4">주문할 상품이 없습니다.</Typography>
           ) : (
             <List sx={{ mb: 2 }}>
               {checkoutItems.map((item, index) => (
@@ -464,16 +401,30 @@ export default function CheckOut() {
                     borderBottom: '1px solid lightgray',
                   }}
                 >
-                  <img
-                    src={item.mainImages[0].path}
-                    alt={item.name}
-                    style={{
-                      width: '80px',
-                      height: '80px',
-                      marginRight: '20px',
-                      objectFit: 'cover',
-                    }}
-                  />
+                  {item.mainImages.length === 0 ? (
+                    <img
+                      src="/assets/no-image.jpg"
+                      alt={item.name}
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        marginRight: '20px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={item.mainImages[0]?.path}
+                      alt={item.name}
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        marginRight: '20px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  )}
+
                   <Box>
                     <Typography variant="h6">{item.name}</Typography>
 
@@ -534,7 +485,7 @@ export default function CheckOut() {
                   onChange={(e) => setAgreedToPrivacy(e.target.checked)}
                 />
               }
-              label="비회원 개인정보수집 이용에 동의합니다. (필수)"
+              label="회원 개인정보수집 이용에 동의합니다. (필수)"
             />
           </Box>
           <Box
@@ -543,8 +494,8 @@ export default function CheckOut() {
               justifyContent: 'end',
               alignItems: 'center',
             }}
-            mt={2}
             gap={1}
+            mt={4}
           >
             <Button
               onClick={() => requestPayment('kakao')}
@@ -557,6 +508,7 @@ export default function CheckOut() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                flex: '1',
                 backgroundColor: handlePurchaseEnabled()
                   ? '#f7e600'
                   : '#e0e0e0',
@@ -570,7 +522,7 @@ export default function CheckOut() {
                 <img
                   src="/assets/kakaopay.png"
                   alt="카카오페이"
-                  style={{ marginRight: '10px', height: '24px' }}
+                  style={{ height: '24px' }}
                 />
               ) : (
                 <img
@@ -583,37 +535,52 @@ export default function CheckOut() {
                   }}
                 />
               )}
-              카카오페이 결제하기
-            </Button>{' '}
+              카카오페이 결제
+            </Button>
             <Button
-              onClick={() => requestPayment('kcp')}
+              onClick={handlePurchase}
               variant="outlined"
               color="primary"
               style={{ height: '56px' }}
               disabled={!handlePurchaseEnabled()}
             >
-              일반카드 결제하기
-            </Button>{' '}
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'end',
-              alignItems: 'center',
-            }}
-            mt={2}
-            gap={1}
-          >
-            <Button
-              onClick={handlePurchase}
-              variant="outlined"
-              color="inherit"
-              style={{ height: '56px' }}
-              disabled={!handlePurchaseEnabled()}
-            >
-              테스트 결제
+              멋사가 결제
             </Button>
           </Box>
+
+          <Button
+            onClick={() => setShowMoreItems(!showMoreItems)}
+            color="inherit"
+          >
+            결제 수단 더보기
+            {showMoreItems ? ' ▲' : ' ▼'}
+          </Button>
+
+          {showMoreItems && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'end',
+                alignItems: 'center',
+                mt: 2,
+              }}
+              gap={1}
+            >
+              {pgMembers.map((pg) => (
+                <Button
+                  onClick={() => requestPayment(pg.id)}
+                  variant="outlined"
+                  color="inherit"
+                  fullWidth
+                  style={{ height: '56px' }}
+                  disabled={!handlePurchaseEnabled()}
+                >
+                  {pg.name} 결제
+                </Button>
+              ))}
+            </Box>
+          )}
         </Grid>
       </Grid>
     </Container>
@@ -622,11 +589,16 @@ export default function CheckOut() {
 
 const CustomTab = styled(Tab)({
   '&.MuiTab-root': {
-    backgroundColor: '#eee', // 탭의 기본 배경색을 옅은 회색으로 설정
+    color: '#777',
+    backgroundColor: '#ccc',
+    fontWeight: '300',
+    fontSize: '0.9rem',
   },
   '&.Mui-selected': {
     border: '1px solid #000',
     backgroundColor: '#fff',
+    fontWeight: '800',
+    fontSize: '1rem',
   },
   marginBottom: '20px',
 });

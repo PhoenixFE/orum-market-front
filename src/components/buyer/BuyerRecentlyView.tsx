@@ -66,7 +66,7 @@ export default function BuyerRecentlyView() {
         {viewItems.map((product: IProduct) => (
           <Grid item {...getItemSize()} key={product._id} marginTop={3}>
             <StyledCard>
-              <CardActionArea component={Link} to={`/product/${product._id}`}>
+              <CardActionArea component={Link} to={`/products/${product._id}`}>
                 <ProductImage
                   image={product.mainImages[0].path}
                   title={product.name}

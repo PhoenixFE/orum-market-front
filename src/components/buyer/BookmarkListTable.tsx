@@ -46,7 +46,7 @@ export default function BookmarkListTable({
             <StyledCard>
               <CardActionArea
                 component={Link}
-                to={`/product/${bookmark.product_id}`}
+                to={`/products/${bookmark.product_id}`}
               >
                 <ProductImage
                   image={bookmark.product.image.path}

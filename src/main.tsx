@@ -32,8 +32,8 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { index: true, path: '/', element: <Home /> },
-      { path: '/product', element: <SearchPage /> },
-      { path: '/product/:id', element: <ProductDetail /> },
+      { path: '/products', element: <SearchPage /> },
+      { path: '/products/:productId', element: <ProductDetail /> },
       { path: '/cart', element: <MyCart /> },
       { path: '/checkout', element: <CheckOut /> },
       { path: '/search', element: <SearchPage /> },
@@ -42,52 +42,21 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: '/user/:id',
+    path: '/user',
     element: <Dashboard />,
     errorElement: <NotFound />,
     children: [
-      // 라우팅 수정 RESTful API
-      { index: true, path: '/user/:id', element: <BuyerHome /> },
-      {
-        path: '/user/:id/buyer-orderlist',
-        element: <BuyerOrdeList />,
-      },
-      {
-        path: '/user/:id/buyer-info',
-        element: <BuyerInfo />,
-      },
-      {
-        path: '/user/:id/buyer-favorite',
-        element: <BuyerFavorite />,
-      },
-      {
-        path: '/user/:id/seller-order-manager',
-        element: <SellerOrderManager />,
-      },
-      {
-        path: '/user/:id/product-create',
-        element: <ProductCreate />,
-      },
-      {
-        path: '/user/:id/product-update',
-        element: <ProductUpdate />,
-      },
-      {
-        path: '/user/:id/seller-info',
-        element: <SellerInfo />,
-      },
-      {
-        path: '/user/:id/product-manager',
-        element: <ProductManager />,
-      },
-      {
-        path: '/user/:id/recently-viewed-items',
-        element: <BuyerRecentlyView />,
-      },
-      {
-        path: '/user/:id/buyer-orderlist/:id',
-        element: <BuyerOrderDetail />,
-      },
+      { index: true, element: <BuyerHome /> },
+      { path: 'order-list', element: <BuyerOrdeList /> },
+      { path: 'info', element: <BuyerInfo /> },
+      { path: 'favorites', element: <BuyerFavorite /> }, // Changed from 'buyer-favorite'
+      { path: 'seller/orders', element: <SellerOrderManager /> }, // Nested under 'seller' to indicate resource
+      { path: 'seller/products/new', element: <ProductCreate /> },
+      { path: 'seller/products/:productId/edit', element: <ProductUpdate /> }, // RESTful way to indicate editing
+      { path: 'seller/info', element: <SellerInfo /> },
+      { path: 'seller/products', element: <ProductManager /> }, // Changed to indicate a collection of products
+      { path: 'recently-viewed', element: <BuyerRecentlyView /> }, // Simplified
+      { path: 'order-list/:orderId', element: <BuyerOrderDetail /> }, // Changed to indicate a specific order
     ],
   },
 ]);

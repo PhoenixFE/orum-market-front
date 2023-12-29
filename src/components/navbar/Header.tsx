@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   AppBar,
@@ -19,19 +19,18 @@ import {
   Typography,
   useTheme,
   styled,
+  useMediaQuery,
 } from '@mui/material';
-import {
-  Notifications as NotificationsIcon,
-  ShoppingCart as ShoppingCartIcon,
-  Brightness4 as Brightness4Icon,
-  Brightness7 as Brightness7Icon,
-  Logout,
-} from '@mui/icons-material';
+import Logout from '@mui/icons-material/Logout';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LoginIcon from '@mui/icons-material/Login';
-import { useCart, useUserStore } from '../lib/store';
-import { IUserStore } from '../type';
-import { ColorModeContext } from '../App';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { useCart, useUserStore } from '../../lib/store';
+import { IUserStore } from '../../type';
+import CustomTooltip from '../CustomTooltip';
+import ThemeSwitch from '../ThemeSwitch';
 
 // 메인 헤더 컴포넌트
 export default function Header() {
@@ -41,10 +40,9 @@ export default function Header() {
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const theme = useTheme();
-  const colorMode = useContext(ColorModeContext);
   const { items: cartItems } = useCart();
   const cartItemsCount = cartItems.length;
-  const _id = localStorage.getItem('_id');
+  const matchesXS = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -53,7 +51,7 @@ export default function Header() {
     setAnchorEl(null);
   };
   const handleDashboard = () => {
-    navigate(`/user/${_id}`);
+    navigate('/user');
     handleMenuClose();
   };
   const handleLogoutDialogOpen = () => {
@@ -79,27 +77,41 @@ export default function Header() {
           gap: '1rem',
         }}
       >
-        <IconButton color="inherit">
-          <Badge badgeContent={4} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <Link to="/cart" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <IconButton color="inherit">
-            <Badge badgeContent={cartItemsCount} color="error">
-              <ShoppingCartIcon />
-            </Badge>
+        <CustomTooltip title="내 정보">
+          <IconButton
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleAvatarClick}
+            color="inherit"
+          >
+            <Avatar alt="User Avatar" src="/path/to/your/avatar.jpg" />
           </IconButton>
-        </Link>
-        <IconButton
-          aria-label="account of current user"
-          aria-controls="menu-appbar"
-          aria-haspopup="true"
-          onClick={handleAvatarClick}
-          color="inherit"
-        >
-          <Avatar alt="User Avatar" src="/path/to/your/avatar.jpg" />
-        </IconButton>
+        </CustomTooltip>
+        {!matchesXS && (
+          <CustomTooltip title="알림">
+            <IconButton color="inherit">
+              <Badge badgeContent={4} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </CustomTooltip>
+        )}
+        {!matchesXS && (
+          <Link to="/cart" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <CustomTooltip title="장바구니">
+              <Button color="inherit">
+                <Badge badgeContent={cartItemsCount} color="error">
+                  <ShoppingCartIcon />
+                </Badge>
+                <Typography variant="body1" sx={{ marginLeft: '0.5rem' }}>
+                  장바구니
+                </Typography>
+              </Button>
+            </CustomTooltip>
+          </Link>
+        )}
+
         <Menu
           id="menu-appbar"
           anchorEl={anchorEl}
@@ -167,33 +179,37 @@ export default function Header() {
           boxShadow: 'none',
           borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
           zIndex: theme.zIndex.drawer + 2,
+          height: '64px',
         }}
       >
         <ToolbarStyled>
-          <Link to="/" style={{ alignItems: 'center' }}>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <img
-                src="../../assets/logo.png"
-                alt="ORUM"
-                style={{ width: '100px', height: 'auto' }}
-              />
-            </Typography>
-          </Link>
-
+          {!matchesXS && (
+            <Link to="/" style={{ alignItems: 'center' }}>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                <img
+                  src="../../assets/logo.png"
+                  alt="ORUM"
+                  style={{ width: '100px', height: 'auto' }}
+                />
+              </Typography>
+            </Link>
+          )}
+          {matchesXS && (
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={() => navigate(-1)}
+              sx={{ mr: 2, ml: 0.5 }}
+            >
+              <ArrowBackIosIcon />
+            </IconButton>
+          )}
           <Box
             sx={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}
+            gap={1}
           >
-            <IconButton
-              onClick={colorMode.toggleColorMode}
-              color="inherit"
-              style={{ marginRight: '0.1rem', fontSize: '1rem' }}
-            >
-              {theme.palette.mode === 'dark' ? (
-                <Brightness7Icon />
-              ) : (
-                <Brightness4Icon />
-              )}
-            </IconButton>
+            <ThemeSwitch />
             {isLoggedIn ? isLoggedInUserButton() : notLoggedInUserButton()}
           </Box>
         </ToolbarStyled>

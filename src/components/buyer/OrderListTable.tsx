@@ -29,7 +29,6 @@ export default function OrderListTable({
   orderList: IOrderItem[];
 }) {
   const matches = useMediaQuery('(min-width:1200px)');
-  const id = localStorage.getItem('_id');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ratingValue, setRatingValue] = useState(0);
   const [replies, setReplies] = useState({
@@ -151,14 +150,7 @@ export default function OrderListTable({
                           alt={product.name}
                         />
                       </TableCell>
-                      <TableCell align="left">
-                        <Link
-                          to={`/product/${product._id}`}
-                          style={{ textDecoration: 'none', color: 'inherit' }}
-                        >
-                          {product.name}
-                        </Link>
-                      </TableCell>
+                      <TableCell align="left">{product.name}</TableCell>
                       <TableCell align="center">
                         {product.price.toLocaleString()}원
                       </TableCell>
@@ -167,7 +159,7 @@ export default function OrderListTable({
                       </TableCell>
                       <TableCell align="center">
                         <Link
-                          to={`/user/${id}/buyer-orderlist/${list._id}`}
+                          to={`/user/order-list/${list._id}`}
                           onClick={handleMoveTo}
                           state={{ productId: list._id }}
                         >
@@ -195,7 +187,7 @@ export default function OrderListTable({
                         <Typography variant="body2">
                           &nbsp;상품금액 {list.cost.products.toLocaleString()} +
                           {list.cost.shippingFees === 0
-                            ? ' 배송비 무료 ='
+                            ? ' 배송비 무료'
                             : ` 배송비 ${list.cost.shippingFees.toLocaleString()}`}{' '}
                           - 할인금액&nbsp;
                           {list.cost.discount.products.toLocaleString()} ={' '}
@@ -224,7 +216,7 @@ export default function OrderListTable({
                   {formatDate(list.createdAt)}
                 </Typography>
                 <Link
-                  to={`/user/${id}/buyer-orderlist/${list._id}`}
+                  to={`/user/order-list/${list._id}`}
                   onClick={handleMoveTo}
                   state={{ productId: list._id }}
                 >
@@ -255,19 +247,16 @@ export default function OrderListTable({
                     >
                       주문번호: {list._id}
                     </Typography>
-                    <Link
-                      to={`/product/${product._id}`}
-                      style={{ textDecoration: 'none', color: 'inherit' }}
+
+                    <Typography
+                      variant="body1"
+                      fontWeight={700}
+                      textOverflow={'ellipsis'}
+                      marginTop={0.3}
                     >
-                      <Typography
-                        variant="body1"
-                        fontWeight={700}
-                        textOverflow={'ellipsis'}
-                        marginTop={0.3}
-                      >
-                        {product.name}
-                      </Typography>
-                    </Link>
+                      {product.name}
+                    </Typography>
+
                     <Typography variant="body1" marginTop={0.5}>
                       {product.price.toLocaleString()}원
                     </Typography>

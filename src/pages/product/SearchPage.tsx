@@ -10,7 +10,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 
 import { SearchSection } from '../../components/search/SearchSection';
 import { useSearchStore, useRecentViewProductStore } from '../../lib/store';
-import StickyNavbar from '../../components/NavigationBar';
+import StickyNavbar from '../../components/navbar/NavigationBar';
 import { useSort } from '../../hooks/useSort';
 import { useEffect, useState } from 'react';
 import { IProduct } from '../../type';
@@ -22,6 +22,7 @@ import {
 } from '../../constants';
 import { useFetchProducts } from '../../hooks/useFetchProducts';
 import { ProductGrid } from '../../components/search/ProductGrid';
+import MobileNavBar from '../../components/navbar/MobileNavBar';
 
 export function SearchPage() {
   const { searchResult, setSearchResult } = useSearchStore();
@@ -274,6 +275,7 @@ export function SearchPage() {
           </Grid>
         </Grid>
       </Box>
+      <MobileNavBar />
     </Box>
   );
 }

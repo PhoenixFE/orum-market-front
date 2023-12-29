@@ -1,6 +1,6 @@
 export type IUpdateProduct = Partial<IProduct>;
 export interface IProduct {
-  _id?: number;
+  _id?: number | string;
   seller_id?: number;
   name: string;
   price: number;
@@ -41,7 +41,7 @@ export interface ICartItem {
   _id: number;
   name: string;
   price: number;
-  shippingFees?: number;
+  shippingFees: number;
   quantity: number;
   mainImages: {
     id: string;
@@ -83,8 +83,9 @@ export interface IOrderItem {
 
 export interface IOrderItemDetail extends IOrderItem {
   value: {
-    name: string;
-    value: string;
+    receiver: string;
+    mainAddress?: string;
+    subAddress?: string;
   };
 }
 
@@ -122,7 +123,7 @@ export interface IUserInfo {
         id: number;
         addressName: string;
         receiver: string;
-        tel: number;
+        tel: number | string;
         mainAddress: string;
         subAddress: string;
         name: string;
@@ -187,7 +188,7 @@ export interface IAddressData {
   id?: number;
   addressName?: string;
   receiver?: string;
-  tel?: number | string | null;
+  tel?: number | string;
   name?: string;
   mainAddress?: string;
   subAddress?: string;

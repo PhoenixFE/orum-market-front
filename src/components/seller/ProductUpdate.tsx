@@ -1,30 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
-  InputLabel,
   TextField,
+  MenuItem,
   Button,
+  InputAdornment,
+  OutlinedInput,
   Box,
-  FormLabel,
+  Divider,
   ToggleButtonGroup,
   ToggleButton,
 } from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { IconButton, Stack } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { FormLabel, ListItemDecorator, Menu, Textarea } from '@mui/joy';
+import {
+  FormatBold,
+  FormatItalic,
+  KeyboardArrowDown,
+} from '@mui/icons-material';
+import Check from '@mui/icons-material/Check';
 
 import { api } from '../../api/api';
 import { CATEGORY, QUALITY } from '../../constants/index';
-import { IProductImage, IProduct } from '../../type/index';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+import { IProduct } from '../../type';
 import {
   validateProductName,
   validateProductContent,
   validateProductPrice,
   validateProductShippingFees,
 } from '../../lib/validation';
+import FileUpload from '../FileUpload';
+
 const initCreateData = {
   price: 0,
   shippingFees: 0,
@@ -44,54 +50,90 @@ const initCreateData = {
     sort: 1,
   },
 };
+
+interface FilePreview {
+  id: string;
+  path: string;
+}
+
 export default function ProductUpdate() {
-  const { id } = useParams();
+  const [productData, setProductData] = useState<IProduct>(initCreateData);
+  const [isValid, setIsValid] = useState(true);
+  const [italic, setItalic] = useState(false);
+  const [fontWeight, setFontWeight] = useState('normal');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedQuality, setSelectedQuality] = useState<string | number>('');
+  const [existingImages, setExistingImages] = useState<FilePreview[]>([]);
+  const { productId } = useParams();
   const navigate = useNavigate();
 
-  const [productData, setProductData] = useState<IProduct>(initCreateData);
-  const [filePreview, setFilePreview] = useState<IProductImage[]>([]);
-  const [isValid, setIsValid] = useState(true);
   const [nameError, setNameError] = useState('');
   const [priceError, setPriceError] = useState('');
   const [shippingFeesError, setShippingFeesError] = useState('');
   const [contentError, setContentError] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedQuality, setSelectedQuality] = useState<string | number>('');
 
-  useEffect(() => {
-    fetchProduct();
+  const handleFilesChange = useCallback((files: FilePreview[]) => {
+    setProductData((prevData) => ({
+      ...prevData,
+      mainImages: prevData.mainImages.filter(
+        (img) => !files.some((file) => file.id === img.id),
+      ),
+    }));
+    console.log('11productData', productData);
   }, []);
 
-  useEffect(() => {}, [productData]);
+  useEffect(() => {
+    const fetchProductData = async () => {
+      try {
+        if (productId !== undefined) {
+          const response = await api.getProduct(Number(productId));
+          const fetchedProductData = response.data.item;
+          console.log('fetchedProductData', fetchedProductData);
+          const images = fetchedProductData.mainImages.map(
+            (image: { id: string; path: string }) => ({
+              id: image.id,
+              path: image.path,
+            }),
+          );
+          setExistingImages(images);
+          if (fetchedProductData.extra && fetchedProductData.extra.category) {
+            setSelectedCategory(fetchedProductData.extra.category[1]);
+          }
+          if (fetchedProductData.extra && fetchedProductData.extra.sort) {
+            setSelectedQuality(fetchedProductData.extra.sort);
+          }
 
-  const checkValidate = () => {
-    if (productData) {
-      if (!validateProductName(productData.name)) {
-        setIsValid(false);
-        setNameError('상품명은 2글자 이상 입력하세요.');
-      } else {
-        setIsValid(true);
-        setNameError('');
+          if (
+            JSON.stringify(fetchedProductData.mainImages) !==
+            JSON.stringify(existingImages)
+          ) {
+            setExistingImages(images);
+            setProductData(fetchedProductData);
+            console.log('fetchedProductData2', fetchedProductData);
+            handleFilesChange(images);
+            console.log('images', images);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch product data:', error);
       }
-      if (!validateProductPrice(productData.price)) {
-        setIsValid(false);
-        setPriceError('상품 가격은 정수로 입력하세요.');
-      } else {
-        setPriceError('');
-      }
-      if (!validateProductShippingFees(productData.shippingFees)) {
-        setIsValid(false);
-        setShippingFeesError('배송비는 정수로 입력하세요.');
-      } else {
-        setShippingFeesError('');
-      }
-      if (!validateProductContent(productData.content)) {
-        setIsValid(false);
-        setContentError('상품 설명을 10글자 이상 입력하세요.');
-      } else {
-        setContentError('');
-      }
+    };
+
+    if (productId) {
+      fetchProductData();
     }
+
+    return () => {
+      setProductData(initCreateData);
+    };
+  }, [productId, handleFilesChange]);
+
+  //뒤로가기
+  const handleMoveBack = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (window.confirm('작성한 내용이 저장되지 않습니다. 취소하시겠습니까?'))
+      navigate(-1);
   };
 
   //카테고리 상태값 업데이트
@@ -112,14 +154,6 @@ export default function ProductUpdate() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProductData((prevData) => ({
-      ...prevData,
-      [e.target.name]: e.target.value,
-    }));
-    checkValidate();
-  };
-
   //품질 상태값 업데이트
   const handleQualityChange = (
     _: React.MouseEvent<HTMLElement>,
@@ -137,163 +171,108 @@ export default function ProductUpdate() {
     }
   };
 
-  //뒤로가기
-  const handleMoveBack = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    navigate(-1);
-  };
-
-  //상품 데이터 조회
-  const fetchProduct = async () => {
-    try {
-      const response = await api.getProduct(Number(id));
-      const mainImagesWithId = response.data.item.mainImages.map(
-        (image: any, index: any) => ({
-          img_id: image.id || index.toString(),
-          path: image.path || image,
-        }),
-      );
-
-      setProductData({
-        ...response.data.item,
-        mainImages: mainImagesWithId,
-      });
-
-      setFilePreview(mainImagesWithId);
-    } catch (error) {
-      console.log('제품불러오기실패', error);
+  //가격, 배송료, 상품명, 상품 설명 상태값 업데이트
+  const handleAllChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { name, value } = event.target;
+    if (name === 'price' || name === 'shippingFees') {
+      const numericValue = parseFloat(value);
+      setProductData((prev) => ({ ...prev, [name]: numericValue }));
+    } else {
+      setProductData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  //전체 form submit
-  const updateAllDataSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await api.updateProduct(id!, productData!);
-      alert('상품 수정이 완료되었습니다.');
-      navigate(`/user/${id}/product-manager`);
-    } catch (error) {
-      console.log('상품수정오류', error);
+  //상품 등록 유효성 검사
+  useEffect(() => {
+    if (!validateProductName(productData.name)) {
+      setIsValid(false);
+      setNameError('상품명은 2글자 이상 입력하세요.');
+    } else {
+      setIsValid(true);
+      setNameError('');
     }
-  };
+    if (!validateProductPrice(productData.price)) {
+      setIsValid(false);
+      setPriceError('상품 가격은 정수로 입력하세요.');
+    } else {
+      setPriceError('');
+    }
+    if (!validateProductShippingFees(productData.shippingFees)) {
+      setIsValid(false);
+      setShippingFeesError('배송비는 정수로 입력하세요.');
+    } else {
+      setShippingFeesError('');
+    }
+    if (!validateProductContent(productData.content)) {
+      setIsValid(false);
+      setContentError('상품 설명을 10글자 이상 입력하세요.');
+    } else {
+      setContentError('');
+    }
+  }, [handleAllChange]);
 
-  //파일 업로드를 눌렀을때 실행
-  const clickFileUpload = async (e: React.FormEvent) => {
+  //상품데이터 form submit
+  const handleUpdateData = async (e: React.FormEvent) => {
     e.preventDefault();
-    const fileInput = (e.target as HTMLInputElement).files;
-
-    if (!fileInput) return;
-
-    const totalFiles = filePreview.length + fileInput.length;
-
-    if (totalFiles > 3) {
-      alert('이미지는 3개까지 첨부가능합니다');
+    if (!isValid) {
+      alert('양식이 올바르지 않습니다.');
       return;
     }
-
-    const formData = new FormData();
-
-    for (let i = 0; i < fileInput.length; i++) {
-      formData.append('attach', fileInput[i]);
+    if (productData.mainImages.length > 10) {
+      alert('You can upload a maximum of 10 images.');
+      return;
     }
-
+    if (productData.mainImages.length === 0) {
+      alert('상품 사진을 등록해주세요.');
+      return;
+    }
     try {
-      const response = await api.uploadFile(formData);
-
-      //파일이 여러개일때
-      if (response.data.files) {
-        let fileObject = response.data.files;
-        const resImgUrl = fileObject.map((images: any) => ({
-          img_id: images.name,
-          path: `${API_BASE_URL}${images.path}`,
-        }));
-        setFilePreview([...filePreview, ...resImgUrl]);
-        setProductData({
-          ...productData,
-          mainImages: [...filePreview, ...resImgUrl],
-        });
-      }
-      //단일파일일때
-      else {
-        let fileObject: IProductImage = {
-          id: response.data.file.name,
-          path: `${API_BASE_URL}${response.data.file.path}`,
-        }!;
-
-        setFilePreview([...filePreview, fileObject]);
-        setProductData({
-          ...productData,
-          mainImages: [...filePreview, fileObject],
-        });
+      if (productId) {
+        const response = await api.updateProduct(productId, productData);
+        console.log(response);
+        alert('상품 정보가 성공적으로 업데이트되었습니다.');
+        navigate('/user/seller/products/');
+      } else {
+        console.error('Invalid product ID');
       }
     } catch (error) {
-      console.log('사진첨부에러발생', error);
+      console.error('API Error:', error);
     }
   };
-  //이미지 삭제 로직
-  const handleFileRemove = (
-    e: React.MouseEvent<HTMLButtonElement>,
-    idToRemove: string,
-  ) => {
-    e.preventDefault();
-    setFilePreview((prevPreview: any) =>
-      prevPreview.filter((item: any) => item.img_id !== idToRemove),
-    );
-    setProductData((prevData) => ({
-      ...prevData,
-      mainImages: prevData!.mainImages!.filter(
-        (item) => item.id !== idToRemove,
-      ),
-    }));
-  };
 
-  //상품 설명 onChange
-  const contentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setProductData((prev) => ({ ...prev, [name]: value }));
-  };
+  console.log('productData', productData);
 
   return (
-    <>
+    <form onSubmit={handleUpdateData}>
       {productData && (
         <>
-          <form onSubmit={updateAllDataSubmit}>
-            <>
-              <InputLabel>상품사진</InputLabel>
-              <h3>이미지는 3개까지 첨부 가능합니다.</h3>
-              <Button
-                component="label"
-                variant="contained"
-                startIcon={<CloudUploadIcon />}
-                onChange={clickFileUpload}
-              >
-                파일 업로드
-                <input hidden type="file" multiple accept="image/*" />
-              </Button>
-              {filePreview.map((item) => (
-                <div key={item.id}>
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <IconButton
-                      aria-label="delete"
-                      size="large"
-                      onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                        handleFileRemove(e, item.id)
-                      }
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Stack>
-                  <img
-                    key={item.id}
-                    src={item.path}
-                    alt={'File Preview'}
-                    style={{ marginTop: '10px', maxWidth: '60%' }}
-                  />
-                </div>
-              ))}
-            </>
-            <br />
-            <br />
+          {/* 제목 */}
+          <Box
+            sx={{
+              position: 'sticky',
+              top: '64px',
+              backgroundColor: '#fff',
+              zIndex: 1100,
+              overscrollBehavior: 'contain',
+            }}
+            m={0}
+            pt={2}
+            px={2}
+          >
+            <FormLabel sx={{ fontSize: 'x-large' }}>상품 수정</FormLabel>
+            <Divider />
+          </Box>
+
+          {/* 카테고리, 품질, 상품명, 가격, 배송비, 설명, 사진 업로드 */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+            m={2}
+            p={4}
+            gap={4}
+          >
             <Box>
               <FormLabel sx={{ fontSize: 'medium' }}>카테고리:</FormLabel>
 
@@ -314,8 +293,7 @@ export default function ProductUpdate() {
                 ))}
               </ToggleButtonGroup>
             </Box>
-            <br />
-            <br />
+
             <Box>
               <FormLabel sx={{ fontSize: 'medium' }}>상품 품질:</FormLabel>
               <ToggleButtonGroup
@@ -335,81 +313,157 @@ export default function ProductUpdate() {
                 ))}
               </ToggleButtonGroup>
             </Box>
-            <br />
-            <br />
-            <>
-              상품명:
+
+            <Box>
+              <FormLabel sx={{ fontSize: 'medium' }}>상품명:</FormLabel>
               <TextField
                 type="text"
                 name="name"
+                placeholder="상품명을 입력하세요."
                 value={productData.name}
-                onChange={handleInputChange}
+                onChange={handleAllChange}
               ></TextField>
-              {!isValid && productData.name?.length !== 0 ? (
+              {!isValid && productData.name.length !== 0 ? (
                 <div style={{ color: 'red' }}>{nameError}</div>
               ) : (
                 <> </>
               )}
-            </>
-            <br />
-            <br />
-            <>
-              상품 가격:
-              <TextField
-                type="text"
+            </Box>
+
+            <Box>
+              <FormLabel sx={{ fontSize: 'medium' }}>상품 가격:</FormLabel>
+              <OutlinedInput
+                type="number"
                 name="price"
-                value={productData.price || ''}
-                onChange={handleInputChange}
-              ></TextField>
+                endAdornment={
+                  <InputAdornment position="end">원</InputAdornment>
+                }
+                inputProps={{ step: 1000, min: 0 }}
+                value={productData.price}
+                onChange={handleAllChange}
+              ></OutlinedInput>
               {!isValid ? (
                 <div style={{ color: 'red' }}>{priceError}</div>
               ) : (
                 <></>
               )}
-            </>
-            <br />
-            <br />
-            <>
-              배송비:
-              <TextField
-                type="text"
+            </Box>
+
+            <Box>
+              <FormLabel sx={{ fontSize: 'medium' }}>배송비:</FormLabel>
+              <OutlinedInput
+                type="number"
                 name="shippingFees"
-                value={productData.shippingFees || ''}
-                onChange={handleInputChange}
-              ></TextField>
+                endAdornment={
+                  <InputAdornment position="end">원</InputAdornment>
+                }
+                inputProps={{ step: 500, min: 0 }}
+                value={productData.shippingFees}
+                onChange={handleAllChange}
+              ></OutlinedInput>
               {shippingFeesError && (
                 <div style={{ color: 'red' }}>{shippingFeesError}</div>
               )}
-            </>
-            <br />
-            <br />
-            <>
-              상품 설명:
-              {productData.content && (
-                <TextField
-                  type="text"
-                  name="content"
-                  placeholder="상품 설명을 입력하세요."
-                  value={productData.content}
-                  onChange={contentChange}
-                ></TextField>
-              )}
-              {!isValid && productData.content?.length! > 0 ? (
+            </Box>
+
+            <Box>
+              <FormLabel sx={{ fontSize: 'medium' }}>상품 설명:</FormLabel>
+              <Textarea
+                placeholder="상품 설명을 입력하세요."
+                minRows={4}
+                name="content"
+                value={productData.content}
+                onChange={handleAllChange}
+                endDecorator={
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      gap: 'var(--Textarea-paddingBlock)',
+                      pt: 'var(--Textarea-paddingBlock)',
+                      borderTop: '1px solid',
+                      borderColor: 'divider',
+                      flex: 'auto',
+                    }}
+                  >
+                    <Button
+                      onClick={(event) => setAnchorEl(event.currentTarget)}
+                    >
+                      <FormatBold />
+                      <KeyboardArrowDown />
+                    </Button>
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={() => setAnchorEl(null)}
+                      size="sm"
+                      placement="bottom-start"
+                      sx={{ '--ListItemDecorator-size': '24px' }}
+                    >
+                      {['200', 'normal', 'bold'].map((weight) => (
+                        <MenuItem
+                          key={weight}
+                          selected={fontWeight === weight}
+                          onClick={() => {
+                            setFontWeight(weight);
+                            setAnchorEl(null);
+                          }}
+                          sx={{ fontWeight: weight }}
+                        >
+                          <ListItemDecorator>
+                            {fontWeight === weight && (
+                              <Check fontSize="small" />
+                            )}
+                          </ListItemDecorator>
+                          {weight === '200' ? 'lighter' : weight}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                    <Button
+                      color={italic ? 'primary' : 'inherit'}
+                      aria-pressed={italic}
+                      onClick={() => setItalic((bool) => !bool)}
+                    >
+                      <FormatItalic />
+                    </Button>
+                  </Box>
+                }
+                sx={{
+                  minWidth: 300,
+                  fontWeight,
+                  fontStyle: italic ? 'italic' : 'initial',
+                }}
+              />
+              {!isValid && productData.content.length > 0 ? (
                 <div style={{ color: 'red' }}>{contentError}</div>
               ) : (
                 <></>
               )}
-            </>
-            <br />
-            <Button type="submit" variant="contained">
-              등록하기
+            </Box>
+            {existingImages && (
+              <FileUpload
+                originalFiles={existingImages}
+                onFilesChange={(files: FilePreview[]) =>
+                  handleFilesChange(files)
+                }
+              />
+            )}
+          </Box>
+
+          <Box
+            sx={{ display: 'flex', justifyContent: 'center' }}
+            m={2}
+            p={2}
+            gap={1}
+          >
+            <Button type="button" onClick={handleMoveBack} variant="outlined">
+              취소
             </Button>
-          </form>
-          <Button type="button" variant="outlined" onClick={handleMoveBack}>
-            취소
-          </Button>
+            <Button type="submit" variant="contained" size="large">
+              수정하기
+            </Button>
+          </Box>
         </>
       )}
-    </>
+    </form>
   );
 }

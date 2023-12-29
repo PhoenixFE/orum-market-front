@@ -10,7 +10,7 @@ const useAddToCart = () => {
     addToCart: Function;
   };
 
-  const addProductToCart = (product: IProduct) => {
+  const handleAddToCart = (product: IProduct) => {
     if (!isLoggedIn) {
       const confirmLogin = confirm(
         '로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?',
@@ -24,8 +24,13 @@ const useAddToCart = () => {
     const productAlreadyInCart = items.some((item) => item._id === product._id);
 
     if (productAlreadyInCart) {
-      alert('이미 장바구니에 있는 상품입니다.');
-      return;
+      const navigateToCart = confirm(
+        '이미 장바구니에 담긴 상품입니다. 장바구니로 이동하시겠습니까?',
+      );
+      if (navigateToCart) {
+        navigate('/cart');
+      }
+      return; // Ensure the function exits here if the product is already in the cart.
     }
 
     const confirmAddToCart = confirm('장바구니에 추가하시겠습니까?');
@@ -40,7 +45,7 @@ const useAddToCart = () => {
     }
   };
 
-  return addProductToCart;
+  return handleAddToCart;
 };
 
 export default useAddToCart;

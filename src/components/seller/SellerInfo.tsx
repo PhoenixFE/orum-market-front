@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   Container,
@@ -7,9 +6,14 @@ import {
   FormLabel,
   Button,
 } from '@mui/material';
-
+import {
+  useQuery,
+  useMutation,
+  QueryClientProvider,
+  QueryClient,
+} from 'react-query';
 import { api } from '../../api/api';
-import { IUserInfo } from '../../type/index';
+import CustomBackdrop from '../CustomBackdrop';
 
 const Form = styled.form`
   display: flex;
@@ -19,80 +23,93 @@ const Form = styled.form`
   gap: 0.5rem;
 `;
 
+const queryClient = new QueryClient();
+
 export default function SellerInfo() {
   const userId = localStorage.getItem('_id');
-  const [sellerInfoData, setSellerInfoData] = useState<IUserInfo>(
-    {} as IUserInfo,
+
+  const {
+    data: sellerInfoData,
+    isLoading,
+    error,
+  } = useQuery('sellerInfo', async () => {
+    if (!userId) {
+      throw new Error('ID가 유효하지 않습니다.');
+    }
+    const response = await api.getUserInfo(userId);
+    return response.data.item;
+  });
+
+  const updateMutation = useMutation(
+    (newInfo) => api.updateUserInfo(userId, newInfo),
+    {
+      onSuccess: () => {
+        // Optionally invalidate and refetch
+        queryClient.invalidateQueries('sellerInfo');
+      },
+    },
   );
 
+  const handleUpdateUserInfo = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    updateMutation.mutate({
+      ...sellerInfoData,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div>
+        <CustomBackdrop open={isLoading} />
+      </div>
+    );
+  }
+
+  if (error) {
+    const err = error as Error;
+    return <div>Error: {err.message}</div>;
+  }
+
   const handleChangeUserName = (newName: string) => {
-    setSellerInfoData({
+    // Optimistically update the UI while mutation is in progress
+    queryClient.setQueryData('sellerInfo', {
       ...sellerInfoData,
       name: newName,
     });
   };
 
-  const handleUpdateUserInfo = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      await api.updateUserInfo(userId, sellerInfoData);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    if (!userId) {
-      console.log('ID가 유효하지 않습니다.');
-      return;
-    }
-    const getSellerInfo = async () => {
-      try {
-        const response = await api.getUserInfo(userId);
-        setSellerInfoData({
-          ...sellerInfoData,
-          id: response.data.item._id,
-          email: response.data.item.email,
-          name: response.data.item.name,
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    getSellerInfo();
-  }, []);
-
   return (
-    <Container>
-      {sellerInfoData && (
-        <>
-          <Typography variant="h4">판매자 정보 수정</Typography>
-          <Form onSubmit={handleUpdateUserInfo}>
-            <FormLabel>이메일</FormLabel>
-            <TextField
-              type="email"
-              value={sellerInfoData.email}
-              variant="outlined"
-              size="small"
-              fullWidth
-              required
-              disabled
-            />
-            <FormLabel>이름</FormLabel>
-            <TextField
-              type="text"
-              value={sellerInfoData.name}
-              onChange={(e) => handleChangeUserName(e.target.value)}
-              size="small"
-              fullWidth
-            />
-            <Button type="submit" variant="contained" size="large">
-              판매자 정보 수정하기
-            </Button>
-          </Form>
-        </>
-      )}
-    </Container>
+    <QueryClientProvider client={queryClient}>
+      <Container>
+        {sellerInfoData && (
+          <>
+            <Typography variant="h4">판매자 정보 수정</Typography>
+            <Form onSubmit={handleUpdateUserInfo}>
+              <FormLabel>이메일</FormLabel>
+              <TextField
+                type="email"
+                value={sellerInfoData.email || ''}
+                variant="outlined"
+                size="small"
+                fullWidth
+                required
+                disabled
+              />
+              <FormLabel>이름</FormLabel>
+              <TextField
+                type="text"
+                value={sellerInfoData.name || ''}
+                onChange={(e) => handleChangeUserName(e.target.value)}
+                size="small"
+                fullWidth
+              />
+              <Button type="submit" variant="contained" size="large">
+                판매자 정보 수정하기
+              </Button>
+            </Form>
+          </>
+        )}
+      </Container>
+    </QueryClientProvider>
   );
 }

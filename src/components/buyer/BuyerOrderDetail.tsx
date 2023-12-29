@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 // import formatDate from '../../lib/formatDate';
 import { ORDER_STATE } from '../../constants';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { api } from '../../api/api';
 import { IOrderItemDetail } from '../../type';
@@ -89,10 +89,6 @@ export default function OrderListTable() {
               <TableCell>{orderDetail?.createdAt}</TableCell>
             </TableRow>
             <TableRow>
-              <BasicHeadCell>주문자</BasicHeadCell>
-              <TableCell>{orderDetail?.value?.name}</TableCell>
-            </TableRow>
-            <TableRow>
               <BasicHeadCell>주문상태</BasicHeadCell>
               <TableCell>{orderState(orderDetail?.state || '')}</TableCell>
             </TableRow>
@@ -135,7 +131,9 @@ export default function OrderListTable() {
             <TableRow>
               <BasicHeadCell>배송비</BasicHeadCell>
               <TableCell>
-                {orderDetail?.cost?.shippingFees?.toLocaleString()}원
+                {orderDetail?.cost?.shippingFees?.toLocaleString()}원 (할인금액:
+                &nbsp;
+                {orderDetail?.cost?.discount.shippingFees.toLocaleString()}원)
               </TableCell>
             </TableRow>
           </TableBody>
@@ -160,11 +158,14 @@ export default function OrderListTable() {
           <TableBody>
             <TableRow>
               <BasicHeadCell>수령인</BasicHeadCell>
-              <TableCell>{orderDetail?.value?.name}</TableCell>
+              <TableCell>{orderDetail?.value?.receiver}</TableCell>
             </TableRow>
             <TableRow>
               <BasicHeadCell>배송주소</BasicHeadCell>
-              <TableCell>{orderDetail?.value?.value}</TableCell>
+              <TableCell>
+                {orderDetail?.value?.mainAddress} +
+                {orderDetail?.value?.subAddress}
+              </TableCell>
             </TableRow>
           </TableBody>
         </BasicTable>
@@ -193,7 +194,7 @@ export default function OrderListTable() {
                 <TableHeaderCell align="center" sx={{ width: '100px' }}>
                   이미지
                 </TableHeaderCell>
-                <TableHeaderCell align="center">상품정보</TableHeaderCell>
+                <TableHeaderCell align="center">상품명</TableHeaderCell>
                 <TableHeaderCell align="center">상품금액</TableHeaderCell>
                 <TableHeaderCell align="center">주문상태</TableHeaderCell>
               </TableRow>
@@ -211,14 +212,7 @@ export default function OrderListTable() {
                     />
                   </TableCell>
 
-                  <TableCell align="left">
-                    <Link
-                      to={`/product/${list._id}`}
-                      style={{ textDecoration: 'none', color: 'inherit' }}
-                    >
-                      {list.name}
-                    </Link>
-                  </TableCell>
+                  <TableCell align="left">{list.name}</TableCell>
                   <TableCell align="center">
                     {list.price.toLocaleString()}원
                   </TableCell>
@@ -248,19 +242,14 @@ export default function OrderListTable() {
                       margin: '0',
                     }}
                   >
-                    <Link
-                      to={`/product/${list._id}`}
-                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    <Typography
+                      variant="body1"
+                      fontWeight={700}
+                      textOverflow={'ellipsis'}
+                      marginTop={0.3}
                     >
-                      <Typography
-                        variant="body1"
-                        fontWeight={700}
-                        textOverflow={'ellipsis'}
-                        marginTop={0.3}
-                      >
-                        {list.name}
-                      </Typography>
-                    </Link>
+                      {list.name}
+                    </Typography>
                     <Typography variant="body1" marginTop={0.5}>
                       {list.price.toLocaleString()}원
                     </Typography>
@@ -269,7 +258,6 @@ export default function OrderListTable() {
                 </OrderProductList>
               ))}
             </Card>
-            {/* ))} */}
           </>
         )}
       </TableContainer>

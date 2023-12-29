@@ -27,8 +27,6 @@ import formatDate from '../../lib/formatDate';
 import SkeletonTable from './SkeletonTable';
 
 export default function ProductManager() {
-  const _id = localStorage.getItem('_id');
-
   const [productList, setProductList] = useState<IProduct[]>([]);
   const [sortedProductList, setSortedProductList] = useState<IProduct[]>([]);
   const [sortOrder, setSortOrder] = useState('최신순');
@@ -109,17 +107,20 @@ export default function ProductManager() {
     return '판매중';
   };
 
-  if (productList.length === 0 && !isLoading) {
-    return (
-      <Typography variant="h3" sx={{ marginBottom: '1rem' }}>
-        판매중인 상품이 존재하지 않습니다.
-      </Typography>
-    );
-  }
+  const deleteProduct = async (_id: string) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await api.deleteProduct(_id);
+        setProductList(productList.filter((product) => product._id !== _id));
+      } catch (error) {
+        console.error('Error deleting product:', error);
+      }
+    }
+  };
 
   return (
     <>
-      <Link to={`/user/${_id}/product-create`}>
+      <Link to={`/user/seller/products/new`}>
         <Button variant="contained">등록하기</Button>
       </Link>
       <Box
@@ -160,14 +161,25 @@ export default function ProductManager() {
                 <TableCell align="center">가격</TableCell>
                 <TableCell align="center">주문상태</TableCell>
                 <TableCell align="center">공개여부</TableCell>
-                <TableCell align="center"></TableCell>
+                <TableCell align="center">수정</TableCell>
+                <TableCell align="center">삭제</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {isLoading ? (
-                <SkeletonTable rows={5} columns={7} />
-              ) : (
-                sortedProductList.map((rows) => (
+            {isLoading ? (
+              <SkeletonTable rows={5} columns={7} />
+            ) : (
+              <TableBody>
+                {productList.length === 0 && !isLoading && (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center">
+                      <Typography variant="subtitle1">
+                        판매중인 상품이 존재하지 않습니다.
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {sortedProductList.map((rows) => (
                   <TableRow key={rows._id}>
                     <TableCell align="center">
                       <Typography variant="body2" color="text.secondary">
@@ -177,19 +189,33 @@ export default function ProductManager() {
                     </TableCell>
 
                     <TableCell align="center">
-                      <img
-                        src={`${rows.mainImages[0].path}`}
-                        alt={`${rows.mainImages[0].id}`}
-                        style={{
-                          width: '80px',
-                          height: '80px',
-                          objectFit: 'cover',
-                          borderRadius: '5px',
-                        }}
-                      />
+                      {rows.mainImages.length === 0 && (
+                        <img
+                          src="../../assets/no-image.jpg"
+                          alt="no image"
+                          style={{
+                            width: '80px',
+                            height: '80px',
+                            objectFit: 'cover',
+                            borderRadius: '5px',
+                          }}
+                        />
+                      )}
+                      {rows.mainImages.length > 1 && (
+                        <img
+                          src={`${rows.mainImages[0].path}`}
+                          alt={`${rows.mainImages[0].id}`}
+                          style={{
+                            width: '80px',
+                            height: '80px',
+                            objectFit: 'cover',
+                            borderRadius: '5px',
+                          }}
+                        />
+                      )}
                     </TableCell>
                     <TableCell align="center">
-                      <Link to={`/product/${rows._id}`}>{rows.name}</Link>
+                      <Link to={`/products/${rows._id}`}>{rows.name}</Link>
                     </TableCell>
                     <TableCell align="center">
                       {rows.extra.sort
@@ -204,7 +230,9 @@ export default function ProductManager() {
                       {rows.price.toLocaleString()}원
                     </TableCell>
                     <TableCell align="center">
-                      {getOrderStateLabel(rows._id)}
+                      {typeof rows._id === 'number'
+                        ? getOrderStateLabel(rows._id)
+                        : 'Invalid ID'}
                     </TableCell>
                     <TableCell align="center">
                       <ToggleButton
@@ -230,18 +258,31 @@ export default function ProductManager() {
                     </TableCell>
                     <TableCell align="center">
                       <Link
-                        to={`/user/${rows._id}/product-update`}
+                        to={`/user/seller/products/${rows._id}/edit/`}
                         state={{ productId: `${rows._id}` }}
                       >
                         <Button type="button" variant="contained">
-                          수정하기
+                          수정
                         </Button>
                       </Link>
                     </TableCell>
+                    <TableCell align="center">
+                      <Button
+                        type="button"
+                        variant="text"
+                        onClick={() => {
+                          if (typeof rows._id === 'string') {
+                            deleteProduct(rows._id);
+                          }
+                        }}
+                      >
+                        삭제
+                      </Button>
+                    </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
+                ))}
+              </TableBody>
+            )}
           </Table>
         </TableContainer>
       </Box>

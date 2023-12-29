@@ -15,6 +15,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { memo } from 'react';
 import { useUserStore } from '../../lib/store';
+import CustomTooltip from '../../components/CustomTooltip';
 
 interface ProductCardProps {
   product: IProduct;
@@ -47,7 +48,7 @@ export const ProductCard = memo(function ProductCard({
   return (
     <>
       <StyledCard>
-        <CardActionArea component={Link} to={`/product/${product._id}`}>
+        <CardActionArea component={Link} to={`/products/${product._id}`}>
           {product.mainImages.length > 0 && (
             <LazyLoadImage
               src={product.mainImages[0].path}
@@ -84,12 +85,16 @@ export const ProductCard = memo(function ProductCard({
                 : '배송료: ' + product.shippingFees.toLocaleString() + '원'}
             </Typography>
           </ShippingFee>
-          <IconButton onClick={() => handleAddToCart(product)}>
-            <ShoppingCartIcon />
-          </IconButton>
-          <IconButton onClick={perchaseProduct}>
-            <PaymentIcon />
-          </IconButton>
+          <CustomTooltip title="장바구니에 담기">
+            <IconButton onClick={() => handleAddToCart(product)}>
+              <ShoppingCartIcon />
+            </IconButton>
+          </CustomTooltip>
+          <CustomTooltip title="바로 구매하기">
+            <IconButton onClick={perchaseProduct}>
+              <PaymentIcon />
+            </IconButton>
+          </CustomTooltip>
         </ProductActions>
       </StyledCard>
     </>

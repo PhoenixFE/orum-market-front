@@ -16,7 +16,6 @@ import BookmarkListTable from './BookmarkListTable';
 import getState from '../../lib/getState';
 
 export const BuyerHome = () => {
-  const id = localStorage.getItem('_id');
   const orderList = useGetOrderList();
   const slicedOrderList = orderList.slice(0, 5);
   const bookmarkList = useGetBookmark();
@@ -82,7 +81,7 @@ export const BuyerHome = () => {
         >
           최근 주문 내역
         </Typography>
-        <Link to={`/user/${id}/buyer-orderlist`}>
+        <Link to="order-list">
           <Button type="button" sx={{ padding: '10px 0' }}>
             주문내역 더보기 <ChevronRight />
           </Button>
@@ -132,7 +131,7 @@ export const BuyerHome = () => {
         <Typography variant="h6" fontWeight={600}>
           찜한 상품
         </Typography>
-        <Link to={`/user/${id}/buyer-favorite`}>
+        <Link to={`/user/favorites`}>
           <Button type="button" sx={{ padding: '6px 0' }}>
             찜한 상품 더보기 <ChevronRight />
           </Button>
