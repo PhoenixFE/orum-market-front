@@ -107,11 +107,12 @@ export default function ProductManager() {
     return '판매중';
   };
 
-  const deleteProduct = async (_id: string) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
+  const deleteProduct = async (_id: number) => {
+    if (window.confirm('상품을 삭제하시겠습니까?')) {
       try {
         await api.deleteProduct(_id);
         setProductList(productList.filter((product) => product._id !== _id));
+        console.log('삭제완료', _id);
       } catch (error) {
         console.error('Error deleting product:', error);
       }
@@ -271,7 +272,7 @@ export default function ProductManager() {
                         type="button"
                         variant="text"
                         onClick={() => {
-                          if (typeof rows._id === 'string') {
+                          if (typeof rows._id === 'number') {
                             deleteProduct(rows._id);
                           }
                         }}

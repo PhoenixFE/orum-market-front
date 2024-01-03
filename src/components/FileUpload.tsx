@@ -67,8 +67,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
-  console.log('filePreview', filePreview);
-  console.log('originalFiles', originalFiles);
+
   return (
     <Box
       sx={{

@@ -80,7 +80,6 @@ export default function ProductUpdate() {
         (img) => !files.some((file) => file.id === img.id),
       ),
     }));
-    console.log('11productData', productData);
   }, []);
 
   useEffect(() => {
@@ -89,7 +88,6 @@ export default function ProductUpdate() {
         if (productId !== undefined) {
           const response = await api.getProduct(Number(productId));
           const fetchedProductData = response.data.item;
-          console.log('fetchedProductData', fetchedProductData);
           const images = fetchedProductData.mainImages.map(
             (image: { id: string; path: string }) => ({
               id: image.id,
@@ -110,7 +108,6 @@ export default function ProductUpdate() {
           ) {
             setExistingImages(images);
             setProductData(fetchedProductData);
-            console.log('fetchedProductData2', fetchedProductData);
             handleFilesChange(images);
             console.log('images', images);
           }
@@ -239,8 +236,6 @@ export default function ProductUpdate() {
       console.error('API Error:', error);
     }
   };
-
-  console.log('productData', productData);
 
   return (
     <form onSubmit={handleUpdateData}>
