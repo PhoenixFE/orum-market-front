@@ -256,10 +256,10 @@ export const ORDER_STATE = {
 };
 
 export const SORT_OPTIONS = [
-  { label: '최신순', value: '최신순' },
-  { label: '오래된순', value: '오래된순' },
-  { label: '높은가격순', value: '높은가격순' },
-  { label: '낮은가격순', value: '낮은가격순' },
+  { label: '최신순', value: '최신순', sortQuery: 'latest' },
+  { label: '오래된순', value: '오래된순', sortQuery: 'oldest' },
+  { label: '높은가격순', value: '높은가격순', sortQuery: 'maxPrice' },
+  { label: '낮은가격순', value: '낮은가격순', sortQuery: 'minPrice' },
 ];
 
 export const PRICE_BOUNDARIES: { [key: string]: { min: number; max: number } } =
