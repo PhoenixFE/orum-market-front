@@ -112,7 +112,6 @@ export default function ProductManager() {
       try {
         await api.deleteProduct(_id);
         setProductList(productList.filter((product) => product._id !== _id));
-        console.log('삭제완료', _id);
       } catch (error) {
         console.error('Error deleting product:', error);
       }
