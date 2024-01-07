@@ -4,7 +4,7 @@ import { IProduct } from '../../type';
 import { ProductCard } from '../../pages/product/ProductCard';
 
 interface ProductGridProps {
-  isLoading: boolean;
+  // isLoading: boolean;
   isDataFetched: boolean;
   filteredProducts: IProduct[];
   itemsPerPage: number;
@@ -12,7 +12,7 @@ interface ProductGridProps {
 }
 
 export const ProductGrid = ({
-  isLoading,
+  // isLoading,
   isDataFetched,
   filteredProducts,
   itemsPerPage,
@@ -39,7 +39,7 @@ export const ProductGrid = ({
   };
 
   const renderNoProductsMessage = () => {
-    if (!isLoading && isDataFetched && filteredProducts.length === 0) {
+    if (isDataFetched && filteredProducts.length === 0) {
       return (
         <Grid item xs={12} style={{ height: '100%' }}>
           <Box
@@ -59,9 +59,9 @@ export const ProductGrid = ({
   };
 
   const renderProductsOrSkeletons = () => {
-    if (isLoading) {
-      return <ProductSkeleton />;
-    }
+    // if (isLoading) {
+    //   return <ProductSkeleton />;
+    // }
 
     return (
       <>
