@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { IProduct } from '../type';
+import { api } from '../api/api';
 
 export const useSort = (products: IProduct[], initialSortOrder: string) => {
   const [sortedProducts, setSortedProducts] = useState(products);
@@ -11,29 +12,31 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
       return;
     }
 
-    let sorted = [...products];
+    let sortQuery = {};
     switch (currentSortOrder) {
-      case '최신순':
-        sorted.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
+      case 'latest':
+        sortQuery = `sort={"createdAt": -1}`;
         break;
-      case '오래된순':
-        sorted.sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-        );
+      case 'oldest':
+        sortQuery = `sort={"createdAt": 1}`;
         break;
-      case '높은가격순':
-        sorted.sort((a, b) => b.price - a.price);
+      case 'maxPrice':
+        sortQuery = `sort={"price": -1}`;
         break;
-      case '낮은가격순':
-        sorted.sort((a, b) => a.price - b.price);
+      case 'minPrice':
+        sortQuery = `sort={"price": 1}`;
         break;
-      // 기타 케이스 추가 가능
     }
-    setSortedProducts(sorted);
+
+    const sortFetchProducts = async () => {
+      try {
+        const response = await api.getProductList(sortQuery);
+        setSortedProducts(response.data.item);
+      } catch (error) {
+        console.log('데이터를 받아오지 못했습니다.', error);
+      }
+    };
+    sortFetchProducts();
   }, [products, currentSortOrder]);
 
   return [sortedProducts, setCurrentSortOrder];

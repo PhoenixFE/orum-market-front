@@ -149,6 +149,8 @@ export interface IProductListQuery {
   sort?: string;
   page?: number;
   limit?: number;
+  createdAt?: number;
+  price?: number;
 }
 
 export interface IBookmarkItem {
