@@ -28,7 +28,7 @@ export function SearchPage() {
   const { searchResult, setSearchResult } = useSearchStore();
   const [sortedProducts, setCurrentSortOrder] = useSort(
     searchResult,
-    '최신순',
+    'latest',
   ) as any;
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

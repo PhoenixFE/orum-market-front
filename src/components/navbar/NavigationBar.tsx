@@ -33,7 +33,7 @@ export default function NavigationBar({
   handleSort,
   handleDisplayChange,
 }: INavigationBar) {
-  const [selectedSortOrder, setSelectedSortOrder] = useState<string>('최신순');
+  const [selectedSortOrder, setSelectedSortOrder] = useState<string>('latest');
   const [itemsPerPage, setItemsPerPage] = useState<number>(4);
   const theme = useTheme();
   const isMdDown = useMediaQuery(theme.breakpoints.down('md'));
