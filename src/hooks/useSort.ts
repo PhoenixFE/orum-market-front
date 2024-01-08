@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { IProduct, IOrderItem } from '../type';
+import { IProduct } from '../type';
 import { api } from '../api/api';
 
 export const useSort = (products: IProduct[], initialSortOrder: string) => {
@@ -64,6 +64,7 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
         setIsLoading(false);
       }
     };
+
     sortFetchProducts(currnetQuery);
   }, [products, currentSortOrder]);
 

@@ -146,7 +146,7 @@ export default function SellerOrderManager() {
               </TableBody>
             )}
             {isLoading && <SkeletonTable rows={5} columns={9} />}
-            {sortedProducts.map((orderItem) => (
+            {sortedProducts.map((orderItem: IOrderItem) => (
               <TableBody key={orderItem._id}>
                 {orderItem.products.map((productItem) => (
                   <TableRow key={productItem._id}>
