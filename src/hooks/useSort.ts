@@ -24,10 +24,10 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
         sortQuery = `sort={"createdAt": 1}`;
         break;
       case 'maxPrice':
-        sortQuery = `sort={"price": -1}`;
+        sortQuery = path === '/' ? `sort={"price": -1}` : `sort={"cost": -1}`;
         break;
       case 'minPrice':
-        sortQuery = `sort={"price": 1}`;
+        sortQuery = path === '/' ? `sort={"price": 1}` : `sort={"cost": 1}`;
         break;
     }
 
@@ -36,8 +36,8 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
       try {
         const response =
           path === '/'
-            ? await api.getProductList(sortQuery)
-            : await api.getOrderState(sortQuery);
+            ? await api.getOrderState(sortQuery)
+            : await api.getProductList(sortQuery);
         setSortedProducts(response.data.item);
       } catch (error) {
         console.log('데이터를 받아오지 못했습니다.', error);
