@@ -18,15 +18,30 @@ import { useEffect, useState } from 'react';
 
 import { api } from '../../api/api';
 import { IOrderItem } from '../../type';
-import { QUALITY, ORDER_STATE } from '../../constants/index';
+import {
+  QUALITY,
+  ORDER_STATE,
+  SORT_OPTIONS_DASHBOARD,
+} from '../../constants/index';
 import formatDate from '../../lib/formatDate';
 import SkeletonTable from './SkeletonTable';
+import { useSort } from '../../hooks/useSort';
 
 export default function SellerOrderManager() {
   const [sortedOrderList, setSortedOrderList] = useState<IOrderItem[]>([]);
-  const [sortOrder, setSortOrder] = useState('최신순');
+  const [sortOrder, setSortOrder] = useState<string>('latest');
   const [orderList, setOrderList] = useState<IOrderItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [sortedProducts, setCurrentSortOrder] = useSort(
+    sortedOrderList,
+    'latest',
+  ) as any;
+
+  const onSortChange = (sortValue: string) => {
+    setSortOrder(sortValue);
+    setCurrentSortOrder(sortValue);
+  };
 
   useEffect(() => {
     const getOrderState = async () => {
@@ -44,33 +59,6 @@ export default function SellerOrderManager() {
     };
     getOrderState();
   }, []);
-
-  useEffect(() => {
-    let sorted = [...orderList];
-    switch (sortOrder) {
-      case '최신순':
-        sorted.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
-        break;
-      case '오래된순':
-        sorted.sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-        );
-        break;
-      case '가-하':
-        sorted.sort((a, b) => a.cost.total - b.cost.total);
-        break;
-      case '하-가':
-        sorted.sort((a, b) => b.cost.total - a.cost.total);
-        break;
-      default:
-        break;
-    }
-    setSortedOrderList(sorted);
-  }, [orderList, sortOrder]);
 
   const getQualityName = (quantity: number) => {
     const qualityItem = QUALITY.find((q) => q.value === quantity);
@@ -130,16 +118,18 @@ export default function SellerOrderManager() {
         <FormControl>
           <InputLabel id="sort-label">정렬</InputLabel>
           <Select
-            labelId="sort-label"
+            labelId="sort-select-label"
             id="sort-select"
             value={sortOrder}
             size="small"
-            onChange={(e) => setSortOrder(e.target.value)}
+            sx={{ fontSize: '0.9rem', borderRadius: 0 }}
+            onChange={(event) => onSortChange(event.target.value as string)}
           >
-            <MenuItem value="최신순">최신순</MenuItem>
-            <MenuItem value="오래된순">오래된순</MenuItem>
-            <MenuItem value="가-하">가격: 낮은 순</MenuItem>
-            <MenuItem value="하-가">가격: 높은 순</MenuItem>
+            {SORT_OPTIONS_DASHBOARD.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <TableContainer component={Paper}>
