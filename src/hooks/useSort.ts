@@ -53,11 +53,18 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
     const sortFetchProducts = async (path: string) => {
       try {
         setIsLoading(true);
-        const response =
-          path === '/'
-            ? await api.getProductList(sortQuery)
-            : await api.getOrderState(sortQuery);
-        setSortedProducts(response.data.item);
+        let response;
+
+        switch (path) {
+          case '/':
+            response = await api.getProductList(sortQuery);
+            break;
+          case 'orders':
+            response = await api.getOrderState(sortQuery);
+            break;
+        }
+
+        setSortedProducts(response?.data.item);
         setIsLoading(false);
       } catch (error) {
         console.log('데이터를 받아오지 못했습니다.', error);
