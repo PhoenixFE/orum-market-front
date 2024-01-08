@@ -14,7 +14,7 @@ import {
   FormControl,
   Button,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { api } from '../../api/api';
 import { IOrderItem } from '../../type';
@@ -26,15 +26,16 @@ import {
 import formatDate from '../../lib/formatDate';
 import SkeletonTable from './SkeletonTable';
 import { useSort } from '../../hooks/useSort';
+import { useSearchStore } from '../../lib/store';
 
 export default function SellerOrderManager() {
+  const { searchResult } = useSearchStore();
   const [sortedOrderList, setSortedOrderList] = useState<IOrderItem[]>([]);
   const [sortOrder, setSortOrder] = useState<string>('latest');
   const [orderList, setOrderList] = useState<IOrderItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  const [sortedProducts, setCurrentSortOrder] = useSort(
-    sortedOrderList,
+  const [sortedProducts, setCurrentSortOrder, isLoading] = useSort(
+    searchResult,
     'latest',
   ) as any;
 
@@ -42,23 +43,6 @@ export default function SellerOrderManager() {
     setSortOrder(sortValue);
     setCurrentSortOrder(sortValue);
   };
-
-  useEffect(() => {
-    const getOrderState = async () => {
-      try {
-        setIsLoading(true);
-        const response = await api.getOrderState();
-        const orderState = response.data.item;
-        setSortedOrderList(orderState);
-        setOrderList(orderState);
-        setIsLoading(false);
-      } catch (error) {
-        console.log('판매자의 주문상태 조회 실패', error);
-        setIsLoading(false);
-      }
-    };
-    getOrderState();
-  }, []);
 
   const getQualityName = (quantity: number) => {
     const qualityItem = QUALITY.find((q) => q.value === quantity);
@@ -140,7 +124,6 @@ export default function SellerOrderManager() {
                   등록일자
                   <br /> (등록번호)
                 </TableCell>
-
                 <TableCell align="center">이미지</TableCell>
                 <TableCell align="center">상품명</TableCell>
                 <TableCell align="center">품질</TableCell>
@@ -151,16 +134,22 @@ export default function SellerOrderManager() {
                 <TableCell align="center"></TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {orderList.length === 0 && !isLoading && (
-                <Typography variant="h5" sx={{ marginBottom: '1rem' }}>
-                  주문 건이 존재하지 않습니다. 분발하세요.
-                </Typography>
-              )}
-              {isLoading && <SkeletonTable rows={5} columns={9} />}
-              {sortedOrderList.map((orderItem) =>
-                orderItem.products.map((productItem) => (
-                  <TableRow key={orderItem._id}>
+            {sortedProducts.length === 0 && !isLoading && (
+              <TableBody>
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Typography variant="body2" sx={{ marginBottom: '1rem' }}>
+                      주문 건이 존재하지 않습니다. 분발하세요.
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            )}
+            {isLoading && <SkeletonTable rows={5} columns={9} />}
+            {sortedProducts.map((orderItem) => (
+              <TableBody key={orderItem._id}>
+                {orderItem.products.map((productItem) => (
+                  <TableRow key={productItem._id}>
                     <TableCell align="center">
                       <Typography variant="body2" color="text.secondary">
                         {formatDate(orderItem.createdAt)}
@@ -221,18 +210,20 @@ export default function SellerOrderManager() {
                         수정하기
                       </Button>
                     </TableCell>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 1,
-                      }}
-                    ></Box>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: 1,
+                        }}
+                      ></Box>
+                    </TableCell>
                   </TableRow>
-                )),
-              )}
-            </TableBody>
+                ))}
+              </TableBody>
+            ))}
           </Table>
         </TableContainer>
       </Box>
