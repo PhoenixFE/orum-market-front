@@ -107,8 +107,8 @@ export default function ProductManager() {
     return '판매중';
   };
 
-  const deleteProduct = async (_id: string) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
+  const deleteProduct = async (_id: number) => {
+    if (window.confirm('상품을 삭제하시겠습니까?')) {
       try {
         await api.deleteProduct(_id);
         setProductList(productList.filter((product) => product._id !== _id));
@@ -116,6 +116,14 @@ export default function ProductManager() {
         console.error('Error deleting product:', error);
       }
     }
+  };
+  //공개여부 처리
+  const handleIsShow = async (_id: number) => {
+    setIsShow(true);
+    // setProductList((prev) => ({
+    //   ...prev,
+    //   show: true,
+    // }));
   };
 
   return (
@@ -239,14 +247,16 @@ export default function ProductManager() {
                         value="check"
                         selected={isShow}
                         size={'small'}
-                        onChange={() => {
-                          setIsShow(!rows.show);
+                        onClick={() => {
+                          if (typeof rows._id === 'number') {
+                            handleIsShow(rows._id);
+                          }
                         }}
                       >
                         <CheckIcon />
                       </ToggleButton>
                     </TableCell>
-                    <TableCell align="center">
+                    {/* <TableCell align="center">
                       <Box
                         sx={{
                           display: 'flex',
@@ -255,7 +265,7 @@ export default function ProductManager() {
                           gap: 1,
                         }}
                       ></Box>
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell align="center">
                       <Link
                         to={`/user/seller/products/${rows._id}/edit/`}
@@ -271,7 +281,7 @@ export default function ProductManager() {
                         type="button"
                         variant="text"
                         onClick={() => {
-                          if (typeof rows._id === 'string') {
+                          if (typeof rows._id === 'number') {
                             deleteProduct(rows._id);
                           }
                         }}
