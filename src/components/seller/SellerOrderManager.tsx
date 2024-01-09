@@ -14,63 +14,31 @@ import {
   FormControl,
   Button,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { api } from '../../api/api';
 import { IOrderItem } from '../../type';
-import { QUALITY, ORDER_STATE } from '../../constants/index';
+import { QUALITY, ORDER_STATE, SORT_OPTIONS } from '../../constants/index';
 import formatDate from '../../lib/formatDate';
 import SkeletonTable from './SkeletonTable';
+import { useSort } from '../../hooks/useSort';
+import { useSearchStore } from '../../lib/store';
 
 export default function SellerOrderManager() {
+  const { searchResult } = useSearchStore();
   const [sortedOrderList, setSortedOrderList] = useState<IOrderItem[]>([]);
-  const [sortOrder, setSortOrder] = useState('최신순');
+  const [sortOrder, setSortOrder] = useState<string>('latest');
   const [orderList, setOrderList] = useState<IOrderItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const getOrderState = async () => {
-      try {
-        setIsLoading(true);
-        const response = await api.getOrderState();
-        const orderState = response.data.item;
-        setSortedOrderList(orderState);
-        setOrderList(orderState);
-        setIsLoading(false);
-      } catch (error) {
-        console.log('판매자의 주문상태 조회 실패', error);
-        setIsLoading(false);
-      }
-    };
-    getOrderState();
-  }, []);
+  const [sortedProducts, setCurrentSortOrder, isLoading] = useSort(
+    searchResult,
+    'latest',
+  ) as any;
 
-  useEffect(() => {
-    let sorted = [...orderList];
-    switch (sortOrder) {
-      case '최신순':
-        sorted.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
-        break;
-      case '오래된순':
-        sorted.sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-        );
-        break;
-      case '가-하':
-        sorted.sort((a, b) => a.cost.total - b.cost.total);
-        break;
-      case '하-가':
-        sorted.sort((a, b) => b.cost.total - a.cost.total);
-        break;
-      default:
-        break;
-    }
-    setSortedOrderList(sorted);
-  }, [orderList, sortOrder]);
+  const onSortChange = (sortValue: string) => {
+    setSortOrder(sortValue);
+    setCurrentSortOrder(sortValue);
+  };
 
   const getQualityName = (quantity: number) => {
     const qualityItem = QUALITY.find((q) => q.value === quantity);
@@ -130,16 +98,18 @@ export default function SellerOrderManager() {
         <FormControl>
           <InputLabel id="sort-label">정렬</InputLabel>
           <Select
-            labelId="sort-label"
+            labelId="sort-select-label"
             id="sort-select"
             value={sortOrder}
             size="small"
-            onChange={(e) => setSortOrder(e.target.value)}
+            sx={{ fontSize: '0.9rem', borderRadius: 0 }}
+            onChange={(event) => onSortChange(event.target.value as string)}
           >
-            <MenuItem value="최신순">최신순</MenuItem>
-            <MenuItem value="오래된순">오래된순</MenuItem>
-            <MenuItem value="가-하">가격: 낮은 순</MenuItem>
-            <MenuItem value="하-가">가격: 높은 순</MenuItem>
+            {SORT_OPTIONS.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <TableContainer component={Paper}>
@@ -150,7 +120,6 @@ export default function SellerOrderManager() {
                   등록일자
                   <br /> (등록번호)
                 </TableCell>
-
                 <TableCell align="center">이미지</TableCell>
                 <TableCell align="center">상품명</TableCell>
                 <TableCell align="center">품질</TableCell>
@@ -161,16 +130,22 @@ export default function SellerOrderManager() {
                 <TableCell align="center"></TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {orderList.length === 0 && !isLoading && (
-                <Typography variant="h5" sx={{ marginBottom: '1rem' }}>
-                  주문 건이 존재하지 않습니다. 분발하세요.
-                </Typography>
-              )}
-              {isLoading && <SkeletonTable rows={5} columns={9} />}
-              {sortedOrderList.map((orderItem) =>
-                orderItem.products.map((productItem) => (
-                  <TableRow key={orderItem._id}>
+            {sortedProducts.length === 0 && !isLoading && (
+              <TableBody>
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Typography variant="body2" sx={{ marginBottom: '1rem' }}>
+                      주문 건이 존재하지 않습니다. 분발하세요.
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            )}
+            {isLoading && <SkeletonTable rows={5} columns={9} />}
+            {sortedProducts.map((orderItem: IOrderItem) => (
+              <TableBody key={orderItem._id}>
+                {orderItem.products.map((productItem) => (
+                  <TableRow key={productItem._id}>
                     <TableCell align="center">
                       <Typography variant="body2" color="text.secondary">
                         {formatDate(orderItem.createdAt)}
@@ -231,18 +206,20 @@ export default function SellerOrderManager() {
                         수정하기
                       </Button>
                     </TableCell>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 1,
-                      }}
-                    ></Box>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: 1,
+                        }}
+                      ></Box>
+                    </TableCell>
                   </TableRow>
-                )),
-              )}
-            </TableBody>
+                ))}
+              </TableBody>
+            ))}
           </Table>
         </TableContainer>
       </Box>

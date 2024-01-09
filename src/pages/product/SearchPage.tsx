@@ -20,7 +20,7 @@ import {
   PRICE_RANGE,
   SHIPPING_FEE,
 } from '../../constants';
-import { useFetchProducts } from '../../hooks/useFetchProducts';
+// import { useFetchProducts } from '../../hooks/useFetchProducts';   // TODO : reactQuery 작업
 import { ProductGrid } from '../../components/search/ProductGrid';
 import MobileNavBar from '../../components/navbar/MobileNavBar';
 
@@ -28,7 +28,7 @@ export function SearchPage() {
   const { searchResult, setSearchResult } = useSearchStore();
   const [sortedProducts, setCurrentSortOrder] = useSort(
     searchResult,
-    '최신순',
+    'latest',
   ) as any;
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -48,15 +48,17 @@ export function SearchPage() {
   function toggleSidebar() {
     setIsSidebarOpen(!isSidebarOpen);
   }
-  const productListQuery = {};
-  const { data, error, isLoading } = useFetchProducts(productListQuery);
+
+  // TODO : reactQuery 작업
+  // const productListQuery = {};
+  // const { data, error, isLoading } = useFetchProducts(productListQuery);
 
   useEffect(() => {
-    if (data) {
-      setSearchResult(Array.isArray(data.data.item) ? data.data.item : []);
+    if (sortedProducts) {
+      setSearchResult(Array.isArray(sortedProducts) ? sortedProducts : []);
       setIsDataFetched(true);
     }
-  }, [data, setSearchResult]);
+  }, [setSearchResult]);
 
   const handleDisplayChange = (value: number) => {
     setItemsPerPage(value);
@@ -88,10 +90,11 @@ export function SearchPage() {
     setSelectedShippingFee('전체');
   };
 
-  if (error) {
-    console.error('Error fetching products:', error);
-    return <div>Error fetching products</div>;
-  }
+  // TODO : reactQuery 작업
+  // if (error) {
+  //   console.error('Error fetching products:', error);
+  //   return <div>Error fetching products</div>;
+  // }
 
   // 사이드바 Grid: MUI Slide의 ref 문제로 인해 내부에서 관리
   const sidebarGrid = (
@@ -266,7 +269,7 @@ export function SearchPage() {
           </Slide>
           <Grid item xs={isSidebarOpen ? 9 : 12}>
             <ProductGrid
-              isLoading={isLoading}
+              // isLoading={isLoading}
               isDataFetched={isDataFetched}
               filteredProducts={filteredProducts}
               itemsPerPage={itemsPerPage}

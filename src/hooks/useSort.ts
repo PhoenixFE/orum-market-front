@@ -1,9 +1,29 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { IProduct } from '../type';
+import { api } from '../api/api';
 
 export const useSort = (products: IProduct[], initialSortOrder: string) => {
   const [sortedProducts, setSortedProducts] = useState(products);
   const [currentSortOrder, setCurrentSortOrder] = useState(initialSortOrder);
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(true);
+
+  let productsSort = '';
+  const getCurrentPath = () => {
+    const path = location.pathname;
+
+    if (path === '/') {
+      productsSort = path;
+      return productsSort;
+    } else {
+      const pathnames = path.split('/');
+      productsSort = pathnames[pathnames.length - 1];
+      return productsSort;
+    }
+  };
+
+  getCurrentPath();
 
   useEffect(() => {
     if (!Array.isArray(products)) {
@@ -11,30 +31,49 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
       return;
     }
 
-    let sorted = [...products];
+    let sortQuery = {};
     switch (currentSortOrder) {
-      case '최신순':
-        sorted.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
+      case 'latest':
+        sortQuery = `sort={"createdAt": -1}`;
         break;
-      case '오래된순':
-        sorted.sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-        );
+      case 'oldest':
+        sortQuery = `sort={"createdAt": 1}`;
         break;
-      case '높은가격순':
-        sorted.sort((a, b) => b.price - a.price);
+      case 'maxPrice':
+        sortQuery =
+          productsSort === '/' ? `sort={"price": -1}` : `sort={"cost": -1}`;
         break;
-      case '낮은가격순':
-        sorted.sort((a, b) => a.price - b.price);
+      case 'minPrice':
+        sortQuery =
+          productsSort === '/' ? `sort={"price": 1}` : `sort={"cost": 1}`;
         break;
-      // 기타 케이스 추가 가능
     }
-    setSortedProducts(sorted);
+
+    // path === '/'면 getProductList, 'order'이면 getOrderState
+    const fetchSortedProducts = async (path: string) => {
+      try {
+        setIsLoading(true);
+        let response = null;
+
+        switch (path) {
+          case '/':
+            response = await api.getProductList(sortQuery);
+            break;
+          case 'orders':
+            response = await api.getOrderState(sortQuery);
+            break;
+        }
+
+        setSortedProducts(response?.data.item);
+        setIsLoading(false);
+      } catch (error) {
+        console.log('데이터를 받아오지 못했습니다.', error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchSortedProducts(productsSort);
   }, [products, currentSortOrder]);
 
-  return [sortedProducts, setCurrentSortOrder];
+  return [sortedProducts, setCurrentSortOrder, isLoading];
 };

@@ -182,7 +182,11 @@ export const api = {
   getOrderProductInfo: () => axiosInstance.get<IOrderRes>('/orders/'),
 
   //판매자 주문 목록 조회
-  getOrderState: () => axiosInstance.get('seller/orders/'),
+  getOrderState: (query: IProductListQuery = {}) => {
+    const queryString = new URLSearchParams(query as any).toString();
+    const response = axiosInstance.get(`seller/orders?${queryString}`);
+    return response;
+  },
 
   //판매자 주문상태 수정
   updateOrderState: (_id: number, product_id: number, state: any) =>
