@@ -117,6 +117,14 @@ export default function ProductManager() {
       }
     }
   };
+  //공개여부 처리
+  const handleIsShow = async (_id: number) => {
+    setIsShow(true);
+    // setProductList((prev) => ({
+    //   ...prev,
+    //   show: true,
+    // }));
+  };
 
   return (
     <>
@@ -239,14 +247,16 @@ export default function ProductManager() {
                         value="check"
                         selected={isShow}
                         size={'small'}
-                        onChange={() => {
-                          setIsShow(!rows.show);
+                        onClick={() => {
+                          if (typeof rows._id === 'number') {
+                            handleIsShow(rows._id);
+                          }
                         }}
                       >
                         <CheckIcon />
                       </ToggleButton>
                     </TableCell>
-                    <TableCell align="center">
+                    {/* <TableCell align="center">
                       <Box
                         sx={{
                           display: 'flex',
@@ -255,7 +265,7 @@ export default function ProductManager() {
                           gap: 1,
                         }}
                       ></Box>
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell align="center">
                       <Link
                         to={`/user/seller/products/${rows._id}/edit/`}
