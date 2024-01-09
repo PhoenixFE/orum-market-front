@@ -127,8 +127,11 @@ export const api = {
   },
 
   // 상품 카테고리 조회
-  getProductListByCategory: (extraQuery: string) =>
-    axiosInstance.get(`/products/?extra=${extraQuery}`),
+  getProductListByCategory: (extraQuery: IProductListQuery = {}) => {
+    const queryString = new URLSearchParams(extraQuery as any).toString();
+    const response = axiosInstance.get(`/products/?=custom${queryString}`);
+    return response;
+  },
 
   // 상품 상세 조회
   getProduct: (_id: number) => axiosInstance.get(`/products/${_id}`),
