@@ -24,6 +24,7 @@ export const ProductGrid = ({
     return { xs: 12, sm: 6, md: 4, lg: 4, xl: 4 };
   };
 
+  // TODO : reactQuery 작업할 때 사용 예정
   // const ProductSkeleton = () => {
   //   return (
   //     <Grid container spacing={4} m={4}>
@@ -59,6 +60,7 @@ export const ProductGrid = ({
   };
 
   const renderProductsOrSkeletons = () => {
+    // TODO : reactQuery
     // if (isLoading) {
     //   return <ProductSkeleton />;
     // }

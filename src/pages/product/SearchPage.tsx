@@ -20,7 +20,7 @@ import {
   PRICE_RANGE,
   SHIPPING_FEE,
 } from '../../constants';
-// import { useFetchProducts } from '../../hooks/useFetchProducts';
+// import { useFetchProducts } from '../../hooks/useFetchProducts';   // TODO : reactQuery 작업
 import { ProductGrid } from '../../components/search/ProductGrid';
 import MobileNavBar from '../../components/navbar/MobileNavBar';
 
@@ -48,6 +48,8 @@ export function SearchPage() {
   function toggleSidebar() {
     setIsSidebarOpen(!isSidebarOpen);
   }
+
+  // TODO : reactQuery 작업
   // const productListQuery = {};
   // const { data, error, isLoading } = useFetchProducts(productListQuery);
 
@@ -88,6 +90,7 @@ export function SearchPage() {
     setSelectedShippingFee('전체');
   };
 
+  // TODO : reactQuery 작업
   // if (error) {
   //   console.error('Error fetching products:', error);
   //   return <div>Error fetching products</div>;

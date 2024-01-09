@@ -9,17 +9,17 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
 
-  let currnetQuery = '';
+  let productsSort = '';
   const getCurrentPath = () => {
     const path = location.pathname;
 
     if (path === '/') {
-      currnetQuery = path;
-      return currnetQuery;
+      productsSort = path;
+      return productsSort;
     } else {
-      const pathSplit = path.split('/');
-      currnetQuery = pathSplit[pathSplit.length - 1];
-      return currnetQuery;
+      const pathnames = path.split('/');
+      productsSort = pathnames[pathnames.length - 1];
+      return productsSort;
     }
   };
 
@@ -41,19 +41,19 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
         break;
       case 'maxPrice':
         sortQuery =
-          currnetQuery === '/' ? `sort={"price": -1}` : `sort={"cost": -1}`;
+          productsSort === '/' ? `sort={"price": -1}` : `sort={"cost": -1}`;
         break;
       case 'minPrice':
         sortQuery =
-          currnetQuery === '/' ? `sort={"price": 1}` : `sort={"cost": 1}`;
+          productsSort === '/' ? `sort={"price": 1}` : `sort={"cost": 1}`;
         break;
     }
 
     // path === '/'면 getProductList, 'order'이면 getOrderState
-    const sortFetchProducts = async (path: string) => {
+    const fetchSortedProducts = async (path: string) => {
       try {
         setIsLoading(true);
-        let response;
+        let response = null;
 
         switch (path) {
           case '/':
@@ -72,7 +72,7 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
       }
     };
 
-    sortFetchProducts(currnetQuery);
+    fetchSortedProducts(productsSort);
   }, [products, currentSortOrder]);
 
   return [sortedProducts, setCurrentSortOrder, isLoading];

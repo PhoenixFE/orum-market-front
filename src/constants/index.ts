@@ -262,13 +262,6 @@ export const SORT_OPTIONS = [
   { label: '낮은가격순', value: 'minPrice' },
 ];
 
-export const SORT_OPTIONS_DASHBOARD = [
-  { label: '최근주문순', value: 'latest' },
-  { label: '오래된주문순', value: 'oldest' },
-  { label: '최고결제금액순', value: 'maxPrice' },
-  { label: '최저결제금액순', value: 'minPrice' },
-];
-
 export const PRICE_BOUNDARIES: { [key: string]: { min: number; max: number } } =
   {
     전체: { min: 0, max: Infinity },
