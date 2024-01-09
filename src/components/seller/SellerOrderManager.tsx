@@ -18,11 +18,7 @@ import { useState } from 'react';
 
 import { api } from '../../api/api';
 import { IOrderItem } from '../../type';
-import {
-  QUALITY,
-  ORDER_STATE,
-  SORT_OPTIONS_DASHBOARD,
-} from '../../constants/index';
+import { QUALITY, ORDER_STATE, SORT_OPTIONS } from '../../constants/index';
 import formatDate from '../../lib/formatDate';
 import SkeletonTable from './SkeletonTable';
 import { useSort } from '../../hooks/useSort';
@@ -109,7 +105,7 @@ export default function SellerOrderManager() {
             sx={{ fontSize: '0.9rem', borderRadius: 0 }}
             onChange={(event) => onSortChange(event.target.value as string)}
           >
-            {SORT_OPTIONS_DASHBOARD.map((option) => (
+            {SORT_OPTIONS.map((option) => (
               <MenuItem key={option.value} value={option.value}>
                 {option.label}
               </MenuItem>
