@@ -12,6 +12,7 @@ import { SearchSection } from '../../components/search/SearchSection';
 import { useSearchStore, useRecentViewProductStore } from '../../lib/store';
 import StickyNavbar from '../../components/navbar/NavigationBar';
 import { useSort } from '../../hooks/useSort';
+import { useFilter } from '../../hooks/useFilter';
 import { useEffect, useState } from 'react';
 import { IProduct } from '../../type';
 import {
@@ -32,10 +33,15 @@ export function SearchPage() {
   ) as any;
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  // const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPrice, setSelectedPrice] = useState('전체');
   const [selectedShippingFee, setSelectedShippingFee] = useState('전체');
   const [isDataFetched, setIsDataFetched] = useState(false);
+
+  const [selectedCategory, setSelectedCategory] = useFilter(
+    sortedProducts,
+    'all',
+  );
 
   const { addRecentViewProduct } = useRecentViewProductStore() as {
     addRecentViewProduct: Function;
@@ -66,10 +72,11 @@ export function SearchPage() {
 
   const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
 
+  // 이 부분이 데이터 불러오는 곳이네..
   const filteredProducts = sortedProducts.filter((product: IProduct) => {
-    const withinCategory =
-      selectedCategory === 'all' ||
-      product.extra?.category?.includes(selectedCategory);
+    // const withinCategory =
+    //   selectedCategory === 'all' ||
+    //   product.extra?.category?.includes(selectedCategory);
     const withinPriceRange =
       product.price >= selectedPriceRange.min &&
       product.price <= selectedPriceRange.max;
@@ -81,8 +88,10 @@ export function SearchPage() {
         (selectedShippingFee === '유료배송' && product.shippingFees > 0);
     }
 
-    return withinCategory && withinPriceRange && withinShippingFee;
+    return withinPriceRange && withinShippingFee;
   });
+
+  console.log('selectedCategory', selectedCategory);
 
   const resetFilters = () => {
     setSelectedCategory('all');
