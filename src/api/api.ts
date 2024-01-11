@@ -126,15 +126,16 @@ export const api = {
     return response;
   },
 
-  // 상품 카테고리 조회
+  // 상품 필터 조회
   getProductListByCategory: (
     extraQuery: IProductListQuery = {},
     minPrice: number,
     maxPrice: number,
+    minShippingFees: number,
+    maxShippingFees: number,
   ) => {
-    const queryString = new URLSearchParams(extraQuery as any).toString();
-    const response = axiosInstance.get(`/products/?${queryString}`, {
-      params: { minPrice, maxPrice },
+    const response = axiosInstance.get(`/products/?custom=${extraQuery}`, {
+      params: { minPrice, maxPrice, minShippingFees, maxShippingFees },
     });
     return response;
   },
