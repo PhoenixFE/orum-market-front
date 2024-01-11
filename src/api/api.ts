@@ -127,9 +127,15 @@ export const api = {
   },
 
   // 상품 카테고리 조회
-  getProductListByCategory: (extraQuery: IProductListQuery = {}) => {
+  getProductListByCategory: (
+    extraQuery: IProductListQuery = {},
+    minPrice: number,
+    maxPrice: number,
+  ) => {
     const queryString = new URLSearchParams(extraQuery as any).toString();
-    const response = axiosInstance.get(`/products/?=custom${queryString}`);
+    const response = axiosInstance.get(`/products/?${queryString}`, {
+      params: { minPrice, maxPrice },
+    });
     return response;
   },
 
