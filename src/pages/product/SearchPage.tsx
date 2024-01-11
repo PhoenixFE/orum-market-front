@@ -32,6 +32,7 @@ export function SearchPage() {
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   const [
+    filteredProducts,
     selectedCategory,
     setSelectedCategory,
     selectedPrice,
@@ -67,17 +68,16 @@ export function SearchPage() {
   };
 
   // 데이터 처리 부분
-  const filteredProducts = sortedProducts.filter((product: IProduct) => {
-    let withinShippingFee = true;
+  // const filteredProducts = sortedProducts.filter((product: IProduct) => {
+  //   let withinShippingFee = true;
+  //   if (selectedShippingFee !== '전체') {
+  //     withinShippingFee =
+  //       (selectedShippingFee === '무료배송' && product.shippingFees === 0) ||
+  //       (selectedShippingFee === '유료배송' && product.shippingFees > 0);
+  //   }
 
-    if (selectedShippingFee !== '전체') {
-      withinShippingFee =
-        (selectedShippingFee === '무료배송' && product.shippingFees === 0) ||
-        (selectedShippingFee === '유료배송' && product.shippingFees > 0);
-    }
-
-    return withinShippingFee;
-  });
+  //   return withinShippingFee;
+  // });
 
   // TODO : reactQuery 작업
   // if (error) {

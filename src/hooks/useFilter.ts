@@ -8,16 +8,30 @@ export const useFilter = (
   initialSelectedCategory: string,
   initialSelectedPrice: string,
 ) => {
-  const [filterProducts, setFilterProducts] = useState(products);
   const [selectedCategory, setSelectedCategory] = useState(
     initialSelectedCategory,
   );
   const [selectedPrice, setSelectedPrice] = useState(initialSelectedPrice);
 
+  const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
+
+  // sort된 데이터인 products로 filter
+  const filteredProducts = products.filter((product: IProduct) => {
+    const withinCategory =
+      selectedCategory === 'all' ||
+      product.extra?.category?.includes(selectedCategory);
+
+    const withinPriceRange =
+      product.price >= selectedPriceRange.min &&
+      product.price <= selectedPriceRange.max;
+
+    return withinCategory && withinPriceRange;
+  });
+
+  console.log('filteredProducts', filteredProducts);
+
   let categoryQuery = {};
   categoryQuery = `{"extra.category.1": "${selectedCategory}"}`;
-
-  const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
 
   useEffect(() => {
     const fetchFilterProducts = async () => {
@@ -44,6 +58,7 @@ export const useFilter = (
   };
 
   return [
+    filteredProducts,
     selectedCategory,
     setSelectedCategory,
     selectedPrice,
