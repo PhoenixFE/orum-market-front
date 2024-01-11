@@ -15,12 +15,7 @@ import { useSort } from '../../hooks/useSort';
 import { useFilter } from '../../hooks/useFilter';
 import { useEffect, useState } from 'react';
 import { IProduct } from '../../type';
-import {
-  CATEGORY,
-  PRICE_BOUNDARIES,
-  PRICE_RANGE,
-  SHIPPING_FEE,
-} from '../../constants';
+import { CATEGORY, PRICE_RANGE, SHIPPING_FEE } from '../../constants';
 // import { useFetchProducts } from '../../hooks/useFetchProducts';   // TODO : reactQuery 작업
 import { ProductGrid } from '../../components/search/ProductGrid';
 import MobileNavBar from '../../components/navbar/MobileNavBar';
@@ -33,15 +28,16 @@ export function SearchPage() {
   ) as any;
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  // const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedPrice, setSelectedPrice] = useState('전체');
   const [selectedShippingFee, setSelectedShippingFee] = useState('전체');
   const [isDataFetched, setIsDataFetched] = useState(false);
 
-  const [selectedCategory, setSelectedCategory] = useFilter(
-    sortedProducts,
-    'all',
-  );
+  const [
+    selectedCategory,
+    setSelectedCategory,
+    selectedPrice,
+    setSelectedPrice,
+    resetFilters,
+  ] = useFilter(sortedProducts, 'all', '전체') as any;
 
   const { addRecentViewProduct } = useRecentViewProductStore() as {
     addRecentViewProduct: Function;
@@ -70,16 +66,8 @@ export function SearchPage() {
     setItemsPerPage(value);
   };
 
-  const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
-
-  // 이 부분이 데이터 불러오는 곳이네..
+  // 데이터 처리 부분
   const filteredProducts = sortedProducts.filter((product: IProduct) => {
-    // const withinCategory =
-    //   selectedCategory === 'all' ||
-    //   product.extra?.category?.includes(selectedCategory);
-    const withinPriceRange =
-      product.price >= selectedPriceRange.min &&
-      product.price <= selectedPriceRange.max;
     let withinShippingFee = true;
 
     if (selectedShippingFee !== '전체') {
@@ -88,16 +76,8 @@ export function SearchPage() {
         (selectedShippingFee === '유료배송' && product.shippingFees > 0);
     }
 
-    return withinPriceRange && withinShippingFee;
+    return withinShippingFee;
   });
-
-  console.log('selectedCategory', selectedCategory);
-
-  const resetFilters = () => {
-    setSelectedCategory('all');
-    setSelectedPrice('전체');
-    setSelectedShippingFee('전체');
-  };
 
   // TODO : reactQuery 작업
   // if (error) {
