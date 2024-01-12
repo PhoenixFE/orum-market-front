@@ -134,7 +134,7 @@ export const api = {
     minShippingFees: number,
     maxShippingFees: number,
   ) => {
-    const response = axiosInstance.get(`/products/?custom=${extraQuery}`, {
+    const response = axiosInstance.get(`/products/${extraQuery}`, {
       params: { minPrice, maxPrice, minShippingFees, maxShippingFees },
     });
     return response;

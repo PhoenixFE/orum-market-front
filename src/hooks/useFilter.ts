@@ -9,6 +9,7 @@ export const useFilter = (
   initialSelectedPrice: string,
   initialSelectedShippingFee: string,
 ) => {
+  const [filterProductData, setFilterProductData] = useState<IProduct[]>([]);
   const [selectedCategory, setSelectedCategory] = useState(
     initialSelectedCategory,
   );
@@ -17,36 +18,23 @@ export const useFilter = (
     initialSelectedShippingFee,
   );
 
-  console.log(selectedPrice);
   const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
-  console.log(selectedShippingFee);
   const seletedShippingFeeValue = SHIPPING_FEE_BOUNDARIES[selectedShippingFee];
 
-  // sort된 데이터인 products로 filter
-  const filteredProducts = products.filter((product: IProduct) => {
-    const withinCategory =
-      selectedCategory === 'all' ||
-      product.extra?.category?.includes(selectedCategory);
+  const filteredProducts = products.filter((product) => {
+    const foundProduct = filterProductData.find(
+      (items) => product._id === items._id,
+    );
 
-    const withinPriceRange =
-      product.price >= selectedPriceRange.min &&
-      product.price <= selectedPriceRange.max;
-
-    let withinShippingFee = true;
-    if (selectedShippingFee !== '전체') {
-      withinShippingFee =
-        (selectedShippingFee === '무료배송' && product.shippingFees === 0) ||
-        (selectedShippingFee === '유료배송' && product.shippingFees > 0);
-    }
-
-    if (withinShippingFee)
-      return withinCategory && withinPriceRange && withinShippingFee;
+    // 동일한 id를 가진 객체가 존재하면 true를 반환하여 필터링에 포함시킴
+    return foundProduct !== undefined;
   });
 
-  console.log('filteredProducts', filteredProducts);
-
   let categoryQuery = {};
-  categoryQuery = `{"extra.category.1": "${selectedCategory}"}`;
+  categoryQuery =
+    selectedCategory !== 'all'
+      ? `?custom={"extra.category.1": "${selectedCategory}"}`
+      : '';
 
   useEffect(() => {
     const fetchFilterProducts = async () => {
@@ -58,7 +46,7 @@ export const useFilter = (
           seletedShippingFeeValue.min,
           seletedShippingFeeValue.max,
         );
-        console.log('응답', response.data.item);
+        setFilterProductData(response.data.item);
       } catch (error) {
         console.log('데이터를 받아오지 못했습니다.', error);
       }
