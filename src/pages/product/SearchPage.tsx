@@ -28,7 +28,6 @@ export function SearchPage() {
   ) as any;
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedShippingFee, setSelectedShippingFee] = useState('전체');
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   const [
@@ -37,8 +36,10 @@ export function SearchPage() {
     setSelectedCategory,
     selectedPrice,
     setSelectedPrice,
+    selectedShippingFee,
+    setSelectedShippingFee,
     resetFilters,
-  ] = useFilter(sortedProducts, 'all', '전체') as any;
+  ] = useFilter(sortedProducts, 'all', '전체', '전체') as any;
 
   const { addRecentViewProduct } = useRecentViewProductStore() as {
     addRecentViewProduct: Function;
@@ -66,18 +67,6 @@ export function SearchPage() {
   const handleDisplayChange = (value: number) => {
     setItemsPerPage(value);
   };
-
-  // 데이터 처리 부분
-  // const filteredProducts = sortedProducts.filter((product: IProduct) => {
-  //   let withinShippingFee = true;
-  //   if (selectedShippingFee !== '전체') {
-  //     withinShippingFee =
-  //       (selectedShippingFee === '무료배송' && product.shippingFees === 0) ||
-  //       (selectedShippingFee === '유료배송' && product.shippingFees > 0);
-  //   }
-
-  //   return withinShippingFee;
-  // });
 
   // TODO : reactQuery 작업
   // if (error) {
