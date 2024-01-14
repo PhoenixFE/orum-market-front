@@ -120,23 +120,9 @@ export const api = {
     axiosInstance.patch(`/users/${_id}`, userData),
 
   // 상품 목록 조회
-  getProductList: (query: IProductListQuery = {}) => {
+  getProductList: (query: string) => {
     const queryString = new URLSearchParams(query as any).toString();
     const response = axiosInstance.get(`/products/?${queryString}`);
-    return response;
-  },
-
-  // 상품 필터 조회
-  getProductListByCategory: (
-    extraQuery: IProductListQuery = {},
-    minPrice: number,
-    maxPrice: number,
-    minShippingFees: number,
-    maxShippingFees: number,
-  ) => {
-    const response = axiosInstance.get(`/products/${extraQuery}`, {
-      params: { minPrice, maxPrice, minShippingFees, maxShippingFees },
-    });
     return response;
   },
 
@@ -192,7 +178,7 @@ export const api = {
   getOrderProductInfo: () => axiosInstance.get<IOrderRes>('/orders/'),
 
   //판매자 주문 목록 조회
-  getOrderState: (query: IProductListQuery = {}) => {
+  getOrderState: (query: string) => {
     const queryString = new URLSearchParams(query as any).toString();
     const response = axiosInstance.get(`seller/orders?${queryString}`);
     return response;
