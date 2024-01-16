@@ -12,34 +12,32 @@ import { SearchSection } from '../../components/search/SearchSection';
 import { useSearchStore, useRecentViewProductStore } from '../../lib/store';
 import StickyNavbar from '../../components/navbar/NavigationBar';
 import { useSort } from '../../hooks/useSort';
-import { useFilter } from '../../hooks/useFilter';
 import { useEffect, useState } from 'react';
 import { IProduct } from '../../type';
-import { CATEGORY, PRICE_RANGE, SHIPPING_FEE } from '../../constants';
+import {
+  CATEGORY,
+  PRICE_BOUNDARIES,
+  PRICE_RANGE,
+  SHIPPING_FEE,
+} from '../../constants';
 // import { useFetchProducts } from '../../hooks/useFetchProducts';   // TODO : reactQuery 작업
 import { ProductGrid } from '../../components/search/ProductGrid';
 import MobileNavBar from '../../components/navbar/MobileNavBar';
 
 export function SearchPage() {
   const { searchResult, setSearchResult } = useSearchStore();
-  const [sortedProducts, setCurrentSortOrder] = useSort(
-    searchResult,
-    'latest',
-  ) as any;
+  const [
+    sortedProducts,
+    setCurrentSortOrder,
+    isLoading,
+    setCurrentFilteredCategory,
+  ] = useSort(searchResult, 'latest', 'all') as any;
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDataFetched, setIsDataFetched] = useState(false);
-
-  const [
-    filteredProducts,
-    selectedCategory,
-    setSelectedCategory,
-    selectedPrice,
-    setSelectedPrice,
-    selectedShippingFee,
-    setSelectedShippingFee,
-    resetFilters,
-  ] = useFilter(sortedProducts, 'all', '전체', '전체') as any;
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedPrice, setSelectedPrice] = useState('전체');
+  const [selectedShippingFee, setSelectedShippingFee] = useState('전체');
 
   const { addRecentViewProduct } = useRecentViewProductStore() as {
     addRecentViewProduct: Function;
@@ -52,6 +50,11 @@ export function SearchPage() {
   function toggleSidebar() {
     setIsSidebarOpen(!isSidebarOpen);
   }
+
+  const onFilterChange = (filterValue: string) => {
+    setCurrentFilteredCategory(filterValue);
+    setSelectedCategory(filterValue);
+  };
 
   // TODO : reactQuery 작업
   // const productListQuery = {};
@@ -66,6 +69,37 @@ export function SearchPage() {
 
   const handleDisplayChange = (value: number) => {
     setItemsPerPage(value);
+  };
+
+  const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
+
+  console.log('selectedCategory', selectedCategory);
+
+  // sort된 데이터인 products로 filter
+  const filteredProducts = sortedProducts.filter((product: IProduct) => {
+    const withinCategory =
+      selectedCategory === 'all' ||
+      product.extra?.category?.includes(selectedCategory);
+
+    const withinPriceRange =
+      product.price >= selectedPriceRange.min &&
+      product.price <= selectedPriceRange.max;
+
+    let withinShippingFee = true;
+    if (selectedShippingFee !== '전체') {
+      withinShippingFee =
+        (selectedShippingFee === '무료배송' && product.shippingFees === 0) ||
+        (selectedShippingFee === '유료배송' && product.shippingFees > 0);
+    }
+
+    if (withinShippingFee)
+      return withinCategory && withinPriceRange && withinShippingFee;
+  });
+
+  const resetFilters = () => {
+    setSelectedCategory('all');
+    setSelectedPrice('전체');
+    setSelectedShippingFee('전체');
   };
 
   // TODO : reactQuery 작업
@@ -107,7 +141,7 @@ export function SearchPage() {
               key="all"
               variant="text"
               color="inherit"
-              onClick={() => setSelectedCategory('all')}
+              onClick={() => onFilterChange('all')}
               startIcon={
                 selectedCategory === 'all' ? (
                   <CheckBoxIcon />
@@ -126,7 +160,7 @@ export function SearchPage() {
                 key={category.id}
                 variant="text"
                 color="inherit"
-                onClick={() => setSelectedCategory(category.dbCode)}
+                onClick={() => onFilterChange(category.dbCode)}
                 startIcon={
                   selectedCategory === category.dbCode ? (
                     <CheckBoxIcon />
@@ -160,7 +194,7 @@ export function SearchPage() {
                 key={price.id}
                 variant="text"
                 color="inherit"
-                onClick={() => setSelectedPrice(price.label)}
+                onClick={() => onFilterChange(price.label)}
                 startIcon={
                   selectedPrice === price.label ? (
                     <CheckBoxIcon />

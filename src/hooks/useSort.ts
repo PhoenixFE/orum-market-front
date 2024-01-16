@@ -3,11 +3,27 @@ import { useLocation } from 'react-router-dom';
 import { IProduct } from '../type';
 import { api } from '../api/api';
 
-export const useSort = (products: IProduct[], initialSortOrder: string) => {
+export const useSort = (
+  products: IProduct[],
+  initialSortOrder: string,
+  initialFilteredCategory: string,
+) => {
   const [sortedProducts, setSortedProducts] = useState(products);
   const [currentSortOrder, setCurrentSortOrder] = useState(initialSortOrder);
+  const [currentFilteredCategory, setCurrentFilteredCategory] = useState(
+    initialFilteredCategory,
+  );
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
+
+  // 데이터 확인 log
+  // console.log(
+  //   'sort: ',
+  //   currentSortOrder,
+  //   '/',
+  //   'filter: ',
+  //   currentFilteredCategory,
+  // );
 
   let productsSort = '';
   const getCurrentPath = () => {
@@ -25,28 +41,37 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
 
   getCurrentPath();
 
+  let sortQuery = '';
+  switch (currentSortOrder) {
+    case 'latest':
+      sortQuery = `sort={"createdAt": -1}`;
+      break;
+    case 'oldest':
+      sortQuery = `sort={"createdAt": 1}`;
+      break;
+    case 'maxPrice':
+      sortQuery =
+        productsSort === '/' ? `sort={"price": -1}` : `sort={"cost": -1}`;
+      break;
+    case 'minPrice':
+      sortQuery =
+        productsSort === '/' ? `sort={"price": 1}` : `sort={"cost": 1}`;
+      break;
+  }
+
+  let filteredQuery = '';
+  if (currentFilteredCategory === 'all') {
+    filteredQuery = '';
+  } else {
+    filteredQuery = `&custom={"extra.category.1": "${currentFilteredCategory}"}`;
+  }
+
+  let query = sortQuery + filteredQuery;
+
   useEffect(() => {
     if (!Array.isArray(products)) {
       setSortedProducts([]);
       return;
-    }
-
-    let sortQuery = {};
-    switch (currentSortOrder) {
-      case 'latest':
-        sortQuery = `sort={"createdAt": -1}`;
-        break;
-      case 'oldest':
-        sortQuery = `sort={"createdAt": 1}`;
-        break;
-      case 'maxPrice':
-        sortQuery =
-          productsSort === '/' ? `sort={"price": -1}` : `sort={"cost": -1}`;
-        break;
-      case 'minPrice':
-        sortQuery =
-          productsSort === '/' ? `sort={"price": 1}` : `sort={"cost": 1}`;
-        break;
     }
 
     // path === '/'면 getProductList, 'order'이면 getOrderState
@@ -57,7 +82,7 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
 
         switch (path) {
           case '/':
-            response = await api.getProductList(sortQuery);
+            response = await api.getProductList(query);
             break;
           case 'orders':
             response = await api.getOrderState(sortQuery);
@@ -73,7 +98,12 @@ export const useSort = (products: IProduct[], initialSortOrder: string) => {
     };
 
     fetchSortedProducts(productsSort);
-  }, [products, currentSortOrder]);
+  }, [products, currentSortOrder, currentFilteredCategory]);
 
-  return [sortedProducts, setCurrentSortOrder, isLoading];
+  return [
+    sortedProducts,
+    setCurrentSortOrder,
+    isLoading,
+    setCurrentFilteredCategory,
+  ];
 };
