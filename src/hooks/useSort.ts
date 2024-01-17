@@ -2,17 +2,21 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { IProduct } from '../type';
 import { api } from '../api/api';
+import { PRICE_BOUNDARIES } from '../constants';
 
 export const useSort = (
   products: IProduct[],
   initialSortOrder: string,
   initialFilteredCategory: string,
+  initialFilteredPrice: string,
 ) => {
   const [sortedProducts, setSortedProducts] = useState(products);
   const [currentSortOrder, setCurrentSortOrder] = useState(initialSortOrder);
   const [currentFilteredCategory, setCurrentFilteredCategory] = useState(
     initialFilteredCategory,
   );
+  const [currentFilteredPrice, setCurrentFilteredPrice] =
+    useState(initialFilteredPrice);
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -23,6 +27,7 @@ export const useSort = (
   //   '/',
   //   'filter: ',
   //   currentFilteredCategory,
+  //   currentFilteredPrice,
   // );
 
   let productsSort = '';
@@ -60,13 +65,18 @@ export const useSort = (
   }
 
   let filteredQuery = '';
-  if (currentFilteredCategory === 'all') {
+  const selectedPriceRange = PRICE_BOUNDARIES[currentFilteredPrice];
+
+  // category가 all 일때는 해당 요청 쿼리 X..고려해야함.
+  if (currentFilteredCategory === 'all' && currentFilteredPrice === '전체') {
     filteredQuery = '';
   } else {
-    filteredQuery = `&custom={"extra.category.1": "${currentFilteredCategory}"}`;
+    filteredQuery = `&custom={"extra.category.1": "${currentFilteredCategory}"}&minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`;
+    console.log('filteredQuery', filteredQuery);
   }
 
   let query = sortQuery + filteredQuery;
+  console.log('query', query);
 
   useEffect(() => {
     if (!Array.isArray(products)) {
@@ -98,12 +108,18 @@ export const useSort = (
     };
 
     fetchSortedProducts(productsSort);
-  }, [products, currentSortOrder, currentFilteredCategory]);
+  }, [
+    products,
+    currentSortOrder,
+    currentFilteredCategory,
+    currentFilteredPrice,
+  ]);
 
   return [
     sortedProducts,
     setCurrentSortOrder,
     isLoading,
     setCurrentFilteredCategory,
+    setCurrentFilteredPrice,
   ];
 };

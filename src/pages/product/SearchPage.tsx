@@ -31,7 +31,8 @@ export function SearchPage() {
     setCurrentSortOrder,
     isLoading,
     setCurrentFilteredCategory,
-  ] = useSort(searchResult, 'latest', 'all') as any;
+    setCurrentFilteredPrice,
+  ] = useSort(searchResult, 'latest', 'all', '전체') as any;
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDataFetched, setIsDataFetched] = useState(false);
@@ -51,9 +52,14 @@ export function SearchPage() {
     setIsSidebarOpen(!isSidebarOpen);
   }
 
-  const onFilterChange = (filterValue: string) => {
+  const onFilterCategoryChange = (filterValue: string) => {
     setCurrentFilteredCategory(filterValue);
     setSelectedCategory(filterValue);
+  };
+
+  const onFilterPriceChange = (filterValue: string) => {
+    setCurrentFilteredPrice(filterValue);
+    setSelectedPrice(filterValue);
   };
 
   // TODO : reactQuery 작업
@@ -71,19 +77,17 @@ export function SearchPage() {
     setItemsPerPage(value);
   };
 
-  const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
-
-  console.log('selectedCategory', selectedCategory);
+  // const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
 
   // sort된 데이터인 products로 filter
   const filteredProducts = sortedProducts.filter((product: IProduct) => {
-    const withinCategory =
-      selectedCategory === 'all' ||
-      product.extra?.category?.includes(selectedCategory);
+    // const withinCategory =
+    //   selectedCategory === 'all' ||
+    //   product.extra?.category?.includes(selectedCategory);
 
-    const withinPriceRange =
-      product.price >= selectedPriceRange.min &&
-      product.price <= selectedPriceRange.max;
+    // const withinPriceRange =
+    //   product.price >= selectedPriceRange.min &&
+    //   product.price <= selectedPriceRange.max;
 
     let withinShippingFee = true;
     if (selectedShippingFee !== '전체') {
@@ -92,13 +96,12 @@ export function SearchPage() {
         (selectedShippingFee === '유료배송' && product.shippingFees > 0);
     }
 
-    if (withinShippingFee)
-      return withinCategory && withinPriceRange && withinShippingFee;
+    if (withinShippingFee) return withinShippingFee;
   });
 
   const resetFilters = () => {
-    setSelectedCategory('all');
-    setSelectedPrice('전체');
+    onFilterCategoryChange('all');
+    onFilterPriceChange('전체');
     setSelectedShippingFee('전체');
   };
 
@@ -141,7 +144,7 @@ export function SearchPage() {
               key="all"
               variant="text"
               color="inherit"
-              onClick={() => onFilterChange('all')}
+              onClick={() => onFilterCategoryChange('all')}
               startIcon={
                 selectedCategory === 'all' ? (
                   <CheckBoxIcon />
@@ -160,7 +163,7 @@ export function SearchPage() {
                 key={category.id}
                 variant="text"
                 color="inherit"
-                onClick={() => onFilterChange(category.dbCode)}
+                onClick={() => onFilterCategoryChange(category.dbCode)}
                 startIcon={
                   selectedCategory === category.dbCode ? (
                     <CheckBoxIcon />
@@ -194,7 +197,7 @@ export function SearchPage() {
                 key={price.id}
                 variant="text"
                 color="inherit"
-                onClick={() => onFilterChange(price.label)}
+                onClick={() => onFilterPriceChange(price.label)}
                 startIcon={
                   selectedPrice === price.label ? (
                     <CheckBoxIcon />
