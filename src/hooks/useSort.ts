@@ -59,22 +59,25 @@ export const useSort = (
   }
 
   let filteredQuery = '';
+
   const selectedPriceRange = PRICE_BOUNDARIES[currentFilteredPrice];
   const selectedShippingFee =
     SHIPPING_FEE_BOUNDARIES[currentFilteredShippingFee];
 
-  const categoryQuery = `custom={"extra.category.1": "${currentFilteredCategory}"}`;
-  const priceQuery = `minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`;
-  const shippingFeeQuery = `minShippingFees=${selectedShippingFee.min}&maxShippingFees=${selectedShippingFee.max}`;
+  const categoryQuery = `&custom={"extra.category.1": "${currentFilteredCategory}"}`;
+  const priceQuery = `&minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`;
+  const shippingFeeQuery = `&minShippingFees=${selectedShippingFee.min}&maxShippingFees=${selectedShippingFee.max}`;
 
-  if (currentFilteredCategory !== 'all' || currentFilteredPrice !== '전체') {
-    if (currentFilteredCategory === 'all') {
-      filteredQuery += '&' + priceQuery;
-      +'&' + shippingFeeQuery;
-    } else {
-      filteredQuery +=
-        '&' + categoryQuery + '&' + priceQuery + '&' + shippingFeeQuery;
-    }
+  const isMatchedQuery =
+    currentFilteredCategory !== 'all' ||
+    currentFilteredPrice !== '전체' ||
+    currentFilteredShippingFee !== '전체';
+
+  if (isMatchedQuery) {
+    filteredQuery =
+      (currentFilteredCategory === 'all' ? '' : categoryQuery) +
+      priceQuery +
+      shippingFeeQuery;
   } else {
     filteredQuery = '';
   }
