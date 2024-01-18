@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { IProduct } from '../type';
 import { api } from '../api/api';
-import { PRICE_BOUNDARIES } from '../constants';
+import { PRICE_BOUNDARIES, SHIPPING_FEE_BOUNDARIES } from '../constants';
 
 export const useSort = (
   products: IProduct[],
   initialSortOrder: string,
   initialFilteredCategory: string,
   initialFilteredPrice: string,
+  initialFilteredShippingFee: string,
 ) => {
   const [sortedProducts, setSortedProducts] = useState(products);
   const [currentSortOrder, setCurrentSortOrder] = useState(initialSortOrder);
@@ -17,6 +18,9 @@ export const useSort = (
   );
   const [currentFilteredPrice, setCurrentFilteredPrice] =
     useState(initialFilteredPrice);
+  const [currentFilteredShippingFee, setCurrentFilteredShippingFee] = useState(
+    initialFilteredShippingFee,
+  );
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -56,14 +60,20 @@ export const useSort = (
 
   let filteredQuery = '';
   const selectedPriceRange = PRICE_BOUNDARIES[currentFilteredPrice];
+  const selectedShippingFee =
+    SHIPPING_FEE_BOUNDARIES[currentFilteredShippingFee];
+
   const categoryQuery = `custom={"extra.category.1": "${currentFilteredCategory}"}`;
   const priceQuery = `minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`;
+  const shippingFeeQuery = `minShippingFees=${selectedShippingFee.min}&maxShippingFees=${selectedShippingFee.max}`;
 
   if (currentFilteredCategory !== 'all' || currentFilteredPrice !== '전체') {
     if (currentFilteredCategory === 'all') {
       filteredQuery += '&' + priceQuery;
+      +'&' + shippingFeeQuery;
     } else {
-      filteredQuery += '&' + categoryQuery + '&' + priceQuery;
+      filteredQuery +=
+        '&' + categoryQuery + '&' + priceQuery + '&' + shippingFeeQuery;
     }
   } else {
     filteredQuery = '';
@@ -106,6 +116,7 @@ export const useSort = (
     currentSortOrder,
     currentFilteredCategory,
     currentFilteredPrice,
+    currentFilteredShippingFee,
   ]);
 
   return [
@@ -114,5 +125,6 @@ export const useSort = (
     isLoading,
     setCurrentFilteredCategory,
     setCurrentFilteredPrice,
+    setCurrentFilteredShippingFee,
   ];
 };

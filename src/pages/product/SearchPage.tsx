@@ -27,7 +27,8 @@ export function SearchPage() {
     isLoading,
     setCurrentFilteredCategory,
     setCurrentFilteredPrice,
-  ] = useSort(searchResult, 'latest', 'all', '전체') as any;
+    setCurrentFilteredShippingFee,
+  ] = useSort(searchResult, 'latest', 'all', '전체', '전체') as any;
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDataFetched, setIsDataFetched] = useState(false);
@@ -57,6 +58,11 @@ export function SearchPage() {
     setSelectedPrice(filterValue);
   };
 
+  const onFilterShippingFeeChange = (filterValue: string) => {
+    setCurrentFilteredShippingFee(filterValue);
+    setSelectedShippingFee(filterValue);
+  };
+
   // TODO : reactQuery 작업
   // const productListQuery = {};
   // const { data, error, isLoading } = useFetchProducts(productListQuery);
@@ -71,28 +77,6 @@ export function SearchPage() {
   const handleDisplayChange = (value: number) => {
     setItemsPerPage(value);
   };
-
-  // const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
-
-  // sort된 데이터인 products로 filter
-  const filteredProducts = sortedProducts.filter((product: IProduct) => {
-    // const withinCategory =
-    //   selectedCategory === 'all' ||
-    //   product.extra?.category?.includes(selectedCategory);
-
-    // const withinPriceRange =
-    //   product.price >= selectedPriceRange.min &&
-    //   product.price <= selectedPriceRange.max;
-
-    let withinShippingFee = true;
-    if (selectedShippingFee !== '전체') {
-      withinShippingFee =
-        (selectedShippingFee === '무료배송' && product.shippingFees === 0) ||
-        (selectedShippingFee === '유료배송' && product.shippingFees > 0);
-    }
-
-    if (withinShippingFee) return withinShippingFee;
-  });
 
   const resetFilters = () => {
     onFilterCategoryChange('all');
@@ -225,7 +209,7 @@ export function SearchPage() {
                 key={fee.label}
                 variant="text"
                 color="inherit"
-                onClick={() => setSelectedShippingFee(fee.value)}
+                onClick={() => onFilterShippingFeeChange(fee.value)}
                 startIcon={
                   selectedShippingFee === fee.value ? (
                     <CheckBoxIcon />
@@ -261,7 +245,7 @@ export function SearchPage() {
       ></Box>
 
       <StickyNavbar
-        totalProducts={filteredProducts.length}
+        totalProducts={sortedProducts.length}
         handleSort={setCurrentSortOrder}
         handleDisplayChange={handleDisplayChange}
         handleToggel={toggleSidebar}
@@ -281,7 +265,7 @@ export function SearchPage() {
             <ProductGrid
               // isLoading={isLoading}
               isDataFetched={isDataFetched}
-              filteredProducts={filteredProducts}
+              filteredProducts={sortedProducts}
               itemsPerPage={itemsPerPage}
               handleSaveRecentlyViewed={handleSaveRecentlyViewed}
             />
