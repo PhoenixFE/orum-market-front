@@ -20,16 +20,6 @@ export const useSort = (
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
 
-  // 데이터 확인 log
-  // console.log(
-  //   'sort: ',
-  //   currentSortOrder,
-  //   '/',
-  //   'filter: ',
-  //   currentFilteredCategory,
-  //   currentFilteredPrice,
-  // );
-
   let productsSort = '';
   const getCurrentPath = () => {
     const path = location.pathname;
@@ -66,17 +56,20 @@ export const useSort = (
 
   let filteredQuery = '';
   const selectedPriceRange = PRICE_BOUNDARIES[currentFilteredPrice];
+  const categoryQuery = `custom={"extra.category.1": "${currentFilteredCategory}"}`;
+  const priceQuery = `minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`;
 
-  // category가 all 일때는 해당 요청 쿼리 X..고려해야함.
-  if (currentFilteredCategory === 'all' && currentFilteredPrice === '전체') {
-    filteredQuery = '';
+  if (currentFilteredCategory !== 'all' || currentFilteredPrice !== '전체') {
+    if (currentFilteredCategory === 'all') {
+      filteredQuery += '&' + priceQuery;
+    } else {
+      filteredQuery += '&' + categoryQuery + '&' + priceQuery;
+    }
   } else {
-    filteredQuery = `&custom={"extra.category.1": "${currentFilteredCategory}"}&minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`;
-    console.log('filteredQuery', filteredQuery);
+    filteredQuery = '';
   }
 
   let query = sortQuery + filteredQuery;
-  console.log('query', query);
 
   useEffect(() => {
     if (!Array.isArray(products)) {

@@ -14,12 +14,7 @@ import StickyNavbar from '../../components/navbar/NavigationBar';
 import { useSort } from '../../hooks/useSort';
 import { useEffect, useState } from 'react';
 import { IProduct } from '../../type';
-import {
-  CATEGORY,
-  PRICE_BOUNDARIES,
-  PRICE_RANGE,
-  SHIPPING_FEE,
-} from '../../constants';
+import { CATEGORY, PRICE_RANGE, SHIPPING_FEE } from '../../constants';
 // import { useFetchProducts } from '../../hooks/useFetchProducts';   // TODO : reactQuery 작업
 import { ProductGrid } from '../../components/search/ProductGrid';
 import MobileNavBar from '../../components/navbar/MobileNavBar';
