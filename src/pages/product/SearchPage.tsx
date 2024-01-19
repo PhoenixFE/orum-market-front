@@ -32,9 +32,9 @@ export function SearchPage() {
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDataFetched, setIsDataFetched] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedPrice, setSelectedPrice] = useState('전체');
-  const [selectedShippingFee, setSelectedShippingFee] = useState('전체');
+  const [isSelectedCategory, setIsSelectedCategory] = useState('all');
+  const [isSelectedPrice, setIsSelectedPrice] = useState('전체');
+  const [isSelectedShippingFee, setIsSelectedShippingFee] = useState('전체');
 
   const { addRecentViewProduct } = useRecentViewProductStore() as {
     addRecentViewProduct: Function;
@@ -50,17 +50,17 @@ export function SearchPage() {
 
   const onFilterCategoryChange = (filterValue: string) => {
     setCurrentFilteredCategory(filterValue);
-    setSelectedCategory(filterValue);
+    setIsSelectedCategory(filterValue);
   };
 
   const onFilterPriceChange = (filterValue: string) => {
     setCurrentFilteredPrice(filterValue);
-    setSelectedPrice(filterValue);
+    setIsSelectedPrice(filterValue);
   };
 
   const onFilterShippingFeeChange = (filterValue: string) => {
     setCurrentFilteredShippingFee(filterValue);
-    setSelectedShippingFee(filterValue);
+    setIsSelectedShippingFee(filterValue);
   };
 
   // TODO : reactQuery 작업
@@ -81,7 +81,7 @@ export function SearchPage() {
   const resetFilters = () => {
     onFilterCategoryChange('all');
     onFilterPriceChange('전체');
-    setSelectedShippingFee('전체');
+    onFilterShippingFeeChange('전체');
   };
 
   // TODO : reactQuery 작업
@@ -125,14 +125,14 @@ export function SearchPage() {
               color="inherit"
               onClick={() => onFilterCategoryChange('all')}
               startIcon={
-                selectedCategory === 'all' ? (
+                isSelectedCategory === 'all' ? (
                   <CheckBoxIcon />
                 ) : (
                   <CheckBoxOutlineBlankIcon />
                 )
               }
               sx={{
-                fontWeight: selectedCategory === 'all' ? 'bold' : 'light',
+                fontWeight: isSelectedCategory === 'all' ? 'bold' : 'light',
               }}
             >
               전체
@@ -144,7 +144,7 @@ export function SearchPage() {
                 color="inherit"
                 onClick={() => onFilterCategoryChange(category.dbCode)}
                 startIcon={
-                  selectedCategory === category.dbCode ? (
+                  isSelectedCategory === category.dbCode ? (
                     <CheckBoxIcon />
                   ) : (
                     <CheckBoxOutlineBlankIcon />
@@ -152,7 +152,7 @@ export function SearchPage() {
                 }
                 sx={{
                   fontWeight:
-                    selectedCategory === category.dbCode ? 'bold' : 'light',
+                    isSelectedCategory === category.dbCode ? 'bold' : 'light',
                 }}
               >
                 {category.name}
@@ -178,14 +178,15 @@ export function SearchPage() {
                 color="inherit"
                 onClick={() => onFilterPriceChange(price.label)}
                 startIcon={
-                  selectedPrice === price.label ? (
+                  isSelectedPrice === price.label ? (
                     <CheckBoxIcon />
                   ) : (
                     <CheckBoxOutlineBlankIcon />
                   )
                 }
                 sx={{
-                  fontWeight: selectedPrice === price.label ? 'bold' : 'light',
+                  fontWeight:
+                    isSelectedPrice === price.label ? 'bold' : 'light',
                 }}
               >
                 {price.label}
@@ -211,7 +212,7 @@ export function SearchPage() {
                 color="inherit"
                 onClick={() => onFilterShippingFeeChange(fee.value)}
                 startIcon={
-                  selectedShippingFee === fee.value ? (
+                  isSelectedShippingFee === fee.value ? (
                     <CheckBoxIcon />
                   ) : (
                     <CheckBoxOutlineBlankIcon />
@@ -219,7 +220,7 @@ export function SearchPage() {
                 }
                 sx={{
                   fontWeight:
-                    selectedShippingFee === fee.value ? 'bold' : 'light',
+                    isSelectedShippingFee === fee.value ? 'bold' : 'light',
                 }}
               >
                 {fee.label}
