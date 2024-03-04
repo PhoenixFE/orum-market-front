@@ -23,6 +23,7 @@ import CheckOut from './pages/user/CheckOut.tsx';
 import BuyerRecentlyView from './components/buyer/BuyerRecentlyView.tsx';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import BuyerOrderDetail from './components/buyer/BuyerOrderDetail.tsx';
+import TestApi from './pages/product/TestApi.tsx';
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
       { path: '/search', element: <SearchPage /> },
       { path: '/sign-in', element: <SignInPage /> },
       { path: '/sign-up', element: <SignUpPage /> },
+      { path: '/test-api', element: <TestApi /> },
     ],
   },
   {
