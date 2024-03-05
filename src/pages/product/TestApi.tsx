@@ -1,38 +1,76 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@mui/material';
-import { CATEGORY } from '../../constants';
+import {
+  CATEGORY,
+  PRICE_BOUNDARIES,
+  PRICE_RANGE,
+  SHIPPING_FEE,
+} from '../../constants';
 import { api } from '../../api/api';
 import { IProduct } from '../../type';
 
 export default function TestApi() {
-  const [query, setQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState({
+  const [queryCategory, setQueryCategory] = useState('');
+  const [queryPrice, setQueryPrice] = useState('');
+  const [queryShippingFee, setQueryShippingFee] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState({
     category: 'all',
     price: '전체',
     shippingFee: '전체',
   });
   const [isSelectedCategory, setIsSelectedCategory] = useState('all');
+  const [isSelectedPrice, setIsSelectedPrice] = useState('전체');
+  const [isSelectedShippingFee, setIsSelectedShippingFee] = useState('전체');
   const [products, setProducts] = useState([]);
 
   const onCategoryButtonClick = (value: string) => {
-    setSelectedCategory({ ...selectedCategory, category: value });
+    setSelectedFilter({ ...selectedFilter, category: value });
     setIsSelectedCategory(value);
 
     if (value === 'all') {
-      setQuery('');
+      setQueryCategory('');
     } else {
-      setQuery(`&custom={"extra.category.1": "${value}"}`);
+      setQueryCategory(`&custom={"extra.category.1": "${value}"}`);
+    }
+  };
+
+  const onPriceButtonClick = (priceValue: string) => {
+    setSelectedFilter({ ...selectedFilter, price: priceValue });
+    setIsSelectedPrice(priceValue);
+
+    const selectedPriceRange = PRICE_BOUNDARIES[priceValue];
+    setQueryPrice(
+      `&minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`,
+    );
+  };
+
+  const onShippingFeeButtonClick = (shippingFeeValue: string) => {
+    setSelectedFilter({ ...selectedFilter, shippingFee: shippingFeeValue });
+    setIsSelectedShippingFee(shippingFeeValue);
+
+    if (shippingFeeValue === '무료배송') {
+      setQueryShippingFee(`&minShippingFees=0&maxShippingFees=0`);
+    } else if (shippingFeeValue === '유료배송') {
+      setQueryShippingFee(`&minShippingFees=1&maxShippingFees=Infinity`);
+    } else {
+      setQueryShippingFee(`&minShippingFees=0&maxShippingFees=Infinity`);
     }
   };
 
   const handleFilteredCategory = async () => {
     try {
       let response;
-      if (selectedCategory.category === 'all') {
-        response = await api.getProductList();
+      let queryData = queryCategory + queryPrice + queryShippingFee;
+
+      if (
+        selectedFilter.category !== 'all' ||
+        selectedFilter.price !== '전체' ||
+        selectedFilter.shippingFee !== '전체'
+      ) {
+        response = await api.getProductList(queryData);
         setProducts(response.data.item);
       } else {
-        response = await api.getProductList(query);
+        response = await api.getProductList();
         setProducts(response.data.item);
       }
     } catch (error) {
@@ -42,7 +80,7 @@ export default function TestApi() {
 
   useEffect(() => {
     handleFilteredCategory();
-  }, [query]);
+  }, [queryCategory, queryPrice, queryShippingFee]);
 
   return (
     <>
@@ -70,6 +108,32 @@ export default function TestApi() {
           }}
         >
           {category.name}
+        </Button>
+      ))}
+      {PRICE_RANGE.map((price) => (
+        <Button
+          key={price.id}
+          variant="text"
+          color="inherit"
+          onClick={() => onPriceButtonClick(price.label)}
+          sx={{
+            fontWeight: isSelectedPrice === price.label ? 'bold' : 'light',
+          }}
+        >
+          {price.label}
+        </Button>
+      ))}
+      {SHIPPING_FEE.map((fee) => (
+        <Button
+          key={fee.label}
+          variant="text"
+          color="inherit"
+          onClick={() => onShippingFeeButtonClick(fee.value)}
+          sx={{
+            fontWeight: isSelectedShippingFee === fee.value ? 'bold' : 'light',
+          }}
+        >
+          {fee.label}
         </Button>
       ))}
       {products.map((product: IProduct) => (
