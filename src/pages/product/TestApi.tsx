@@ -10,9 +10,11 @@ import { api } from '../../api/api';
 import { IProduct } from '../../type';
 
 export default function TestApi() {
-  const [queryCategory, setQueryCategory] = useState('');
-  const [queryPrice, setQueryPrice] = useState('');
-  const [queryShippingFee, setQueryShippingFee] = useState('');
+  const [query, setQuery] = useState({
+    categoryQuery: '',
+    priceQuery: '',
+    shippingFeeQuery: '',
+  });
   const [selectedFilter, setSelectedFilter] = useState({
     category: 'all',
     price: '전체',
@@ -23,55 +25,87 @@ export default function TestApi() {
   const [isSelectedShippingFee, setIsSelectedShippingFee] = useState('전체');
   const [products, setProducts] = useState([]);
 
-  const onCategoryButtonClick = (value: string) => {
-    setSelectedFilter({ ...selectedFilter, category: value });
-    setIsSelectedCategory(value);
-
+  const updateCategoryQuery = (value: string) => {
     if (value !== 'all') {
-      setQueryCategory(`&custom={"extra.category.1": "${value}"}`);
+      setQuery({
+        ...query,
+        categoryQuery: `&custom={"extra.category.1": "${value}"}`,
+      });
     } else {
-      setQueryCategory('');
+      setQuery({
+        ...query,
+        categoryQuery: '',
+      });
     }
   };
 
-  const onPriceButtonClick = (priceValue: string) => {
-    setSelectedFilter({ ...selectedFilter, price: priceValue });
-    setIsSelectedPrice(priceValue);
-
+  const updatePriceQuery = (priceValue: string) => {
     const selectedPriceRange = PRICE_BOUNDARIES[priceValue];
     if (priceValue !== '전체') {
-      setQueryPrice(
-        `&minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`,
-      );
+      setQuery({
+        ...query,
+        priceQuery: `&minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`,
+      });
     } else {
-      setQueryPrice('');
+      setQuery({
+        ...query,
+        priceQuery: '',
+      });
     }
   };
 
-  const onShippingFeeButtonClick = (shippingFeeValue: string) => {
-    setSelectedFilter({ ...selectedFilter, shippingFee: shippingFeeValue });
-    setIsSelectedShippingFee(shippingFeeValue);
-
+  const updateShippingFeeQuery = (shippingFeeValue: string) => {
     if (shippingFeeValue === '무료배송') {
-      setQueryShippingFee(`&minShippingFees=0&maxShippingFees=0`);
+      setQuery({
+        ...query,
+        shippingFeeQuery: `&minShippingFees=0&maxShippingFees=0`,
+      });
     } else if (shippingFeeValue === '유료배송') {
-      setQueryShippingFee(`&minShippingFees=1&maxShippingFees=Infinity`);
+      setQuery({
+        ...query,
+        shippingFeeQuery: `&minShippingFees=1&maxShippingFees=Infinity`,
+      });
     } else {
-      setQueryShippingFee('');
+      setQuery({
+        ...query,
+        shippingFeeQuery: '',
+      });
+    }
+  };
+
+  const onFilterButtonClick = (filterType: string, value: string) => {
+    const newFilter = { ...selectedFilter, [filterType]: value };
+    setSelectedFilter(newFilter);
+
+    switch (filterType) {
+      case 'category':
+        setIsSelectedCategory(value);
+        updateCategoryQuery(value);
+        break;
+      case 'price':
+        setIsSelectedPrice(value);
+        updatePriceQuery(value);
+        break;
+      case 'shippingFee':
+        setIsSelectedShippingFee(value);
+        updateShippingFeeQuery(value);
+        break;
+      default:
+        break;
     }
   };
 
   const handleFilteredProducts = async () => {
     try {
       let response;
-      let queryData = queryCategory + queryPrice + queryShippingFee;
+      const queryValues = Object.values(query).join('');
 
       if (
         selectedFilter.category !== 'all' ||
         selectedFilter.price !== '전체' ||
         selectedFilter.shippingFee !== '전체'
       ) {
-        response = await api.getProductList(queryData);
+        response = await api.getProductList(queryValues);
         setProducts(response.data.item);
       } else {
         response = await api.getProductList();
@@ -84,7 +118,7 @@ export default function TestApi() {
 
   useEffect(() => {
     handleFilteredProducts();
-  }, [queryCategory, queryPrice, queryShippingFee]);
+  }, [selectedFilter]);
 
   return (
     <>
@@ -92,7 +126,7 @@ export default function TestApi() {
         key="all"
         variant="text"
         color="inherit"
-        onClick={() => onCategoryButtonClick('all')}
+        onClick={() => onFilterButtonClick('category', 'all')}
         sx={{
           fontWeight: isSelectedCategory === 'all' ? 'bold' : 'light',
         }}
@@ -105,7 +139,7 @@ export default function TestApi() {
           variant="text"
           color="inherit"
           key={category.id}
-          onClick={() => onCategoryButtonClick(category.dbCode)}
+          onClick={() => onFilterButtonClick('category', category.dbCode)}
           sx={{
             fontWeight:
               isSelectedCategory === category.dbCode ? 'bold' : 'light',
@@ -119,7 +153,7 @@ export default function TestApi() {
           key={price.id}
           variant="text"
           color="inherit"
-          onClick={() => onPriceButtonClick(price.label)}
+          onClick={() => onFilterButtonClick('price', price.label)}
           sx={{
             fontWeight: isSelectedPrice === price.label ? 'bold' : 'light',
           }}
@@ -132,7 +166,7 @@ export default function TestApi() {
           key={fee.label}
           variant="text"
           color="inherit"
-          onClick={() => onShippingFeeButtonClick(fee.value)}
+          onClick={() => onFilterButtonClick('shippingFee', fee.value)}
           sx={{
             fontWeight: isSelectedShippingFee === fee.value ? 'bold' : 'light',
           }}
