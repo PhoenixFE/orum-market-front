@@ -27,10 +27,10 @@ export default function TestApi() {
     setSelectedFilter({ ...selectedFilter, category: value });
     setIsSelectedCategory(value);
 
-    if (value === 'all') {
-      setQueryCategory('');
-    } else {
+    if (value !== 'all') {
       setQueryCategory(`&custom={"extra.category.1": "${value}"}`);
+    } else {
+      setQueryCategory('');
     }
   };
 
@@ -39,9 +39,13 @@ export default function TestApi() {
     setIsSelectedPrice(priceValue);
 
     const selectedPriceRange = PRICE_BOUNDARIES[priceValue];
-    setQueryPrice(
-      `&minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`,
-    );
+    if (priceValue !== '전체') {
+      setQueryPrice(
+        `&minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`,
+      );
+    } else {
+      setQueryPrice('');
+    }
   };
 
   const onShippingFeeButtonClick = (shippingFeeValue: string) => {
@@ -53,11 +57,11 @@ export default function TestApi() {
     } else if (shippingFeeValue === '유료배송') {
       setQueryShippingFee(`&minShippingFees=1&maxShippingFees=Infinity`);
     } else {
-      setQueryShippingFee(`&minShippingFees=0&maxShippingFees=Infinity`);
+      setQueryShippingFee('');
     }
   };
 
-  const handleFilteredCategory = async () => {
+  const handleFilteredProducts = async () => {
     try {
       let response;
       let queryData = queryCategory + queryPrice + queryShippingFee;
@@ -79,7 +83,7 @@ export default function TestApi() {
   };
 
   useEffect(() => {
-    handleFilteredCategory();
+    handleFilteredProducts();
   }, [queryCategory, queryPrice, queryShippingFee]);
 
   return (
