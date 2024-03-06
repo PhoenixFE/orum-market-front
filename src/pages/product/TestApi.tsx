@@ -1,182 +1,92 @@
 import { useEffect, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Button } from '@mui/material';
-import {
-  CATEGORY,
-  PRICE_BOUNDARIES,
-  PRICE_RANGE,
-  SHIPPING_FEE,
-} from '../../constants';
-import { api } from '../../api/api';
+
+import { SORT_OPTIONS } from '../../constants';
 import { IProduct } from '../../type';
+import { api } from '../../api/api';
 
 export default function TestApi() {
-  const [query, setQuery] = useState({
-    categoryQuery: '',
-    priceQuery: '',
-    shippingFeeQuery: '',
-  });
-  const [selectedFilter, setSelectedFilter] = useState({
-    category: 'all',
-    price: '전체',
-    shippingFee: '전체',
-  });
-  const [isSelectedCategory, setIsSelectedCategory] = useState('all');
-  const [isSelectedPrice, setIsSelectedPrice] = useState('전체');
-  const [isSelectedShippingFee, setIsSelectedShippingFee] = useState('전체');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isSelectedSort, setIsSelectedSort] = useState('latest');
   const [products, setProducts] = useState([]);
 
-  const updateCategoryQuery = (value: string) => {
-    if (value !== 'all') {
-      setQuery({
-        ...query,
-        categoryQuery: `&custom={"extra.category.1": "${value}"}`,
-      });
+  const sortQueryParams = (queryKey: string, sortName: string) => {
+    const isExist = searchParams.toString().includes(queryKey);
+
+    if (!isExist) {
+      // 예시) ?sortOption=maxPrice
+      searchParams.append(queryKey, sortName);
+      setSearchParams(searchParams);
     } else {
-      setQuery({
-        ...query,
-        categoryQuery: '',
-      });
+      searchParams.delete(queryKey);
+      searchParams.append(queryKey, sortName);
+      setSearchParams(searchParams);
     }
   };
 
-  const updatePriceQuery = (priceValue: string) => {
-    const selectedPriceRange = PRICE_BOUNDARIES[priceValue];
-    if (priceValue !== '전체') {
-      setQuery({
-        ...query,
-        priceQuery: `&minPrice=${selectedPriceRange.min}&maxPrice=${selectedPriceRange.max}`,
-      });
-    } else {
-      setQuery({
-        ...query,
-        priceQuery: '',
-      });
-    }
-  };
+  const location = useLocation()?.search;
+  const queryString = new URLSearchParams(location);
+  const sortOption = queryString.get('sort');
 
-  const updateShippingFeeQuery = (shippingFeeValue: string) => {
-    if (shippingFeeValue === '무료배송') {
-      setQuery({
-        ...query,
-        shippingFeeQuery: `&minShippingFees=0&maxShippingFees=0`,
-      });
-    } else if (shippingFeeValue === '유료배송') {
-      setQuery({
-        ...query,
-        shippingFeeQuery: `&minShippingFees=1&maxShippingFees=Infinity`,
-      });
-    } else {
-      setQuery({
-        ...query,
-        shippingFeeQuery: '',
-      });
-    }
-  };
+  let sortQuery = {};
+  switch (sortOption) {
+    case 'latest':
+      sortQuery = `sort={"createdAt": -1}`;
+      break;
+    case 'oldest':
+      sortQuery = `sort={"createdAt": 1}`;
+      break;
+    case 'maxPrice':
+      sortQuery = `sort={"price": -1}`;
+      break;
+    case 'minPrice':
+      sortQuery = `sort={"price": 1}`;
+      break;
+    default:
+      break;
+  }
 
-  const onFilterButtonClick = (filterType: string, value: string) => {
-    const newFilter = { ...selectedFilter, [filterType]: value };
-    setSelectedFilter(newFilter);
-
-    switch (filterType) {
-      case 'category':
-        setIsSelectedCategory(value);
-        updateCategoryQuery(value);
-        break;
-      case 'price':
-        setIsSelectedPrice(value);
-        updatePriceQuery(value);
-        break;
-      case 'shippingFee':
-        setIsSelectedShippingFee(value);
-        updateShippingFeeQuery(value);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleFilteredProducts = async () => {
+  const fetchSortedProducts = async () => {
     try {
       let response;
-      const queryValues = Object.values(query).join('');
-
-      if (
-        selectedFilter.category !== 'all' ||
-        selectedFilter.price !== '전체' ||
-        selectedFilter.shippingFee !== '전체'
-      ) {
-        response = await api.getProductList(queryValues);
-        setProducts(response.data.item);
-      } else {
-        response = await api.getProductList();
-        setProducts(response.data.item);
-      }
+      response = await api.getProductList(sortQuery);
+      setProducts(response.data.item);
     } catch (error) {
-      console.error('error: ', error);
+      console.log('error', error);
     }
   };
 
   useEffect(() => {
-    handleFilteredProducts();
-  }, [selectedFilter]);
+    fetchSortedProducts();
+
+    if (sortOption !== null) {
+      setIsSelectedSort(sortOption);
+    }
+  }, [location]);
 
   return (
     <>
-      <Button
-        key="all"
-        variant="text"
-        color="inherit"
-        onClick={() => onFilterButtonClick('category', 'all')}
-        sx={{
-          fontWeight: isSelectedCategory === 'all' ? 'bold' : 'light',
-        }}
-      >
-        전체
-      </Button>
-      {CATEGORY.depth2.map((category) => (
+      {SORT_OPTIONS.map((option) => (
         <Button
           type="button"
           variant="text"
           color="inherit"
-          key={category.id}
-          onClick={() => onFilterButtonClick('category', category.dbCode)}
+          key={option.value}
+          onClick={() => sortQueryParams('sort', option.value)}
           sx={{
-            fontWeight:
-              isSelectedCategory === category.dbCode ? 'bold' : 'light',
+            fontWeight: isSelectedSort === option.value ? 'bold' : 'light',
           }}
         >
-          {category.name}
+          {option.label}
         </Button>
       ))}
-      {PRICE_RANGE.map((price) => (
-        <Button
-          key={price.id}
-          variant="text"
-          color="inherit"
-          onClick={() => onFilterButtonClick('price', price.label)}
-          sx={{
-            fontWeight: isSelectedPrice === price.label ? 'bold' : 'light',
-          }}
-        >
-          {price.label}
-        </Button>
-      ))}
-      {SHIPPING_FEE.map((fee) => (
-        <Button
-          key={fee.label}
-          variant="text"
-          color="inherit"
-          onClick={() => onFilterButtonClick('shippingFee', fee.value)}
-          sx={{
-            fontWeight: isSelectedShippingFee === fee.value ? 'bold' : 'light',
-          }}
-        >
-          {fee.label}
-        </Button>
-      ))}
+
       {products.map((product: IProduct) => (
         <ul key={product._id}>
-          <li>{product.name}</li>
+          <li>
+            {product.name} / {product.createdAt}/ {product.price}
+          </li>
         </ul>
       ))}
     </>
