@@ -290,3 +290,11 @@ export const SHIPPING_FEE = [
   { id: 1, label: '무료배송', value: '무료배송' },
   { id: 2, label: '유료배송', value: '유료배송' },
 ];
+
+export const SHIPPING_FEE_BOUNDARIES: {
+  [key: string]: { min: number; max: number };
+} = {
+  전체: { min: 0, max: Infinity },
+  무료배송: { min: 0, max: 0 },
+  유료배송: { min: 1, max: Infinity },
+};
