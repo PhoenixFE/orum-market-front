@@ -22,7 +22,6 @@ function getFilterRangeFromKeyword(queryKey: string, filterName: string) {
       : { ...queryParams, category: { category: 'all' } };
   } else if (queryKey === 'price') {
     const priceRange = PRICE_BOUNDARIES[filterName];
-    console.log(priceRange.min);
     return {
       ...queryParams,
       price: {
@@ -52,13 +51,6 @@ export default function TestApi() {
     price: '전체',
     shippingFee: '전체',
   });
-  const [filterQueryName, setFilterQueryName] = useState({
-    category: 'all',
-    minPrice: 0,
-    maxPrice: 0,
-    minShippingFees: 0,
-    maxShippingFees: 0,
-  });
   const [products, setProducts] = useState([]);
 
   // sorting query keyword check
@@ -66,47 +58,96 @@ export default function TestApi() {
     // const isExist = searchParams.toString().includes(queryKey);
     const isExistInSortQuery = searchParams.has(queryKey);
 
-    if (!isExistInSortQuery) {
+    if (isExistInSortQuery) {
       // 예시) ?sortOption=maxPrice
       searchParams.set(queryKey, sortName);
-      setSearchParams(searchParams);
     } else {
-      searchParams.set(queryKey, sortName);
-      setSearchParams(searchParams);
+      searchParams.append(queryKey, sortName);
     }
+    setSearchParams(searchParams);
   };
 
   // filtering query keyword check
   const filterQueryParams = (queryKey: string, filterName: string) => {
+    setIsSelectedFilter({
+      ...isSelectedFilter,
+      [queryKey]: filterName,
+    });
+
     // 선택된 필터 버튼에 대한 쿼리 스트링 키워드를 받아옴(객체 형태)
     // 가격과 배송료 API는 min, max 범위가 있기 때문.
     const filterQueryKeyword = getFilterRangeFromKeyword(queryKey, filterName);
 
     // 현재 페이지의 쿼리 스트링 값과 선택한 필터 값 비교를 위해
-    // 현재 쿼리 스트링 key=value값을 배열 형태로 받아옴
+    // 현재 쿼리 스트링 key=value값을 배열 형태로 받아옴(중첩 배열 [[][]])
     const getAllSearchParams = Array.from(searchParams.entries());
-    // 그 중에서 sort 쿼리를 제외한 filter 관련 쿼리 스트링값만 새배열로 반환
-    // 형식 : [key, value, key, value ...]
-    const getFilterParams = getAllSearchParams
-      .filter(([key]) => key != 'sort')
-      .flat();
 
-    // 현재 페이지에 쿼리 스트링이 존재하지 않는 경우 제일 처음 누른 필터에 대한 쿼리 추가
-    if (!getFilterParams.length && filterQueryKeyword) {
+    // 쿼리 비교를 위해 sort 쿼리를 제외한 filter 관련 쿼리의 key, value 각각 새배열로 반환
+    const [paramsKey, paramsValue] = getAllSearchParams.reduce(
+      ([paramsKey, paramsValue], [key, value]) => {
+        if (key != 'sort') {
+          paramsKey.push(key);
+          paramsValue.push(value);
+        }
+        return [paramsKey, paramsValue];
+      },
+      [[], []],
+    );
+
+    if (filterQueryKeyword) {
       // 조건 처리를 위해 key, value 추출
-      const paramsValue = Object.values(filterQueryKeyword)[0];
+      const filterValue = Object.values(filterQueryKeyword)[0];
 
-      // 필터값에 따른 쿼리 처리
-      Object.entries(paramsValue).forEach(([key, value]) => {
-        searchParams.set(`${key}`, `${value}`);
+      // 현재 페이지에 쿼리 스트링이 존재하지 않는 경우 제일 처음 누른 필터에 대한 쿼리 추가
+      if (!paramsKey.length && !paramsValue.length) {
+        // 필터값에 따른 쿼리 처리
+        Object.entries(filterValue).forEach(([key, value]) => {
+          searchParams.set(`${key}`, `${value}`);
+        });
         setSearchParams(searchParams);
-      });
+      }
+
+      // 쿼리 스트링이 존재하는 경우
+      // 선택한 필터값도 비교를 위해 key, value 배열로 반환
+      const clickedFilterKey = Object.keys(filterValue);
+      const clickedFilterValue = Object.values(filterValue).map((value) =>
+        String(value),
+      );
+
+      // 현재 페이지에 있는 쿼리 스트링의 key와 value가 클릭한 필터 값과 동일한지 확인
+      const compareFilterAndQueryKeys = (selectedFilter, params) => {
+        let result = true;
+        selectedFilter.forEach((elem) => {
+          if (!params.includes(elem)) {
+            return (result = false);
+          }
+        });
+        return result;
+      };
+
+      const keysMatch = compareFilterAndQueryKeys(clickedFilterKey, paramsKey);
+      const valuesMatch = compareFilterAndQueryKeys(
+        clickedFilterValue,
+        paramsValue,
+      );
+      const isExistInFilterQuery = keysMatch && valuesMatch;
+
+      // 이미 동일한 값이 존재하는 경우 새로운 값으로 변경
+      if (!isExistInFilterQuery) {
+        Object.entries(filterValue).forEach(([key, value]) => {
+          searchParams.set(`${key}`, `${value}`);
+        });
+        setSearchParams(searchParams);
+      }
     }
   };
 
   const location = useLocation()?.search;
   const queryString = new URLSearchParams(location);
   const sortOption = queryString.get('sort') || 'latest';
+  const test = queryString.getAll('minPrice');
+
+  console.log('location: ', test);
 
   let sortQuery = {};
   switch (sortOption) {
