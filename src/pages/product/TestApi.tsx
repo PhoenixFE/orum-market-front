@@ -94,30 +94,15 @@ export default function TestApi() {
     // 현재 페이지에 쿼리 스트링이 존재하지 않는 경우 제일 처음 누른 필터에 대한 쿼리 추가
     if (!getFilterParams.length && filterQueryKeyword) {
       // 조건 처리를 위해 key, value 추출
-      const [paramsKey, paramsValue] = Object.entries(filterQueryKeyword)[0];
+      const paramsValue = Object.values(filterQueryKeyword)[0];
 
       // 필터값에 따른 쿼리 처리
-      Object.entries(paramsValue).forEach(([key, value], idx) => {
-        console.log(`Key: ${key}, Value: ${value}`);
-        if (paramsKey === 'category') {
-          searchParams.set('category', `${value}`);
-          setSearchParams(searchParams);
-        } else if (paramsKey === 'price') {
-          idx === 0
-            ? searchParams.set('minPrice', `${value}`)
-            : searchParams.set('maxPrice', `${value}`);
-          setSearchParams(searchParams);
-        } else if (paramsKey === 'shippingFee') {
-          idx === 0
-            ? searchParams.set('minShippingFees', `${value}`)
-            : searchParams.set('maxShippingFees', `${value}`);
-          setSearchParams(searchParams);
-        }
+      Object.entries(paramsValue).forEach(([key, value]) => {
+        searchParams.set(`${key}`, `${value}`);
+        setSearchParams(searchParams);
       });
     }
   };
-
-  console.log(searchParams.toString());
 
   const location = useLocation()?.search;
   const queryString = new URLSearchParams(location);
