@@ -81,101 +81,40 @@ export default function TestApi() {
     // 선택된 필터 버튼에 대한 쿼리 스트링 키워드를 받아옴(객체 형태)
     // 가격과 배송료 API는 min, max 범위가 있기 때문.
     const filterQueryKeyword = getFilterRangeFromKeyword(queryKey, filterName);
-    console.log('filterQueryKeyword: ', filterQueryKeyword);
 
     // 현재 페이지의 쿼리 스트링 값과 선택한 필터 값 비교를 위해
     // 현재 쿼리 스트링 key=value값을 배열 형태로 받아옴
     const getAllSearchParams = Array.from(searchParams.entries());
     // 그 중에서 sort 쿼리를 제외한 filter 관련 쿼리 스트링값만 새배열로 반환
-    // 형식 : [key, value][key, value]..
-    const getFilterParams = getAllSearchParams.filter(([key]) => key != 'sort');
-    // const tesss = Object.entries(getFilterParams)
-    //   .join()
-    //   .split(',')
-    //   .includes('category');
-    const nestedArrays = Object.values(getFilterParams)
-      .filter(Array.isArray)
+    // 형식 : [key, value, key, value ...]
+    const getFilterParams = getAllSearchParams
+      .filter(([key]) => key != 'sort')
       .flat();
 
-    console.log('getFilterParams', getFilterParams, 'tesss', nestedArrays);
-
-    // 현재 페이지에 쿼리 스트링이 아예 없을 때는 제일 처음 누른 필터에 대한 쿼리를 넣어주자.
+    // 현재 페이지에 쿼리 스트링이 존재하지 않는 경우 제일 처음 누른 필터에 대한 쿼리 추가
     if (!getFilterParams.length && filterQueryKeyword) {
+      // 조건 처리를 위해 key, value 추출
       const [paramsKey, paramsValue] = Object.entries(filterQueryKeyword)[0];
-      const dd = Object.entries(paramsValue);
-      console.log(dd.join().split(','));
 
-      console.log('paramsKey:', paramsKey);
-      console.log('paramsValue:', paramsValue);
-
-      // const entries = Object.entries(filterQueryKeyword);
-      // console.log('entries', entries);
-
-      // const ttt = entries.map((list) => console.log(list));
-
-      // if (paramsKey === 'category') {
-      //   searchParams.set('category', filterQueryKeyword);
-      //   setSearchParams(searchParams);
-      //   return;
-      // }
+      // 필터값에 따른 쿼리 처리
+      Object.entries(paramsValue).forEach(([key, value], idx) => {
+        console.log(`Key: ${key}, Value: ${value}`);
+        if (paramsKey === 'category') {
+          searchParams.set('category', `${value}`);
+          setSearchParams(searchParams);
+        } else if (paramsKey === 'price') {
+          idx === 0
+            ? searchParams.set('minPrice', `${value}`)
+            : searchParams.set('maxPrice', `${value}`);
+          setSearchParams(searchParams);
+        } else if (paramsKey === 'shippingFee') {
+          idx === 0
+            ? searchParams.set('minShippingFees', `${value}`)
+            : searchParams.set('maxShippingFees', `${value}`);
+          setSearchParams(searchParams);
+        }
+      });
     }
-    // if (getFilterParams.length === 0 && filterQueryKeyword) {
-    //   console.log(filterQueryKeyword);
-    //   const isExistInRangeQuery =
-    //     Object.keys(filterQueryKeyword).includes('secondQuery');
-
-    //   if (isExistInRangeQuery) {
-    //     searchParams.set(
-    //       filterQueryKeyword.firstQuery?.queryKey,
-    //       filterQueryKeyword.firstQuery?.value,
-    //     );
-    //     searchParams.set(
-    //       filterQueryKeyword.secondQuery?.queryKey,
-    //       filterQueryKeyword.secondQuery?.value,
-    //     );
-    //     setSearchParams(searchParams);
-    //   } else {
-    //     searchParams.set(
-    //       filterQueryKeyword.firstQuery.queryKey,
-    //       filterQueryKeyword.firstQuery.value,
-    //     );
-    //     setSearchParams(searchParams);
-    //   }
-    // }
-
-    // const count = Object.keys(filterQueryKeyword).length;
-
-    // const isExistInFilterQuery = getFilterParams.some(([key]) => {
-    //   if (count === 1) {
-    //     return key === filterQueryKeyword.firstQuery.queryKey;
-    //   } else {
-    //     return (
-    //       key === filterQueryKeyword.firstQuery.queryKey ||
-    //       key === filterQueryKeyword.secondQuery.queryKey
-    //     );
-    //   }
-    // });
-
-    // if (isExistInFilterQuery) {
-    //   if (count > 1) {
-    //     searchParams.set(
-    //       filterQueryKeyword.firstQuery?.queryKey,
-    //       filterQueryKeyword.firstQuery?.value,
-    //     );
-    //     searchParams.set(
-    //       filterQueryKeyword.secondQuery?.queryKey,
-    //       filterQueryKeyword.secondQuery?.value,
-    //     );
-
-    //     setSearchParams(searchParams);
-    //   } else {
-    //     searchParams.set(
-    //       filterQueryKeyword.firstQuery?.queryKey,
-    //       filterQueryKeyword.firstQuery?.value,
-    //     );
-    //     setSearchParams(searchParams);
-    //   }
-    // }
   };
 
   console.log(searchParams.toString());
