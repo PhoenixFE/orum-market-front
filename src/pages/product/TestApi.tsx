@@ -15,6 +15,11 @@ import { api } from '../../api/api';
 
 export default function TestApi() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [filterQuery, setFilterQuery] = useState({
+    categoryQuery: '',
+    priceQuery: '',
+    shippingQuery: '',
+  });
   const [isSelectedSort, setIsSelectedSort] = useState('latest');
   const [isSelectedFilter, setIsSelectedFilter] = useState({
     category: 'all',
@@ -136,11 +141,14 @@ export default function TestApi() {
   const location = useLocation()?.search;
   const queryString = new URLSearchParams(location);
   const sortOption = queryString.get('sort') || 'latest';
-  const test = queryString.getAll('minPrice');
 
-  console.log('location: ', test);
+  const category = searchParams.get('category');
+  const minPrice = searchParams.get('minPrice');
+  const maxPrice = searchParams.get('maxPrice');
+  const minShippingFees = searchParams.get('minShippingFees');
+  const maxShippingFees = searchParams.get('maxShippingFees');
 
-  let sortQuery = {};
+  let sortQuery = '';
   switch (sortOption) {
     case 'latest':
       sortQuery = `sort={"createdAt": -1}`;
@@ -158,11 +166,30 @@ export default function TestApi() {
       break;
   }
 
+  let filterQuerys = {};
+  if (category) {
+    filterQuerys.category = `&custom=${JSON.stringify({
+      'extra.category.1': category,
+    })}`;
+  }
+  if (minPrice && maxPrice) {
+    filterQuerys.price = `&minPrice=${JSON.stringify({
+      minPrice,
+    })}&maxPrice=${JSON.stringify({ maxPrice })}`;
+  }
+  if (minShippingFees && maxShippingFees) {
+    filterQuerys.shippingFees = `&minShippingFees=${JSON.stringify({
+      minShippingFees,
+    })}&maxShippingFees=${JSON.stringify({ maxShippingFees })}`;
+  }
+
   const fetchSortedProducts = async () => {
     try {
       let response;
-      // response = await api.getProductList(sortQuery);
-      // setProducts(response.data.item);
+      let sortFilterQuery = sortQuery + filterQuerys.category;
+
+      response = await api.getProductList(sortFilterQuery);
+      setProducts(response.data.item);
     } catch (error) {
       console.log('error', error);
     }
