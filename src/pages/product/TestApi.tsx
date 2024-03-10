@@ -13,36 +13,6 @@ import {
 import { IProduct } from '../../type';
 import { api } from '../../api/api';
 
-const queryParams = {};
-
-function getFilterRangeFromKeyword(queryKey: string, filterName: string) {
-  if (queryKey === 'category') {
-    return filterName !== 'all'
-      ? { ...queryParams, category: { category: filterName } }
-      : { ...queryParams, category: { category: 'all' } };
-  } else if (queryKey === 'price') {
-    const priceRange = PRICE_BOUNDARIES[filterName];
-    return {
-      ...queryParams,
-      price: {
-        ...queryParams,
-        minPrice: priceRange.min,
-        maxPrice: priceRange.max,
-      },
-    };
-  } else if (queryKey === 'shippingFee') {
-    const shippingFeeRange = SHIPPING_FEE_BOUNDARIES[filterName];
-    return {
-      ...queryParams,
-      shippingFee: {
-        ...queryParams,
-        minShippingFees: shippingFeeRange.min,
-        maxShippingFees: shippingFeeRange.max,
-      },
-    };
-  }
-}
-
 export default function TestApi() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSelectedSort, setIsSelectedSort] = useState('latest');
@@ -55,14 +25,13 @@ export default function TestApi() {
 
   // sorting query keyword check
   const sortQueryParams = (queryKey: string, sortName: string) => {
-    // const isExist = searchParams.toString().includes(queryKey);
-    const isExistInSortQuery = searchParams.has(queryKey);
+    const isExistInSortQuery = searchParams.has(queryKey, sortName);
 
-    if (isExistInSortQuery) {
+    console.log('sort 완전 일치 있니 없니: ?', isExistInSortQuery);
+
+    if (!isExistInSortQuery) {
       // 예시) ?sortOption=maxPrice
       searchParams.set(queryKey, sortName);
-    } else {
-      searchParams.append(queryKey, sortName);
     }
     setSearchParams(searchParams);
   };
@@ -74,25 +43,47 @@ export default function TestApi() {
       [queryKey]: filterName,
     });
 
+    // 선택한 필터 버튼값 비교하여 객체로 반환하는 함수
+    // price와 category API는 min, max 범위가 있기 때문.
+    const getFilterRangeFromKeyword = (
+      queryKey: string,
+      filterName: string,
+    ) => {
+      if (queryKey === 'category') {
+        return filterName !== 'all'
+          ? { category: { category: filterName } }
+          : { category: { category: 'all' } };
+      } else if (queryKey === 'price') {
+        const priceRange = PRICE_BOUNDARIES[filterName];
+        return {
+          price: {
+            minPrice: priceRange.min,
+            maxPrice: priceRange.max,
+          },
+        };
+      } else if (queryKey === 'shippingFee') {
+        const shippingFeeRange = SHIPPING_FEE_BOUNDARIES[filterName];
+        return {
+          shippingFee: {
+            minShippingFees: shippingFeeRange.min,
+            maxShippingFees: shippingFeeRange.max,
+          },
+        };
+      }
+    };
+
     // 선택된 필터 버튼에 대한 쿼리 스트링 키워드를 받아옴(객체 형태)
-    // 가격과 배송료 API는 min, max 범위가 있기 때문.
     const filterQueryKeyword = getFilterRangeFromKeyword(queryKey, filterName);
 
     // 현재 페이지의 쿼리 스트링 값과 선택한 필터 값 비교를 위해
-    // 현재 쿼리 스트링 key=value값을 배열 형태로 받아옴(중첩 배열 [[][]])
-    const getAllSearchParams = Array.from(searchParams.entries());
+    // 현재 쿼리 스트링 key=value값 중에 sort를 제외한 값을 중첩 배열([[][]]) 형태로 받아옴
+    const getAllSearchParams = Array.from(searchParams.entries())
+      .filter(([key]) => key !== 'sort')
+      .flat();
 
     // 쿼리 비교를 위해 sort 쿼리를 제외한 filter 관련 쿼리의 key, value 각각 새배열로 반환
-    const [paramsKey, paramsValue] = getAllSearchParams.reduce(
-      ([paramsKey, paramsValue], [key, value]) => {
-        if (key != 'sort') {
-          paramsKey.push(key);
-          paramsValue.push(value);
-        }
-        return [paramsKey, paramsValue];
-      },
-      [[], []],
-    );
+    const paramsKey = getAllSearchParams.filter((_, idx) => idx % 2 === 0);
+    const paramsValue = getAllSearchParams.filter((_, idx) => idx % 2 !== 0);
 
     if (filterQueryKeyword) {
       // 조건 처리를 위해 key, value 추출
@@ -132,7 +123,7 @@ export default function TestApi() {
       );
       const isExistInFilterQuery = keysMatch && valuesMatch;
 
-      // 이미 동일한 값이 존재하는 경우 새로운 값으로 변경
+      // 동일한 값이 없을 경우 새로운 값으로 변경
       if (!isExistInFilterQuery) {
         Object.entries(filterValue).forEach(([key, value]) => {
           searchParams.set(`${key}`, `${value}`);
