@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@mui/material';
 
 import {
@@ -15,17 +15,12 @@ import { api } from '../../api/api';
 
 export default function TestApi() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [filterQuery, setFilterQuery] = useState({
-    categoryQuery: '',
-    priceQuery: '',
-    shippingQuery: '',
-  });
   const [isSelectedSort, setIsSelectedSort] = useState('latest');
-  const [isSelectedFilter, setIsSelectedFilter] = useState({
-    category: 'all',
-    price: '전체',
-    shippingFee: '전체',
-  });
+  const [isSelectedFilterCategory, setIsSelectedFilterCategory] =
+    useState('all');
+  const [isSelectedFilterPrice, setIsSelectedFilterPrice] = useState('전체');
+  const [isSelectedFilterShippingFee, setIsSelectedFilterShippingFee] =
+    useState('전체');
   const [products, setProducts] = useState([]);
 
   // sorting query keyword check
@@ -43,11 +38,6 @@ export default function TestApi() {
 
   // filtering query keyword check
   const filterQueryParams = (queryKey: string, filterName: string) => {
-    setIsSelectedFilter({
-      ...isSelectedFilter,
-      [queryKey]: filterName,
-    });
-
     // 선택한 필터 버튼값 비교하여 객체로 반환하는 함수
     // price와 category API는 min, max 범위가 있기 때문.
     const getFilterRangeFromKeyword = (
@@ -138,10 +128,19 @@ export default function TestApi() {
     }
   };
 
-  const location = useLocation()?.search;
-  const queryString = new URLSearchParams(location);
-  const sortOption = queryString.get('sort') || 'latest';
+  // filter button active 유지를 위한 함수
+  const findFilterKeyByValue = (obj, minValue, maxValue) => {
+    for (const [key, value] of Object.entries(obj)) {
+      if (
+        value.min.toString() === minValue &&
+        value.max.toString() === maxValue
+      ) {
+        return key;
+      }
+    }
+  };
 
+  const sortOption = searchParams.get('sort') || 'latest';
   const category = searchParams.get('category');
   const minPrice = searchParams.get('minPrice');
   const maxPrice = searchParams.get('maxPrice');
@@ -183,7 +182,7 @@ export default function TestApi() {
     })}&maxShippingFees=${JSON.stringify({ maxShippingFees })}`;
   }
 
-  const fetchSortedProducts = async () => {
+  const fetchProducts = async () => {
     try {
       let response;
       let sortFilterQuery = sortQuery + filterQuerys.category;
@@ -196,12 +195,28 @@ export default function TestApi() {
   };
 
   useEffect(() => {
-    fetchSortedProducts();
+    fetchProducts();
 
+    // 정렬&필터 버튼 active 설정
     if (sortOption !== null) {
       setIsSelectedSort(sortOption);
     }
-  }, [location]);
+    if (category !== null) {
+      setIsSelectedFilterCategory(category);
+    }
+    if (minPrice !== null && maxPrice !== null) {
+      const price = findFilterKeyByValue(PRICE_BOUNDARIES, minPrice, maxPrice);
+      setIsSelectedFilterPrice(price);
+    }
+    if (minShippingFees !== null && maxShippingFees !== null) {
+      const shippingFee = findFilterKeyByValue(
+        SHIPPING_FEE_BOUNDARIES,
+        minShippingFees,
+        maxShippingFees,
+      );
+      setIsSelectedFilterShippingFee(shippingFee);
+    }
+  }, [searchParams]);
 
   return (
     <>
@@ -227,7 +242,7 @@ export default function TestApi() {
           color="inherit"
           onClick={() => filterQueryParams('category', 'all')}
           sx={{
-            fontWeight: isSelectedFilter.category === 'all' ? 'bold' : 'light',
+            fontWeight: isSelectedFilterCategory === 'all' ? 'bold' : 'light',
           }}
         >
           전체
@@ -241,9 +256,7 @@ export default function TestApi() {
             onClick={() => filterQueryParams('category', category.dbCode)}
             sx={{
               fontWeight:
-                isSelectedFilter.category === category.dbCode
-                  ? 'bold'
-                  : 'light',
+                isSelectedFilterCategory === category.dbCode ? 'bold' : 'light',
             }}
           >
             {category.name}
@@ -258,7 +271,7 @@ export default function TestApi() {
             onClick={() => filterQueryParams('price', price.label)}
             sx={{
               fontWeight:
-                isSelectedFilter.price === price.label ? 'bold' : 'light',
+                isSelectedFilterPrice === price.label ? 'bold' : 'light',
             }}
           >
             {price.label}
@@ -273,7 +286,7 @@ export default function TestApi() {
             onClick={() => filterQueryParams('shippingFee', fee.value)}
             sx={{
               fontWeight:
-                isSelectedFilter.shippingFee === fee.value ? 'bold' : 'light',
+                isSelectedFilterShippingFee === fee.value ? 'bold' : 'light',
             }}
           >
             {fee.label}
@@ -284,7 +297,8 @@ export default function TestApi() {
       {products.map((product: IProduct) => (
         <ul key={product._id}>
           <li>
-            {product.name} / {product.createdAt}/ {product.price}
+            {product.name} / {product.createdAt}/ {product.price} /
+            {product.shippingFees}
           </li>
         </ul>
       ))}
