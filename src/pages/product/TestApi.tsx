@@ -16,18 +16,17 @@ import { api } from '../../api/api';
 export default function TestApi() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSelectedSort, setIsSelectedSort] = useState('latest');
-  const [isSelectedFilterCategory, setIsSelectedFilterCategory] =
-    useState('all');
-  const [isSelectedFilterPrice, setIsSelectedFilterPrice] = useState('전체');
-  const [isSelectedFilterShippingFee, setIsSelectedFilterShippingFee] =
-    useState('전체');
+  const [isSelectedFilter, setIsSelectedFilter] = useState({
+    category: 'all',
+    price: '전체',
+    shippingFee: '전체',
+  });
+
   const [products, setProducts] = useState([]);
 
   // sorting query keyword check
   const sortQueryParams = (queryKey: string, sortName: string) => {
     const isExistInSortQuery = searchParams.has(queryKey, sortName);
-
-    console.log('sort 완전 일치 있니 없니: ?', isExistInSortQuery);
 
     if (!isExistInSortQuery) {
       // 예시) ?sortOption=maxPrice
@@ -197,24 +196,36 @@ export default function TestApi() {
   useEffect(() => {
     fetchProducts();
 
-    // 정렬&필터 버튼 active 설정
     if (sortOption !== null) {
       setIsSelectedSort(sortOption);
     }
     if (category !== null) {
-      setIsSelectedFilterCategory(category);
+      setIsSelectedFilter((current) => ({
+        ...current,
+        category: category,
+      }));
     }
     if (minPrice !== null && maxPrice !== null) {
-      const price = findFilterKeyByValue(PRICE_BOUNDARIES, minPrice, maxPrice);
-      setIsSelectedFilterPrice(price);
+      const price =
+        findFilterKeyByValue(PRICE_BOUNDARIES, minPrice, maxPrice) || '';
+
+      setIsSelectedFilter((current) => ({
+        ...current,
+        price: price,
+      }));
     }
     if (minShippingFees !== null && maxShippingFees !== null) {
-      const shippingFee = findFilterKeyByValue(
-        SHIPPING_FEE_BOUNDARIES,
-        minShippingFees,
-        maxShippingFees,
-      );
-      setIsSelectedFilterShippingFee(shippingFee);
+      const shippingFee =
+        findFilterKeyByValue(
+          SHIPPING_FEE_BOUNDARIES,
+          minShippingFees,
+          maxShippingFees,
+        ) || '';
+
+      setIsSelectedFilter((current) => ({
+        ...current,
+        shippingFee: shippingFee,
+      }));
     }
   }, [searchParams]);
 
@@ -242,7 +253,7 @@ export default function TestApi() {
           color="inherit"
           onClick={() => filterQueryParams('category', 'all')}
           sx={{
-            fontWeight: isSelectedFilterCategory === 'all' ? 'bold' : 'light',
+            fontWeight: isSelectedFilter.category === 'all' ? 'bold' : 'light',
           }}
         >
           전체
@@ -256,7 +267,9 @@ export default function TestApi() {
             onClick={() => filterQueryParams('category', category.dbCode)}
             sx={{
               fontWeight:
-                isSelectedFilterCategory === category.dbCode ? 'bold' : 'light',
+                isSelectedFilter.category === category.dbCode
+                  ? 'bold'
+                  : 'light',
             }}
           >
             {category.name}
@@ -271,7 +284,7 @@ export default function TestApi() {
             onClick={() => filterQueryParams('price', price.label)}
             sx={{
               fontWeight:
-                isSelectedFilterPrice === price.label ? 'bold' : 'light',
+                isSelectedFilter.price === price.label ? 'bold' : 'light',
             }}
           >
             {price.label}
@@ -286,7 +299,7 @@ export default function TestApi() {
             onClick={() => filterQueryParams('shippingFee', fee.value)}
             sx={{
               fontWeight:
-                isSelectedFilterShippingFee === fee.value ? 'bold' : 'light',
+                isSelectedFilter.shippingFee === fee.value ? 'bold' : 'light',
             }}
           >
             {fee.label}
@@ -297,8 +310,7 @@ export default function TestApi() {
       {products.map((product: IProduct) => (
         <ul key={product._id}>
           <li>
-            {product.name} / {product.createdAt}/ {product.price} /
-            {product.shippingFees}
+            {product.name} / {product.createdAt}/ {product.price}
           </li>
         </ul>
       ))}
