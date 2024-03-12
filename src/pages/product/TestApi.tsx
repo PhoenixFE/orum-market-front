@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Button } from '@mui/material';
 
 import {
@@ -139,52 +139,89 @@ export default function TestApi() {
     }
   };
 
-  const sortOption = searchParams.get('sort') || 'latest';
-  const category = searchParams.get('category');
-  const minPrice = searchParams.get('minPrice');
-  const maxPrice = searchParams.get('maxPrice');
-  const minShippingFees = searchParams.get('minShippingFees');
-  const maxShippingFees = searchParams.get('maxShippingFees');
+  const loaction = useLocation().search;
+  const [searchParamss] = useSearchParams(loaction);
 
-  let sortQuery = '';
-  switch (sortOption) {
-    case 'latest':
-      sortQuery = `sort={"createdAt": -1}`;
-      break;
-    case 'oldest':
-      sortQuery = `sort={"createdAt": 1}`;
-      break;
-    case 'maxPrice':
-      sortQuery = `sort={"price": -1}`;
-      break;
-    case 'minPrice':
-      sortQuery = `sort={"price": 1}`;
-      break;
-    default:
-      break;
+  const sortOption = searchParamss.get('sort');
+  const category = searchParamss.get('category');
+  const minPrice = searchParamss.get('minPrice');
+  const maxPrice = searchParamss.get('maxPrice');
+  const minShippingFees = searchParamss.get('minShippingFees');
+  const maxShippingFees = searchParamss.get('maxShippingFees');
+
+  let sortQuery = {};
+  if (sortOption === 'latest') {
+    sortQuery.createdAt = -1;
+  } else if (sortOption === 'oldest') {
+    sortQuery.createdAt = 1;
+  } else if (sortOption === 'maxPrice') {
+    sortQuery.price = -1;
+  } else if (sortOption === 'minPrice') {
+    sortQuery.price = 1;
   }
 
   let filterQuerys = {};
   if (category) {
-    filterQuerys.category = `&custom=${JSON.stringify({
-      'extra.category.1': category,
-    })}`;
+    filterQuerys.category = category;
   }
   if (minPrice && maxPrice) {
-    filterQuerys.price = `&minPrice=${JSON.stringify({
-      minPrice,
-    })}&maxPrice=${JSON.stringify({ maxPrice })}`;
+    filterQuerys.minPrice = minPrice;
+    filterQuerys.maxPrice = maxPrice;
   }
   if (minShippingFees && maxShippingFees) {
-    filterQuerys.shippingFees = `&minShippingFees=${JSON.stringify({
-      minShippingFees,
-    })}&maxShippingFees=${JSON.stringify({ maxShippingFees })}`;
+    filterQuerys.minShippingFees = minShippingFees;
+    filterQuerys.maxShippingFees = maxShippingFees;
   }
+
+  // sort API 요청 쿼리 생성
+  const sortApiQuery =
+    Object.keys(sortQuery).length === 0
+      ? ''
+      : `sort=${JSON.stringify(sortQuery)}`;
+
+  // filter API 요청 쿼리 생성
+  const filterArray = Object.entries(filterQuerys);
+
+  const filterObject: {
+    'extra.category.1'?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    priceRange?: {
+      minPrice?: string;
+      maxPrice?: string;
+    };
+    shippingFeesRange?: {
+      minShippingFees?: string;
+      maxShippingFees?: string;
+    };
+  } = {};
+
+  filterArray.forEach((entry: string) => {
+    const [key, value] = entry;
+
+    if (key === 'category' && value !== 'all') {
+      filterObject[`extra.${key}.1`] = value;
+    } else if (key === 'minPrice' || key === 'maxPrice') {
+      if (!filterObject.priceRange) {
+        filterObject.priceRange = {};
+      }
+      filterObject.priceRange[key] = value;
+    } else if (key === 'minShippingFees' || key === 'maxShippingFees') {
+      if (!filterObject.shippingFeesRange) {
+        filterObject.shippingFeesRange = {};
+      }
+      filterObject.shippingFeesRange[key] = value;
+    }
+  });
+
+  console.log(`custom=${JSON.stringify(filterObject.priceRange)}`);
+
+  console.log('dd', filterObject);
 
   const fetchProducts = async () => {
     try {
       let response;
-      let sortFilterQuery = sortQuery + filterQuerys.category;
+      let sortFilterQuery = sortApiQuery;
 
       response = await api.getProductList(sortFilterQuery);
       setProducts(response.data.item);
