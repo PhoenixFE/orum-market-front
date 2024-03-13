@@ -37,36 +37,57 @@ export default function TestApi() {
 
   // filtering query keyword check
   const filterQueryParams = (queryKey: string, filterName: string) => {
+    console.log('선택된 버튼: ', filterName);
     // 선택한 필터 버튼값 비교하여 객체로 반환하는 함수
     // price와 category API는 min, max 범위가 있기 때문.
     const getFilterRangeFromKeyword = (
       queryKey: string,
       filterName: string,
     ) => {
-      if (queryKey === 'category') {
-        return filterName !== 'all'
-          ? { category: { category: filterName } }
-          : { category: { category: 'all' } };
-      } else if (queryKey === 'price') {
-        const priceRange = PRICE_BOUNDARIES[filterName];
-        return {
-          price: {
-            minPrice: priceRange.min,
-            maxPrice: priceRange.max,
+      let filterQuery = {};
+      if (filterName !== 'all' && filterName !== '전체') {
+        if (queryKey === 'category') {
+          filterQuery = {
+            ...filterQuery,
+            categoryQuery: {
+              category: filterName,
+            },
+          };
+          return filterQuery;
+        } else if (queryKey === 'price') {
+          const priceRange = PRICE_BOUNDARIES[filterName];
+          filterQuery = {
+            ...filterQuery,
+            priceQuery: {
+              minPrice: priceRange.min,
+              maxPrice: priceRange.max,
+            },
+          };
+          return filterQuery;
+        } else if (queryKey === 'shippingFee') {
+          const shippingFeeRange = SHIPPING_FEE_BOUNDARIES[filterName];
+          filterQuery = {
+            ...filterQuery,
+            shippingFeeQuery: {
+              minShippingFees: shippingFeeRange.min,
+              maxShippingFees: shippingFeeRange.max,
+            },
+          };
+          return filterQuery;
+        }
+      } else {
+        return (filterQuery = {
+          ...filterQuery,
+          allQuery: {
+            queryKey,
+            filterName,
           },
-        };
-      } else if (queryKey === 'shippingFee') {
-        const shippingFeeRange = SHIPPING_FEE_BOUNDARIES[filterName];
-        return {
-          shippingFee: {
-            minShippingFees: shippingFeeRange.min,
-            maxShippingFees: shippingFeeRange.max,
-          },
-        };
+        });
       }
     };
 
     // 선택된 필터 버튼에 대한 쿼리 스트링 키워드를 받아옴(객체 형태)
+    // 전체 버튼 클릭시에는 문자열 반환
     const filterQueryKeyword = getFilterRangeFromKeyword(queryKey, filterName);
 
     // 현재 페이지의 쿼리 스트링 값과 선택한 필터 값 비교를 위해
@@ -79,7 +100,11 @@ export default function TestApi() {
     const paramsKey = getAllSearchParams.filter((_, idx) => idx % 2 === 0);
     const paramsValue = getAllSearchParams.filter((_, idx) => idx % 2 !== 0);
 
-    if (filterQueryKeyword) {
+    const isNotAll =
+      filterQueryKeyword?.allQuery?.filterName !== 'all' &&
+      filterQueryKeyword?.allQuery?.filterName !== '전체';
+
+    if (isNotAll) {
       // 조건 처리를 위해 key, value 추출
       const filterValue = Object.values(filterQueryKeyword)[0];
 
@@ -87,6 +112,7 @@ export default function TestApi() {
       if (!paramsKey.length && !paramsValue.length) {
         // 필터값에 따른 쿼리 처리
         Object.entries(filterValue).forEach(([key, value]) => {
+          console.log(key, value);
           searchParams.set(`${key}`, `${value}`);
         });
         setSearchParams(searchParams);
@@ -98,6 +124,8 @@ export default function TestApi() {
       const clickedFilterValue = Object.values(filterValue).map((value) =>
         String(value),
       );
+
+      console.log('clickedFilterKey', clickedFilterKey);
 
       // 현재 페이지에 있는 쿼리 스트링의 key와 value가 클릭한 필터 값과 동일한지 확인
       const compareFilterAndQueryKeys = (selectedFilter, params) => {
@@ -122,6 +150,19 @@ export default function TestApi() {
         Object.entries(filterValue).forEach(([key, value]) => {
           searchParams.set(`${key}`, `${value}`);
         });
+        setSearchParams(searchParams);
+      }
+    } else {
+      if (filterQueryKeyword?.allQuery?.queryKey === 'category') {
+        searchParams.delete('category');
+        setSearchParams(searchParams);
+      } else if (filterQueryKeyword?.allQuery?.queryKey === 'price') {
+        searchParams.delete('minPrice');
+        searchParams.delete('maxPrice');
+        setSearchParams(searchParams);
+      } else if (filterQueryKeyword?.allQuery?.queryKey === 'shippingFee') {
+        searchParams.delete('minShippingFees');
+        searchParams.delete('maxShippingFees');
         setSearchParams(searchParams);
       }
     }
@@ -216,15 +257,17 @@ export default function TestApi() {
 
   console.log(`custom=${JSON.stringify(filterObject.priceRange)}`);
 
-  console.log('dd', filterObject);
+  console.log('sortApiQuery: ', sortApiQuery ? sortApiQuery : '현재 쿼리 없음');
 
   const fetchProducts = async () => {
     try {
       let response;
       let sortFilterQuery = sortApiQuery;
 
-      response = await api.getProductList(sortFilterQuery);
-      setProducts(response.data.item);
+      // response = await api.getProductList(sortFilterQuery);
+      // const { item } = response.data;
+      // console.log(item);
+      // setProducts(response);
     } catch (error) {
       console.log('error', error);
     }
