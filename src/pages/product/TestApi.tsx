@@ -37,7 +37,6 @@ export default function TestApi() {
 
   // filtering query keyword check
   const filterQueryParams = (queryKey: string, filterName: string) => {
-    console.log('선택된 버튼: ', filterName);
     // 선택한 필터 버튼값 비교하여 객체로 반환하는 함수
     // price와 category API는 min, max 범위가 있기 때문.
     const getFilterRangeFromKeyword = (
@@ -112,7 +111,6 @@ export default function TestApi() {
       if (!paramsKey.length && !paramsValue.length) {
         // 필터값에 따른 쿼리 처리
         Object.entries(filterValue).forEach(([key, value]) => {
-          console.log(key, value);
           searchParams.set(`${key}`, `${value}`);
         });
         setSearchParams(searchParams);
@@ -124,8 +122,6 @@ export default function TestApi() {
       const clickedFilterValue = Object.values(filterValue).map((value) =>
         String(value),
       );
-
-      console.log('clickedFilterKey', clickedFilterKey);
 
       // 현재 페이지에 있는 쿼리 스트링의 key와 value가 클릭한 필터 값과 동일한지 확인
       const compareFilterAndQueryKeys = (selectedFilter, params) => {
@@ -166,6 +162,8 @@ export default function TestApi() {
         setSearchParams(searchParams);
       }
     }
+
+    console.log('❌ searchParams: ', Array.from(searchParams));
   };
 
   // filter button active 유지를 위한 함수
@@ -180,8 +178,11 @@ export default function TestApi() {
     }
   };
 
+  // TODO: 새로고침시 location 변경사항 감지에 대한 이슈 해결하기
   const loaction = useLocation().search;
   const [searchParamss] = useSearchParams(loaction);
+
+  console.log('⭕️ searchParamss: ', Array.from(searchParamss));
 
   const sortOption = searchParamss.get('sort');
   const category = searchParamss.get('category');
@@ -192,26 +193,47 @@ export default function TestApi() {
 
   let sortQuery = {};
   if (sortOption === 'latest') {
-    sortQuery.createdAt = -1;
+    sortQuery = {
+      ...sortQuery,
+      createdAt: -1,
+    };
   } else if (sortOption === 'oldest') {
-    sortQuery.createdAt = 1;
+    sortQuery = {
+      ...sortQuery,
+      createdAt: 1,
+    };
   } else if (sortOption === 'maxPrice') {
-    sortQuery.price = -1;
+    sortQuery = {
+      ...sortQuery,
+      price: -1,
+    };
   } else if (sortOption === 'minPrice') {
-    sortQuery.price = 1;
+    sortQuery = {
+      ...sortQuery,
+      price: 1,
+    };
   }
 
   let filterQuerys = {};
   if (category) {
-    filterQuerys.category = category;
+    filterQuerys = {
+      ...filterQuerys,
+      category: category,
+    };
   }
   if (minPrice && maxPrice) {
-    filterQuerys.minPrice = minPrice;
-    filterQuerys.maxPrice = maxPrice;
+    filterQuerys = {
+      ...filterQuerys,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+    };
   }
   if (minShippingFees && maxShippingFees) {
-    filterQuerys.minShippingFees = minShippingFees;
-    filterQuerys.maxShippingFees = maxShippingFees;
+    filterQuerys = {
+      ...filterQuerys,
+      minShippingFees: minShippingFees,
+      maxShippingFees: maxShippingFees,
+    };
   }
 
   // sort API 요청 쿼리 생성
@@ -223,10 +245,11 @@ export default function TestApi() {
   // filter API 요청 쿼리 생성
   const filterArray = Object.entries(filterQuerys);
 
-  const filterObject: {
-    'extra.category.1'?: string;
-    minPrice?: string;
-    maxPrice?: string;
+  let filterObject: {
+    category?: {
+      'extra.category.1'?: string;
+    };
+
     priceRange?: {
       minPrice?: string;
       maxPrice?: string;
@@ -237,37 +260,69 @@ export default function TestApi() {
     };
   } = {};
 
+  let categoryQuery = '';
+  let priceQuery = '';
+  let shippingFeeQuery = '';
+
   filterArray.forEach((entry: string) => {
     const [key, value] = entry;
 
-    if (key === 'category' && value !== 'all') {
-      filterObject[`extra.${key}.1`] = value;
+    if (key === 'category') {
+      filterObject = {
+        ...filterObject,
+        category: {
+          [`extra.${key}.1`]: value,
+        },
+      };
+      categoryQuery = `custom=${JSON.stringify(filterObject?.category)}`;
     } else if (key === 'minPrice' || key === 'maxPrice') {
-      if (!filterObject.priceRange) {
-        filterObject.priceRange = {};
-      }
-      filterObject.priceRange[key] = value;
+      filterObject = {
+        ...filterObject,
+        priceRange: {
+          ...filterObject.priceRange,
+          [key]: value,
+        },
+      };
+      priceQuery = `minPrice=${filterObject?.priceRange?.minPrice}&maxPrice=${filterObject?.priceRange?.maxPrice}`;
     } else if (key === 'minShippingFees' || key === 'maxShippingFees') {
-      if (!filterObject.shippingFeesRange) {
-        filterObject.shippingFeesRange = {};
-      }
-      filterObject.shippingFeesRange[key] = value;
+      filterObject = {
+        ...filterObject,
+        shippingFeesRange: {
+          ...filterObject.shippingFeesRange,
+          [key]: value,
+        },
+      };
+
+      shippingFeeQuery = `minShippingFees=${filterObject?.shippingFeesRange?.minShippingFees}&maxShippingFees=${filterObject?.shippingFeesRange?.maxShippingFees}`;
     }
   });
 
-  console.log(`custom=${JSON.stringify(filterObject.priceRange)}`);
+  let filterApiQuery = '';
 
-  console.log('sortApiQuery: ', sortApiQuery ? sortApiQuery : '현재 쿼리 없음');
+  if (categoryQuery) {
+    filterApiQuery += '&' + categoryQuery;
+  }
+
+  if (priceQuery) {
+    filterApiQuery += '&' + priceQuery;
+  }
+
+  if (shippingFeeQuery) {
+    filterApiQuery += '&' + shippingFeeQuery;
+  }
+
+  // 첫 번째 쿼리 뒤에는 &를 제거
+  filterApiQuery = filterApiQuery.slice(1);
 
   const fetchProducts = async () => {
     try {
       let response;
-      let sortFilterQuery = sortApiQuery;
+      let sortFilterQuery = `${sortApiQuery}${
+        sortApiQuery && filterApiQuery ? '&' : ''
+      }${filterApiQuery}`;
 
-      // response = await api.getProductList(sortFilterQuery);
-      // const { item } = response.data;
-      // console.log(item);
-      // setProducts(response);
+      response = await api.getProductList(sortFilterQuery);
+      setProducts(response.data.item);
     } catch (error) {
       console.log('error', error);
     }
@@ -307,7 +362,7 @@ export default function TestApi() {
         shippingFee: shippingFee,
       }));
     }
-  }, [searchParams]);
+  }, [searchParams, searchParamss]);
 
   return (
     <>
