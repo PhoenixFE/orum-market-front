@@ -14,7 +14,8 @@ import { IProduct } from '../../type';
 import { api } from '../../api/api';
 
 export default function TestApi() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const loaction = useLocation().search;
+  const [searchParams, setSearchParams] = useSearchParams(loaction);
   const [isSelectedSort, setIsSelectedSort] = useState('latest');
   const [isSelectedFilter, setIsSelectedFilter] = useState({
     category: 'all',
@@ -162,8 +163,6 @@ export default function TestApi() {
         setSearchParams(searchParams);
       }
     }
-
-    console.log('❌ searchParams: ', Array.from(searchParams));
   };
 
   // filter button active 유지를 위한 함수
@@ -178,18 +177,12 @@ export default function TestApi() {
     }
   };
 
-  // TODO: 새로고침시 location 변경사항 감지에 대한 이슈 해결하기
-  const loaction = useLocation().search;
-  const [searchParamss] = useSearchParams(loaction);
-
-  console.log('⭕️ searchParamss: ', Array.from(searchParamss));
-
-  const sortOption = searchParamss.get('sort');
-  const category = searchParamss.get('category');
-  const minPrice = searchParamss.get('minPrice');
-  const maxPrice = searchParamss.get('maxPrice');
-  const minShippingFees = searchParamss.get('minShippingFees');
-  const maxShippingFees = searchParamss.get('maxShippingFees');
+  const sortOption = searchParams.get('sort');
+  const category = searchParams.get('category');
+  const minPrice = searchParams.get('minPrice');
+  const maxPrice = searchParams.get('maxPrice');
+  const minShippingFees = searchParams.get('minShippingFees');
+  const maxShippingFees = searchParams.get('maxShippingFees');
 
   let sortQuery = {};
   if (sortOption === 'latest') {
@@ -362,7 +355,7 @@ export default function TestApi() {
         shippingFee: shippingFee,
       }));
     }
-  }, [searchParams, searchParamss]);
+  }, [searchParams]);
 
   return (
     <>
