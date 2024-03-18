@@ -31,7 +31,7 @@ export function SearchPage() {
     searchResult,
     'latest',
   ) as any;
-  const [sortQueryParams] = useQueryParams();
+  const [sortQueryParams, filterQueryParams] = useQueryParams();
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -131,7 +131,7 @@ export function SearchPage() {
               key="all"
               variant="text"
               color="inherit"
-              onClick={() => setSelectedCategory('all')}
+              onClick={() => filterQueryParams('category', 'all')}
               startIcon={
                 selectedCategory === 'all' ? (
                   <CheckBoxIcon />
@@ -150,7 +150,7 @@ export function SearchPage() {
                 key={category.id}
                 variant="text"
                 color="inherit"
-                onClick={() => setSelectedCategory(category.dbCode)}
+                onClick={() => filterQueryParams('category', category.dbCode)}
                 startIcon={
                   selectedCategory === category.dbCode ? (
                     <CheckBoxIcon />
@@ -184,7 +184,7 @@ export function SearchPage() {
                 key={price.id}
                 variant="text"
                 color="inherit"
-                onClick={() => setSelectedPrice(price.label)}
+                onClick={() => filterQueryParams('price', price.label)}
                 startIcon={
                   selectedPrice === price.label ? (
                     <CheckBoxIcon />
@@ -217,7 +217,7 @@ export function SearchPage() {
                 key={fee.label}
                 variant="text"
                 color="inherit"
-                onClick={() => setSelectedShippingFee(fee.value)}
+                onClick={() => filterQueryParams('shippingFee', fee.value)}
                 startIcon={
                   selectedShippingFee === fee.value ? (
                     <CheckBoxIcon />
