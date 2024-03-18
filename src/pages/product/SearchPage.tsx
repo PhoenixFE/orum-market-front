@@ -23,6 +23,7 @@ import {
 // import { useFetchProducts } from '../../hooks/useFetchProducts';   // TODO : reactQuery 작업
 import { ProductGrid } from '../../components/search/ProductGrid';
 import MobileNavBar from '../../components/navbar/MobileNavBar';
+import { useQueryParams } from '../../hooks/useQueryParams';
 
 export function SearchPage() {
   const { searchResult, setSearchResult } = useSearchStore();
@@ -30,6 +31,7 @@ export function SearchPage() {
     searchResult,
     'latest',
   ) as any;
+  const [sortQueryParams] = useQueryParams();
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -252,7 +254,7 @@ export function SearchPage() {
 
       <StickyNavbar
         totalProducts={filteredProducts.length}
-        handleSort={setCurrentSortOrder}
+        handleSort={sortQueryParams}
         handleDisplayChange={handleDisplayChange}
         handleToggel={toggleSidebar}
         isSidebarOpen={isSidebarOpen}

@@ -21,7 +21,7 @@ import CustomTooltip from '../CustomTooltip';
 interface INavigationBar {
   totalProducts: number;
   handleToggel: () => void;
-  handleSort: (value: string) => void;
+  handleSort: (key: string, value: string) => void;
   handleDisplayChange: (value: number) => void;
   isSidebarOpen: boolean;
 }
@@ -38,9 +38,9 @@ export default function NavigationBar({
   const theme = useTheme();
   const isMdDown = useMediaQuery(theme.breakpoints.down('md'));
 
-  const onSortChange = (sortValue: string) => {
+  const onSortChange = (queryKey: string, sortValue: string) => {
     setSelectedSortOrder(sortValue);
-    handleSort(sortValue);
+    handleSort(queryKey, sortValue);
   };
 
   const handleGridChange = (value: number) => {
@@ -79,7 +79,9 @@ export default function NavigationBar({
                 id="filter-select"
                 value={selectedSortOrder}
                 sx={{ fontSize: '0.9rem', borderRadius: 0 }}
-                onChange={(event) => onSortChange(event.target.value as string)}
+                onChange={(event) =>
+                  onSortChange('sort', event.target.value as string)
+                }
               >
                 {SORT_OPTIONS.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
@@ -96,7 +98,7 @@ export default function NavigationBar({
                 key={option.value}
                 value={option.value}
                 color="inherit"
-                onClick={() => onSortChange(option.value)}
+                onClick={() => onSortChange('sort', option.value)}
                 sx={{
                   fontWeight: isSortSelected(option.value) ? '700' : '300',
                 }}
