@@ -77,5 +77,5 @@ export const useQueryParams = () => {
     }
   };
 
-  return [sortQueryParams, filterQueryParams];
+  return [sortQueryParams, filterQueryParams, searchParams];
 };

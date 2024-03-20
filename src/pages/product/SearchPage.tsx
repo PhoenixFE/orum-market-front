@@ -24,6 +24,7 @@ import {
 import { ProductGrid } from '../../components/search/ProductGrid';
 import MobileNavBar from '../../components/navbar/MobileNavBar';
 import { useQueryParams } from '../../hooks/useQueryParams';
+import useSortFilter from '../../hooks/useSortFilter';
 
 export function SearchPage() {
   const { searchResult, setSearchResult } = useSearchStore();
@@ -31,13 +32,16 @@ export function SearchPage() {
     searchResult,
     'latest',
   ) as any;
-  const [sortQueryParams, filterQueryParams] = useQueryParams();
+  const [sortQueryParams, filterQueryParams, searchParams] = useQueryParams();
+  const [products] = useSortFilter(searchParams);
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPrice, setSelectedPrice] = useState('전체');
   const [selectedShippingFee, setSelectedShippingFee] = useState('전체');
   const [isDataFetched, setIsDataFetched] = useState(false);
+
+  console.log(products);
 
   const { addRecentViewProduct } = useRecentViewProductStore() as {
     addRecentViewProduct: Function;
