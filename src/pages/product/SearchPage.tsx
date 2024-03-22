@@ -11,15 +11,9 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { SearchSection } from '../../components/search/SearchSection';
 import { useSearchStore, useRecentViewProductStore } from '../../lib/store';
 import StickyNavbar from '../../components/navbar/NavigationBar';
-import { useSort } from '../../hooks/useSort';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { IProduct } from '../../type';
-import {
-  CATEGORY,
-  PRICE_BOUNDARIES,
-  PRICE_RANGE,
-  SHIPPING_FEE,
-} from '../../constants';
+import { CATEGORY, PRICE_RANGE, SHIPPING_FEE } from '../../constants';
 // import { useFetchProducts } from '../../hooks/useFetchProducts';   // TODO : reactQuery 작업
 import { ProductGrid } from '../../components/search/ProductGrid';
 import MobileNavBar from '../../components/navbar/MobileNavBar';
@@ -27,21 +21,16 @@ import { useQueryParams } from '../../hooks/useQueryParams';
 import useSortFilter from '../../hooks/useSortFilter';
 
 export function SearchPage() {
-  const { searchResult, setSearchResult } = useSearchStore();
-  const [sortedProducts, setCurrentSortOrder] = useSort(
-    searchResult,
-    'latest',
-  ) as any;
-  const [sortQueryParams, filterQueryParams, searchParams] = useQueryParams();
-  const [products] = useSortFilter(searchParams);
+  // const { searchResult, setSearchResult } = useSearchStore();
+
+  const [sortQueryParams, filterQueryParams] = useQueryParams();
+  const [products] = useSortFilter();
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPrice, setSelectedPrice] = useState('전체');
   const [selectedShippingFee, setSelectedShippingFee] = useState('전체');
   const [isDataFetched, setIsDataFetched] = useState(false);
-
-  console.log(products);
 
   const { addRecentViewProduct } = useRecentViewProductStore() as {
     addRecentViewProduct: Function;
@@ -58,37 +47,9 @@ export function SearchPage() {
   // TODO : reactQuery 작업
   // const productListQuery = {};
   // const { data, error, isLoading } = useFetchProducts(productListQuery);
-
-  useEffect(() => {
-    if (sortedProducts) {
-      setSearchResult(Array.isArray(sortedProducts) ? sortedProducts : []);
-      setIsDataFetched(true);
-    }
-  }, [setSearchResult]);
-
   const handleDisplayChange = (value: number) => {
     setItemsPerPage(value);
   };
-
-  const selectedPriceRange = PRICE_BOUNDARIES[selectedPrice];
-
-  const filteredProducts = sortedProducts.filter((product: IProduct) => {
-    const withinCategory =
-      selectedCategory === 'all' ||
-      product.extra?.category?.includes(selectedCategory);
-    const withinPriceRange =
-      product.price >= selectedPriceRange.min &&
-      product.price <= selectedPriceRange.max;
-    let withinShippingFee = true;
-
-    if (selectedShippingFee !== '전체') {
-      withinShippingFee =
-        (selectedShippingFee === '무료배송' && product.shippingFees === 0) ||
-        (selectedShippingFee === '유료배송' && product.shippingFees > 0);
-    }
-
-    return withinCategory && withinPriceRange && withinShippingFee;
-  });
 
   const resetFilters = () => {
     setSelectedCategory('all');
@@ -257,7 +218,7 @@ export function SearchPage() {
       ></Box>
 
       <StickyNavbar
-        totalProducts={filteredProducts.length}
+        totalProducts={products.length}
         handleSort={sortQueryParams}
         handleDisplayChange={handleDisplayChange}
         handleToggel={toggleSidebar}
@@ -277,7 +238,7 @@ export function SearchPage() {
             <ProductGrid
               // isLoading={isLoading}
               isDataFetched={isDataFetched}
-              filteredProducts={filteredProducts}
+              filteredProducts={products}
               itemsPerPage={itemsPerPage}
               handleSaveRecentlyViewed={handleSaveRecentlyViewed}
             />
