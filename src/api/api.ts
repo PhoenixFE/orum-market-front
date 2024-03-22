@@ -120,7 +120,7 @@ export const api = {
     axiosInstance.patch(`/users/${_id}`, userData),
 
   // 상품 목록 조회
-  getProductList: (query: IProductListQuery = {}) => {
+  getProductList: (query?: string) => {
     const queryString = new URLSearchParams(query as any).toString();
     const response = axiosInstance.get(`/products/?${queryString}`);
     return response;
