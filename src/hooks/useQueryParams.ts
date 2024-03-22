@@ -1,10 +1,8 @@
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import getFilterRangeFromKeyword from '../lib/getFilterRangeFromKeyword';
 
 export const useQueryParams = () => {
-  const location = useLocation();
-  const queryParams = location.search;
-  const [searchParams, setSearchParams] = useSearchParams(queryParams);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // sort query parameter
   const sortQueryParams = (queryKey: string, sortName: string) => {
@@ -77,5 +75,5 @@ export const useQueryParams = () => {
     }
   };
 
-  return [sortQueryParams, filterQueryParams, searchParams];
+  return [sortQueryParams, filterQueryParams];
 };
